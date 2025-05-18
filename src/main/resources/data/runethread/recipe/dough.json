@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "EME",
+    "MBM",
+    "MMM"
+  ],
+  "key": {
+    "E": {
+      "tag": "minecraft:spider_eye"
+    },
+    "M": {
+      "tag": "minecraft:rabbit"
+    },
+    "B": {
+      "tag": "minecraft:bone"
+    }
+  },
+  "result": {
+    "id": "runethread:dough",
+    "count": 1
+  }
+}
