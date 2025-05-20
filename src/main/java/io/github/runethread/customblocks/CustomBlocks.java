@@ -2,13 +2,12 @@ package io.github.runethread.customblocks;
 
 import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.craftingtable.Animator;
-import io.github.runethread.customblocks.craftingtable.ArcaneTable;
+import io.github.runethread.customblocks.craftingtable.ArcaneTableEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -22,7 +21,7 @@ public class CustomBlocks {
 
 
     public static final DeferredBlock<Block> ARCANE_TABLE_BLOCK = BLOCKS.registerBlock("arcane_table",
-            properties -> new ArcaneTable(properties.sound(SoundType.METAL)
+            properties -> new Block(properties.sound(SoundType.METAL)
                     .mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0f)));
     public static final DeferredItem<BlockItem> ARCANE_TABLE_ITEM = ITEMS.registerSimpleBlockItem("arcane_table", ARCANE_TABLE_BLOCK);
 

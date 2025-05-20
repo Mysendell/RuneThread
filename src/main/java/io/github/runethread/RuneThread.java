@@ -1,9 +1,21 @@
 package io.github.runethread;
 
+import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
 import io.github.runethread.customitems.CustomItems;
+import io.github.runethread.menus.ArcaneMenu;
+import io.github.runethread.menus.CustomMenus;
+import io.github.runethread.menus.screens.ArcaneScreen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 
@@ -34,8 +46,6 @@ public class RuneThread {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-
-
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> RUNE_THREAD_TAB =
@@ -53,6 +63,8 @@ public class RuneThread {
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
+        CustomMenus.MENUS.register(modEventBus);
+        CustomBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         NeoForge.EVENT_BUS.register(this);
 
     }
@@ -69,13 +81,9 @@ public class RuneThread {
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
         }
-    }
-
-    public static void registerRecipes(RegisterEvent event) {
-        if (event.getRegistryKey().equals(Registries.RECIPE_SERIALIZER)) {
-            event.register(Registries.RECIPE_SERIALIZER,
-                    new ResourceLocation("runethread", "arcane_crafting"),
-                    () -> ArcaneRecipeSerializer.INSTANCE);
+        @SubscribeEvent
+        public static void onRegisterScreens(RegisterMenuScreensEvent event) {
+            event.register(CustomMenus.ARCANE_MENU.get(), ArcaneScreen::new);
         }
-    }
+    } //ShapedRecipePattern#setCraftingSize(int width, int height)
 }

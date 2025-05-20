@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "runethread:arcane_shaped",
   "category": "misc",
   "pattern": [
     "EME",
@@ -18,7 +18,7 @@
     }
   },
   "result": {
-    "id": "runethread:dough",
+    "item": "runethread:dough",
     "count": 1
   }
 }
