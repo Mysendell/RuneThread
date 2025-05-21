@@ -26,18 +26,26 @@ import static io.github.runethread.customblocks.CustomBlockEntities.ARCANE_TABLE
 import static io.github.runethread.customblocks.CustomBlocks.ARCANE_TABLE_BLOCK;
 
 public class ArcaneTableEntity extends BlockEntity implements MenuProvider{
-    public static final ItemStackHandler inventory = new ItemStackHandler(9);
+    public final ItemStackHandler inventory = new ItemStackHandler(9);
 
     public ArcaneTableEntity(BlockPos pos, BlockState state) {
         super(ARCANE_TABLE.get(), pos, state);
+    }
+
+    public ItemStackHandler getInventory() {
+        return inventory;
     }
 
     public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof ArcaneTableEntity myBe) {
             return new SimpleMenuProvider(
-                    (windowId, inv, player) -> new ArcaneMenu(windowId, inv, new FriendlyByteBuf(Unpooled.buffer())),
-                    Component.translatable("container.magic_table")
+                    (windowId, inv, player) -> {
+                        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+                        buf.writeBlockPos(pos); // <-- write the position
+                        return new ArcaneMenu(windowId, inv, buf);
+                    },
+                    Component.translatable("container.arcane_table")
             );
         }
         return null;
@@ -50,11 +58,12 @@ public class ArcaneTableEntity extends BlockEntity implements MenuProvider{
 
     @Override
     public Component getDisplayName() {
-        return null;
+        return Component.translatable("container.arcane_table");
     }
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-        return null;
+        System.out.println("ArcaneTableEntity#createMenu called");
+        return new ArcaneMenu(containerId, playerInventory, this,ContainerLevelAccess.create(level, worldPosition));
     }
 }

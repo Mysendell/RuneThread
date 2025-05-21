@@ -16,7 +16,6 @@ public class CustomBlockEntities {
             BLOCK_ENTITY_TYPES.register("arcane_table",
                     () -> new BlockEntityType<>(
                             ArcaneTableEntity::new,
-                            CustomBlocks.ARCANE_TABLE_BLOCK.get(),
-                            null
+                            CustomBlocks.ARCANE_TABLE_BLOCK.get()
                     ));
 }

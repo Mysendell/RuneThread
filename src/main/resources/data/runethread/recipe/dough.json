@@ -1,24 +1,15 @@
 {
   "type": "runethread:arcane_shaped",
-  "category": "misc",
-  "pattern": [
-    "EME",
-    "MBM",
-    "MMM"
+  "width": 3,
+  "height": 3,
+  "ingredients": [
+    { "tag": "minecraft:spider_eye" }, { "tag": "minecraft:rabbit" }, { "tag": "minecraft:spider_eye" },
+    { "tag": "minecraft:rabbit" }, { "tag": "minecraft:bone" }, { "tag": "minecraft:rabbit" },
+    { "tag": "minecraft:rabbit" }, { "tag": "minecraft:rabbit" }, { "tag": "minecraft:rabbit" }
   ],
-  "key": {
-    "E": {
-      "tag": "minecraft:spider_eye"
-    },
-    "M": {
-      "tag": "minecraft:rabbit"
-    },
-    "B": {
-      "tag": "minecraft:bone"
-    }
-  },
   "result": {
     "item": "runethread:dough",
     "count": 1
-  }
+  },
+  "time": 100
 }

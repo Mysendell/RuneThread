@@ -2,6 +2,7 @@ package io.github.runethread.customblocks;
 
 import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.craftingtable.Animator;
+import io.github.runethread.customblocks.craftingtable.ArcaneTableBlock;
 import io.github.runethread.customblocks.craftingtable.ArcaneTableEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -21,7 +22,7 @@ public class CustomBlocks {
 
 
     public static final DeferredBlock<Block> ARCANE_TABLE_BLOCK = BLOCKS.registerBlock("arcane_table",
-            properties -> new Block(properties.sound(SoundType.METAL)
+            properties -> new ArcaneTableBlock(properties.sound(SoundType.METAL).noOcclusion()
                     .mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0f)));
     public static final DeferredItem<BlockItem> ARCANE_TABLE_ITEM = ITEMS.registerSimpleBlockItem("arcane_table", ARCANE_TABLE_BLOCK);
 

@@ -23,5 +23,4 @@ public class CustomRecipes {
 
     public static final Supplier<RecipeSerializer<ArcaneRecipeShaped>> MAGIC_RECIPE_SERIALIZER =
             RECIPE_SERIALIZERS.register("arcane_shaped", ArcaneRecipeSerializer::new);
-
 }
