@@ -6,6 +6,7 @@ import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.menus.ArcaneMenu;
 import io.github.runethread.menus.CustomMenus;
 import io.github.runethread.menus.screens.ArcaneScreen;
+import io.github.runethread.recipes.CustomRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
@@ -65,6 +66,8 @@ public class RuneThread {
         CREATIVE_MODE_TABS.register(modEventBus);
         CustomMenus.MENUS.register(modEventBus);
         CustomBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
+        CustomRecipes.RECIPE_TYPES.register(modEventBus);
+        CustomRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         NeoForge.EVENT_BUS.register(this);
 
     }

@@ -100,12 +100,12 @@ public class ArcaneRecipeShaped implements Recipe<CraftingInput> {
 
     @Override
     public RecipeSerializer<? extends Recipe<CraftingInput>> getSerializer() {
-        return CustomRecipes.MAGIC_RECIPE_SERIALIZER.get();
+        return CustomRecipes.ARCANE_RECIPE_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<? extends Recipe<CraftingInput>> getType() {
-        return CustomRecipes.MAGIC_RECIPE_TYPE.get();
+        return CustomRecipes.ARCANE_SHAPED.get();
     }
 
     @Override

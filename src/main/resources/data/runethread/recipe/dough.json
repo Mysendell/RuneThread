@@ -3,9 +3,9 @@
   "width": 3,
   "height": 3,
   "ingredients": [
-    { "tag": "minecraft:spider_eye" }, { "tag": "minecraft:rabbit" }, { "tag": "minecraft:spider_eye" },
-    { "tag": "minecraft:rabbit" }, { "tag": "minecraft:bone" }, { "tag": "minecraft:rabbit" },
-    { "tag": "minecraft:rabbit" }, { "tag": "minecraft:rabbit" }, { "tag": "minecraft:rabbit" }
+    { "item": "minecraft:spider_eye" }, { "item": "minecraft:rabbit" }, { "item": "minecraft:spider_eye" },
+    { "item": "minecraft:rabbit" }, { "item": "minecraft:bone" }, { "item": "minecraft:rabbit" },
+    { "item": "minecraft:rabbit" }, { "item": "minecraft:rabbit" }, { "item": "minecraft:rabbit" }
   ],
   "result": {
     "item": "runethread:dough",

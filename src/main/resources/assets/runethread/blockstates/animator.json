@@ -1,8 +1,6 @@
 {
   "variants": {
-    "lit": {
-      "true": { "model": "runethread:block/unlit" },
-      "false": { "model": "runethread:block/lit" }
-    }
+    "lit=true":  { "model": "runethread:block/animator/lit" },
+    "lit=false": { "model": "runethread:block/animator/unlit" }
   }
 }

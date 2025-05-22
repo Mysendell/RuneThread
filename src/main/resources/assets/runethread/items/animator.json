@@ -1,6 +1,6 @@
 {
   "model": {
-    "type": "minecraft:item",
-    "model": "runethread:item/animator"
+    "type": "minecraft:model",
+    "model": "runethread:block/animator"
   }
 }

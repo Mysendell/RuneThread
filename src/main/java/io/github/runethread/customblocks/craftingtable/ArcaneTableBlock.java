@@ -1,6 +1,7 @@
 package io.github.runethread.customblocks.craftingtable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +28,24 @@ public class ArcaneTableBlock extends Block implements EntityBlock {
             }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ArcaneTableEntity arcaneTable) {
+                System.out.println("Dropping ArcaneTable inventory at " + pos);
+                for (int i = 0; i < arcaneTable.getInventory().getSlots(); i++) {
+                    var stack = arcaneTable.getInventory().getStackInSlot(i);
+                    System.out.println("Slot " + i + ": " + stack);
+                    Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+                }
+            } else {
+                System.out.println("No ArcaneTableEntity at " + pos);
+            }
+            super.onRemove(state, level, pos, newState, isMoving);
+        }
     }
 
     @Override

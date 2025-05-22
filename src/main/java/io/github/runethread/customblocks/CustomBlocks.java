@@ -23,12 +23,12 @@ public class CustomBlocks {
 
     public static final DeferredBlock<Block> ARCANE_TABLE_BLOCK = BLOCKS.registerBlock("arcane_table",
             properties -> new ArcaneTableBlock(properties.sound(SoundType.METAL).noOcclusion()
-                    .mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0f)));
+                    .mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1.0f)));
     public static final DeferredItem<BlockItem> ARCANE_TABLE_ITEM = ITEMS.registerSimpleBlockItem("arcane_table", ARCANE_TABLE_BLOCK);
 
     public static final DeferredBlock<Block> ANIMATOR_BLOCK = BLOCKS.registerBlock("animator",
             properties -> new Animator(properties.mapColor(MapColor.COLOR_LIGHT_GRAY)
-                    .strength(20f).sound(SoundType.DEEPSLATE)));
+                    .strength(1f).sound(SoundType.DEEPSLATE)));
     public static final DeferredItem<BlockItem> ANIMATOR_ITEM = ITEMS.registerSimpleBlockItem("animator", ANIMATOR_BLOCK);
 
     public static void CreativeTabBlocks(CreativeModeTab.Output output) {
