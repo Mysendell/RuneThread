@@ -26,7 +26,7 @@ import static io.github.runethread.customblocks.CustomBlockEntities.ARCANE_TABLE
 import static io.github.runethread.customblocks.CustomBlocks.ARCANE_TABLE_BLOCK;
 
 public class ArcaneTableEntity extends BlockEntity implements MenuProvider{
-    public final ItemStackHandler inventory = new ItemStackHandler(9);
+    private final ItemStackHandler inventory = new ItemStackHandler(9);
 
     public ArcaneTableEntity(BlockPos pos, BlockState state) {
         super(ARCANE_TABLE.get(), pos, state);
@@ -36,26 +36,6 @@ public class ArcaneTableEntity extends BlockEntity implements MenuProvider{
         return inventory;
     }
 
-    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof ArcaneTableEntity myBe) {
-            return new SimpleMenuProvider(
-                    (windowId, inv, player) -> {
-                        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-                        buf.writeBlockPos(pos); // <-- write the position
-                        return new ArcaneMenu(windowId, inv, buf);
-                    },
-                    Component.translatable("container.arcane_table")
-            );
-        }
-        return null;
-    }
-
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        player.openMenu(getMenuProvider(state, level, pos));
-        return InteractionResult.SUCCESS;
-    }
-
     @Override
     public Component getDisplayName() {
         return Component.translatable("container.arcane_table");
@@ -63,7 +43,6 @@ public class ArcaneTableEntity extends BlockEntity implements MenuProvider{
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-        System.out.println("ArcaneTableEntity#createMenu called");
-        return new ArcaneMenu(containerId, playerInventory, this,ContainerLevelAccess.create(level, worldPosition));
+        return new ArcaneMenu(containerId, playerInventory, this);
     }
 }

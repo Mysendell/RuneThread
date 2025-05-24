@@ -43,8 +43,7 @@ public class PedestalBlock extends BaseEntityBlock {
         return CODEC;
     }
 
-    */
-/* BLOCK ENTITY *//*
+ BLOCK ENTITY
 
 
     @Override
@@ -81,4 +80,5 @@ public class PedestalBlock extends BaseEntityBlock {
 
         return InteractionResult.SUCCESS;
     }
-}*/
+}
+*/

@@ -3,9 +3,12 @@ package io.github.runethread.customblocks.craftingtable;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -17,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ArcaneTableBlock extends BaseEntityBlock {
@@ -43,12 +47,14 @@ public class ArcaneTableBlock extends BaseEntityBlock {
         return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
-    protected InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+
+    @Override
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         System.out.println("ArcaneTableBlock#use called");
-        if (!level.isClientSide) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ArcaneTableEntity arcaneTable) {
-                player.openMenu(arcaneTable);
+        if (level.getBlockEntity(pos) instanceof ArcaneTableEntity arcaneTableEntity) {
+            if (!level.isClientSide) {
+                ((ServerPlayer) player).openMenu(new SimpleMenuProvider(arcaneTableEntity, Component.literal("Arcane_Table")), pos);
+                return InteractionResult.SUCCESS;
             }
         }
         return InteractionResult.SUCCESS;

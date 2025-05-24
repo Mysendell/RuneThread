@@ -90,7 +90,7 @@ public class RuneThread {
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
         }
         @SubscribeEvent
-        public static void onRegisterScreens(RegisterMenuScreensEvent event) {
+        public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(CustomMenus.ARCANE_MENU.get(), ArcaneScreen::new);
         }
     } //ShapedRecipePattern#setCraftingSize(int width, int height)
