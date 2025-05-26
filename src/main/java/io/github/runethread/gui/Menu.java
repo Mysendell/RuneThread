@@ -1,4 +1,4 @@
-package io.github.runethread.menus;
+package io.github.runethread.gui;
 
 import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneCraftResultSlot;
 import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableEntity;
@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -15,54 +16,32 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
-import static io.github.runethread.menus.CustomMenus.ARCANE_MENU;
+import static io.github.runethread.gui.CustomMenus.ARCANE_MENU;
 
-public class ArcaneMenu extends AbstractContainerMenu {
-    private final ArcaneTableEntity blockEntity;
-    private final IItemHandler inventory;
-    private final Level level;
-    private final IItemHandler output;
-    private final Player player;
+public abstract class Menu<T extends BlockEntity> extends AbstractContainerMenu{
+    protected final T blockEntity;
+    protected final Level level;
+    protected final Player player;
 
-    // Client constructor: called with network data (buf) when opening the screen
-    public ArcaneMenu(int id, Inventory playerInv, FriendlyByteBuf buf) {
-        this(id, playerInv, playerInv.player.level().getBlockEntity(buf.readBlockPos()));
-    }
 
-    public ArcaneMenu(int id, Inventory playerInv, BlockEntity blockEntity) {
-        super(ARCANE_MENU.get(), id);
-        this.blockEntity = (ArcaneTableEntity) blockEntity;
-        this.inventory = ((ArcaneTableEntity) blockEntity).getInventory();
-        this.output  = ((ArcaneTableEntity) blockEntity).getOutput();
+    public Menu(int id, Inventory playerInv, BlockEntity blockEntity, MenuType<?> Menu) {
+        super(Menu, id);
+        this.blockEntity = (T) blockEntity;
         this.level = playerInv.player.level();
         this.player = playerInv.player;
-
-        // Add player inventory and hotbar
-        addPlayerInventory(playerInv);
-        addPlayerHotbar(playerInv);
-        // Add slots for the Arcane Table
-        addArcaneTableSlots();
     }
 
-    private void addArcaneTableSlots() {
-        this.addSlot(new ArcaneCraftResultSlot(blockEntity, player, level, 0, 124, 35));
-        for (int row = 0, row2=0; row < 3; row++, row2 += 3) {
-            for(int col = 0; col < 3; col++) {
-                this.addSlot(new SlotItemHandler(inventory, row2 + col, 30 + row * 18, 17 + col * 18));
-            }
-        }
-    }
-    private void addPlayerInventory(Inventory playerInv) {
+    protected void addPlayerInventory(Inventory playerInv, int startX, int startY, int spaceX, int spaceY) {
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
-                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+                this.addSlot(new Slot(playerInv, col + row * 9 + 9, startX + col * spaceX, startY + row * spaceY));
             }
         }
     }
 
-    private void addPlayerHotbar(Inventory playerInv) {
+    protected void addPlayerHotbar(Inventory playerInv, int startX, int startY, int spaceX) {
         for (int col = 0; col < 9; ++col) {
-            this.addSlot(new Slot(playerInv, col, 8 + col * 18, 142));
+            this.addSlot(new Slot(playerInv, col, startX + col * spaceX, startY));
         }
     }
 
@@ -119,7 +98,5 @@ public class ArcaneMenu extends AbstractContainerMenu {
         );
     }
 
-    public ResourceLocation getBackgroundTexture() {
-        return ResourceLocation.parse("runethread:textures/gui/arcane_table.png");
-    }
+    public abstract ResourceLocation getBackgroundTexture();
 }

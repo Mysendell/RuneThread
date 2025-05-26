@@ -1,6 +1,6 @@
 package io.github.runethread.customblocks.craftingtable.arcanetable;
 
-import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableEntity;
+import io.github.runethread.ItemStackHandlerContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;

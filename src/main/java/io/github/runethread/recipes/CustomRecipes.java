@@ -1,6 +1,8 @@
 package io.github.runethread.recipes;
 
 import io.github.runethread.RuneThread;
+import io.github.runethread.recipes.arcanetable.ArcaneRecipeSerializer;
+import io.github.runethread.recipes.arcanetable.ArcaneRecipeShaped;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;

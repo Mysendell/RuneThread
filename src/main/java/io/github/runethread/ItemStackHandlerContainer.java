@@ -1,4 +1,4 @@
-package io.github.runethread.customblocks.craftingtable.arcanetable;
+package io.github.runethread;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
