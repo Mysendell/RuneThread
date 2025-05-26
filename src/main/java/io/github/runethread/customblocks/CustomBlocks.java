@@ -2,8 +2,7 @@ package io.github.runethread.customblocks;
 
 import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.craftingtable.Animator;
-import io.github.runethread.customblocks.craftingtable.ArcaneTableBlock;
-import io.github.runethread.customblocks.craftingtable.ArcaneTableEntity;
+import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableBlock;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;

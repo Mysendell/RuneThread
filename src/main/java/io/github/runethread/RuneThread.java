@@ -2,27 +2,12 @@ package io.github.runethread;
 
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
-import io.github.runethread.customblocks.craftingtable.ArcaneTableBlock;
 import io.github.runethread.customitems.CustomItems;
-import io.github.runethread.menus.ArcaneMenu;
 import io.github.runethread.menus.CustomMenus;
 import io.github.runethread.menus.screens.ArcaneScreen;
 import io.github.runethread.recipes.CustomRecipes;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -66,13 +51,13 @@ public class RuneThread {
 
     public RuneThread(IEventBus modEventBus, ModContainer modContainer) {
 
+        CustomRecipes.RECIPE_TYPES.register(modEventBus);
+        CustomRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         CustomMenus.MENUS.register(modEventBus);
         CustomBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
-        CustomRecipes.RECIPE_TYPES.register(modEventBus);
-        CustomRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         NeoForge.EVENT_BUS.register(this);
 
     }

@@ -12,22 +12,22 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Function;
 
-public class ArcaneRecipeShaped implements Recipe<CraftingInput> {
-    private final @Nullable ResourceLocation id;
+public class ArcaneRecipeShaped implements Recipe<ArcaneRecipeShapedInput> {
+    private final ResourceLocation id;
     private final List<Ingredient> ingredients;
     private final ItemStack result;
-    private final int craftTime;
     private final int width, height;
+    private final int gridWidth = 3;
+    private final int gridHeight = 3;
+    private PlacementInfo placementInfo;
 
-    public ArcaneRecipeShaped(@Nullable ResourceLocation id, List<Ingredient> ingredients, ItemStack result, int craftTime, int width, int height) {
+    public ArcaneRecipeShaped(ResourceLocation id, List<Ingredient> ingredients, ItemStack result, int width, int height) {
         this.id = id;
         this.ingredients = ingredients;
         this.result = result;
-        this.craftTime = craftTime;
         this.width = width;
         this.height = height;
     }
-
     public int getWidth() {
         return width;
     }
@@ -53,15 +53,8 @@ public class ArcaneRecipeShaped implements Recipe<CraftingInput> {
         return result.copy();
     }
 
-    public int getCraftTime() {
-        return craftTime;
-    }
-
     @Override
-    public boolean matches(CraftingInput input, Level level) {
-        int gridWidth = (int) Math.sqrt(input.size()); // Only works for square grids, adapt as needed!
-        int gridHeight = gridWidth; // If not square, get height differently.
-
+    public boolean matches(ArcaneRecipeShapedInput input, Level level) {
         for (int xOffset = 0; xOffset <= gridWidth - width; ++xOffset) {
             for (int yOffset = 0; yOffset <= gridHeight - height; ++yOffset) {
                 if (matchesAt(input, xOffset, yOffset, gridWidth, gridHeight)) {
@@ -72,45 +65,41 @@ public class ArcaneRecipeShaped implements Recipe<CraftingInput> {
         return false;
     }
 
-    private boolean matchesAt(CraftingInput input, int xOffset, int yOffset, int gridWidth, int gridHeight) {
-        for (int x = 0; x < gridWidth; ++x) {
-            for (int y = 0; y < gridHeight; ++y) {
-                int subX = x - xOffset;
-                int subY = y - yOffset;
-                Ingredient expected = Ingredient.of(); // empty by default
-
-                if (subX >= 0 && subY >= 0 && subX < width && subY < height) {
-                    int idx = subX + subY * width;
-                    expected = ingredients.get(idx);
-                }
-
-                ItemStack inSlot = input.getItem(x + y * gridWidth);
-                if (!expected.test(inSlot)) {
-                    return false;
-                }
+    private boolean matchesAt(ArcaneRecipeShapedInput input, int xOffset, int yOffset, int gridWidth, int gridHeight) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int subX = x + xOffset;
+                int subY = y + yOffset;
+                if (subX >= gridWidth || subY >= gridHeight) return false;
+                int idx = subX + subY * gridWidth;
+                Ingredient expected = ingredients.get(x + y * width);
+                ItemStack inSlot = input.getItem(idx);
+                if (!expected.test(inSlot)) return false;
             }
         }
         return true;
     }
-
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(ArcaneRecipeShapedInput input, HolderLookup.Provider registries) {
         return result.copy();
     }
 
     @Override
-    public RecipeSerializer<? extends Recipe<CraftingInput>> getSerializer() {
+    public RecipeSerializer<? extends Recipe<ArcaneRecipeShapedInput>> getSerializer() {
         return CustomRecipes.ARCANE_RECIPE_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<? extends Recipe<CraftingInput>> getType() {
+    public RecipeType<? extends Recipe<ArcaneRecipeShapedInput>> getType() {
         return CustomRecipes.ARCANE_SHAPED.get();
     }
 
     @Override
     public PlacementInfo placementInfo() {
-        return null;
+        if (this.placementInfo == null) {
+            this.placementInfo = PlacementInfo.create(this.ingredients);
+        }
+        return this.placementInfo;
     }
 
     @Override

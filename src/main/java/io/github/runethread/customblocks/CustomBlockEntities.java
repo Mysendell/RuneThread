@@ -1,13 +1,11 @@
 package io.github.runethread.customblocks;
 
 import io.github.runethread.RuneThread;
-import io.github.runethread.customblocks.craftingtable.ArcaneTableEntity;
+import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableEntity;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 public class CustomBlockEntities {
@@ -15,6 +13,6 @@ public class CustomBlockEntities {
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, RuneThread.MODID);
 
     public static final Supplier<BlockEntityType<ArcaneTableEntity>> ARCANE_TABLE =
-            BLOCK_ENTITY_TYPES.register("pedestal_be", () -> new BlockEntityType<>(
+            BLOCK_ENTITY_TYPES.register("arcane_tablee", () -> new BlockEntityType<>(
                     ArcaneTableEntity::new, CustomBlocks.ARCANE_TABLE_BLOCK.get()));
 }

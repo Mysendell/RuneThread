@@ -1,4 +1,4 @@
-package io.github.runethread.customblocks.craftingtable;
+package io.github.runethread.customblocks.craftingtable.arcanetable;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -6,15 +6,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -50,10 +49,9 @@ public class ArcaneTableBlock extends BaseEntityBlock {
 
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        System.out.println("ArcaneTableBlock#use called");
         if (level.getBlockEntity(pos) instanceof ArcaneTableEntity arcaneTableEntity) {
             if (!level.isClientSide) {
-                ((ServerPlayer) player).openMenu(new SimpleMenuProvider(arcaneTableEntity, Component.literal("Arcane_Table")), pos);
+                ((ServerPlayer) player).openMenu(new SimpleMenuProvider(arcaneTableEntity, Component.literal("Arcane Table")), pos);
                 return InteractionResult.SUCCESS;
             }
         }
@@ -64,11 +62,11 @@ public class ArcaneTableBlock extends BaseEntityBlock {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(this));
             if (be instanceof ArcaneTableEntity arcaneTable) {
                 System.out.println("Dropping ArcaneTable inventory at " + pos);
                 for (int i = 0; i < arcaneTable.getInventory().getSlots(); i++) {
                     var stack = arcaneTable.getInventory().getStackInSlot(i);
-                    System.out.println("Slot " + i + ": " + stack);
                     Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
                 }
             } else {

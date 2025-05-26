@@ -15,12 +15,6 @@ public class ArcaneScreen extends AbstractContainerScreen<ArcaneMenu> {
 
     public ArcaneScreen(ArcaneMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        this.imageWidth = 331;
-        this.imageHeight = 351;
-        this.titleLabelX = 8;
-        this.titleLabelY = 6;
-        this.inventoryLabelX = 8;
-        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
@@ -28,7 +22,7 @@ public class ArcaneScreen extends AbstractContainerScreen<ArcaneMenu> {
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
 
-        guiGraphics.blit(RenderType.GUI_TEXTURED, GUI_TEXTURE, x, y, 0, 0, imageWidth, imageHeight, 352, 332);
+        guiGraphics.blit(RenderType.GUI_TEXTURED, GUI_TEXTURE, x, y, 0, 0, imageWidth, imageHeight, 256, 256);
     }
 
     @Override

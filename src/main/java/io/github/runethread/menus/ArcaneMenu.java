@@ -1,21 +1,19 @@
 package io.github.runethread.menus;
 
-import io.github.runethread.customblocks.craftingtable.ArcaneTableEntity;
-import net.minecraft.core.BlockPos;
+import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneCraftResultSlot;
+import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
-import org.jetbrains.annotations.Nullable;
 
 import static io.github.runethread.menus.CustomMenus.ARCANE_MENU;
 
@@ -23,6 +21,8 @@ public class ArcaneMenu extends AbstractContainerMenu {
     private final ArcaneTableEntity blockEntity;
     private final IItemHandler inventory;
     private final Level level;
+    private final IItemHandler output;
+    private final Player player;
 
     // Client constructor: called with network data (buf) when opening the screen
     public ArcaneMenu(int id, Inventory playerInv, FriendlyByteBuf buf) {
@@ -33,7 +33,9 @@ public class ArcaneMenu extends AbstractContainerMenu {
         super(ARCANE_MENU.get(), id);
         this.blockEntity = (ArcaneTableEntity) blockEntity;
         this.inventory = ((ArcaneTableEntity) blockEntity).getInventory();
+        this.output  = ((ArcaneTableEntity) blockEntity).getOutput();
         this.level = playerInv.player.level();
+        this.player = playerInv.player;
 
         // Add player inventory and hotbar
         addPlayerInventory(playerInv);
@@ -43,28 +45,28 @@ public class ArcaneMenu extends AbstractContainerMenu {
     }
 
     private void addArcaneTableSlots() {
-        for (int row = 0; row < 3; row++) {
+        this.addSlot(new ArcaneCraftResultSlot(blockEntity, player, level, 0, 124, 35));
+        for (int row = 0, row2=0; row < 3; row++, row2 += 3) {
             for(int col = 0; col < 3; col++) {
-                this.addSlot(new SlotItemHandler(this.blockEntity.getInventory(), row + col, 60 + row * 36, 34 + col * 36));
+                this.addSlot(new SlotItemHandler(inventory, row2 + col, 30 + row * 18, 17 + col * 18));
             }
         }
     }
-
     private void addPlayerInventory(Inventory playerInv) {
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
-                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 16 + col * 36, 168 + row * 36));
+                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
             }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInv) {
         for (int col = 0; col < 9; ++col) {
-            this.addSlot(new Slot(playerInv, col, 16 + col * 36, 284));
+            this.addSlot(new Slot(playerInv, col, 8 + col * 18, 142));
         }
     }
 
-
+    // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
     private static final int HOTBAR_SLOT_COUNT = 9;
     private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
     private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
