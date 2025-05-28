@@ -39,8 +39,14 @@ public class ArcaneTableEntity extends CraftingEntity {
 
     @Override
     protected Optional<RecipeHolder<CraftingRecipe>> getRecipeOpt(Level level, CraftingInput input) {
-        return level.getServer().getRecipeManager()
+        Optional<RecipeHolder<CraftingRecipe>> shaped = level.getServer().getRecipeManager()
                 .getRecipeFor(CustomRecipes.ARCANE_SHAPED.get(), input, level);
+        if (shaped.isPresent())
+            return shaped;
+
+        Optional<RecipeHolder<CraftingRecipe>> shapeless = level.getServer().getRecipeManager()
+                .getRecipeFor(CustomRecipes.ARCANE_SHAPELESS.get(), input, level);
+        return shapeless;
     }
 
     public static void tick(Level level, BlockPos blockPos, BlockState blockState, ArcaneTableEntity entity) {

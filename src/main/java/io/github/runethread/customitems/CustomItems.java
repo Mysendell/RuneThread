@@ -16,9 +16,12 @@ public class CustomItems {
     public static final DeferredItem<Item> DOUGH_ITEM = ITEMS.registerSimpleItem("dough",
             new Item.Properties().food(new FoodProperties.Builder().alwaysEdible()
                     .nutrition(1).saturationModifier(0.5f).build()));
+    public static final DeferredItem<Item> CAKE = ITEMS.registerSimpleItem("cake",
+            new Item.Properties().food(new FoodProperties.Builder().alwaysEdible().nutrition(1).saturationModifier(1f).build()));
 
     public static void CreativeTabItems(CreativeModeTab.Output output){
         output.accept(new ItemStack(HAMPTER_ITEM.get()));
         output.accept(new ItemStack(DOUGH_ITEM.get()));
+        output.accept(new ItemStack(CAKE.get()));
     }
 }

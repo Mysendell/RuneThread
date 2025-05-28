@@ -3,6 +3,7 @@ package io.github.runethread.recipes;
 import io.github.runethread.RuneThread;
 import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeSerializer;
 import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeShaped;
+import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeShapeless;
 import io.github.runethread.recipes.smelting.Philosophal;
 import io.github.runethread.recipes.smelting.PhilosophalSerializer;
 import io.github.runethread.recipes.smelting.Smelting;
@@ -29,9 +30,18 @@ public class CustomRecipes {
                     name -> new RecipeType<CraftingRecipe>() {
                         @Override public String toString() { return name.toString(); }
                     });
+    
+    public static final Supplier<RecipeType<CraftingRecipe>> ARCANE_SHAPELESS =
+            RECIPE_TYPES.register("arcane_shapeless",
+                    name -> new RecipeType<CraftingRecipe>() {
+                        @Override public String toString() { return name.toString(); }
+                    });
 
-    public static final Supplier<RecipeSerializer<ArcaneRecipeShaped>> ARCANE_RECIPE_SERIALIZER =
-            RECIPE_SERIALIZERS.register("arcane_shaped", ArcaneRecipeSerializer::new);
+    public static final Supplier<RecipeSerializer<ArcaneRecipeShaped>> ARCANE_SHAPED_SERIALIZER =
+            RECIPE_SERIALIZERS.register("arcane_shaped", () -> new ArcaneRecipeSerializer<>(ArcaneRecipeShaped::new));
+
+    public static final Supplier<RecipeSerializer<ArcaneRecipeShapeless>> ARCANE_SHAPELESS_SERIALIZER =
+            RECIPE_SERIALIZERS.register("arcane_shapeless", () -> new ArcaneRecipeSerializer<>(ArcaneRecipeShapeless::new));
 
     public static final Supplier<RecipeType<CraftingRecipe>> SMELTING =
             RECIPE_TYPES.register("smelting",

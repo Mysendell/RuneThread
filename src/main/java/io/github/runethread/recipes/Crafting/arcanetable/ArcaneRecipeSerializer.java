@@ -3,36 +3,47 @@ package io.github.runethread.recipes.Crafting.arcanetable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.runethread.recipes.Crafting.Recipe;
 import io.github.runethread.recipes.RecipeResult;
-import io.github.runethread.recipes.smelting.Philosophal;
-import io.github.runethread.recipes.smelting.animator.AnimatorRecipe;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
-public class ArcaneRecipeSerializer implements RecipeSerializer<ArcaneRecipeShaped> {
-    public static final MapCodec<ArcaneRecipeShaped> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(ArcaneRecipeShaped::getIngredients),
-            RecipeResult.CODEC.listOf().fieldOf("results").forGetter(ArcaneRecipeShaped::getResultStack),
-            Codec.INT.fieldOf("width").forGetter(ArcaneRecipeShaped::getWidth),
-            Codec.INT.fieldOf("height").forGetter(ArcaneRecipeShaped::getHeight)
-    ).apply(inst, ArcaneRecipeShaped::new));
+import java.util.List;
+import java.util.function.BiFunction;
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ArcaneRecipeShaped> STREAM_CODEC =
-            StreamCodec.composite(
-                    ByteBufCodecs.<RegistryFriendlyByteBuf, Ingredient>list().apply(Ingredient.CONTENTS_STREAM_CODEC), ArcaneRecipeShaped::getIngredients,
-                    ByteBufCodecs.<RegistryFriendlyByteBuf, RecipeResult>list().apply(RecipeResult.STREAM_CODEC), ArcaneRecipeShaped::getResultStack,
-                    ByteBufCodecs.INT, ArcaneRecipeShaped::getWidth,
-                    ByteBufCodecs.INT, ArcaneRecipeShaped::getHeight,
-                    ArcaneRecipeShaped::new
-            );
-    @Override
-    public MapCodec<ArcaneRecipeShaped> codec() { return CODEC; }
+public class ArcaneRecipeSerializer<T extends Recipe> implements RecipeSerializer<T> {
+    private final MapCodec<T> codec;
+    private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
+
+    public ArcaneRecipeSerializer(RecipeFactory<T> factory) {
+        // Construct the CODEC and STREAM_CODEC using the factory
+        this.codec = RecordCodecBuilder.mapCodec(inst -> inst.group(
+                Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(Recipe::getIngredients),
+                RecipeResult.CODEC.listOf().fieldOf("results").forGetter(Recipe::getResultStack),
+                Codec.INT.fieldOf("width").forGetter(Recipe::getWidth),
+                Codec.INT.fieldOf("height").forGetter(Recipe::getHeight)
+        ).apply(inst, factory::create));
+
+        this.streamCodec = StreamCodec.composite(
+                ByteBufCodecs.<RegistryFriendlyByteBuf, Ingredient>list().apply(Ingredient.CONTENTS_STREAM_CODEC), Recipe::getIngredients,
+                ByteBufCodecs.<RegistryFriendlyByteBuf, RecipeResult>list().apply(RecipeResult.STREAM_CODEC), Recipe::getResultStack,
+                ByteBufCodecs.INT, Recipe::getWidth,
+                ByteBufCodecs.INT, Recipe::getHeight,
+                factory::create
+        );
+    }
 
     @Override
-    public StreamCodec<RegistryFriendlyByteBuf, ArcaneRecipeShaped> streamCodec() { return STREAM_CODEC; }
+    public MapCodec<T> codec() { return codec; }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() { return streamCodec; }
+
+    // Factory for constructing recipe instances
+    public interface RecipeFactory<T> {
+        T create(List<Ingredient> ingredients, List<RecipeResult> results, int width, int height);
+    }
 }
