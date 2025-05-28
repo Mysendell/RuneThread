@@ -1,6 +1,7 @@
 package io.github.runethread.gui;
 
 import io.github.runethread.RuneThread;
+import io.github.runethread.gui.menus.AnimatorMenu;
 import io.github.runethread.gui.menus.ArcaneMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -21,4 +22,7 @@ public class CustomMenus {
 
     public static final DeferredHolder<MenuType<?>, MenuType<ArcaneMenu>> ARCANE_MENU =
             registerMenuType("arcane_menu", ArcaneMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<AnimatorMenu>> ANIMATOR_MENU =
+            registerMenuType("animator_menu", AnimatorMenu::new);
 }

@@ -5,8 +5,10 @@ import io.github.runethread.customblocks.CustomBlocks;
 import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.gui.CustomMenus;
 import io.github.runethread.gui.screens.ArcaneScreen;
+import io.github.runethread.gui.screens.AnimatorScreen;
 import io.github.runethread.recipes.CustomRecipes;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import org.slf4j.Logger;
 
@@ -33,6 +35,10 @@ import static io.github.runethread.customitems.CustomItems.ITEMS;
 
 @Mod(RuneThread.MODID)
 public class RuneThread {
+/*
+    public static final RecipeBookCategory ARCANE_CATEGORY = RecipeBookCategory.create("arcane");
+*/
+
     public static final String MODID = "runethread";
 
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -49,8 +55,14 @@ public class RuneThread {
                     })
                     .build());
 
-    public RuneThread(IEventBus modEventBus, ModContainer modContainer) {
+    /*public void registerRecipeBookCategory() {
+        RecipeBookRegistry.registerBookCategory(ARCANE_CATEGORY,
+                new ItemStack(HAMPTER_ITEM.get()), // icon
+                Component.translatable("gui.runethread.arcane_category") // name
+        );
+    }*/
 
+    public RuneThread(IEventBus modEventBus, ModContainer modContainer) {
         CustomRecipes.RECIPE_TYPES.register(modEventBus);
         CustomRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         BLOCKS.register(modEventBus);
@@ -59,7 +71,6 @@ public class RuneThread {
         CustomMenus.MENUS.register(modEventBus);
         CustomBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         NeoForge.EVENT_BUS.register(this);
-
     }
 
     @SubscribeEvent
@@ -77,6 +88,7 @@ public class RuneThread {
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(CustomMenus.ARCANE_MENU.get(), ArcaneScreen::new);
+            event.register(CustomMenus.ANIMATOR_MENU.get(), AnimatorScreen::new);
         }
     } //ShapedRecipePattern#setCraftingSize(int width, int height)
 }

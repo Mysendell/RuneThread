@@ -1,5 +1,4 @@
 {
-  "id": "runethread:dough",
   "type": "runethread:arcane_shaped",
   "width": 3,
   "height": 3,
@@ -14,8 +13,10 @@
     "minecraft:rabbit",
     "minecraft:rabbit"
   ],
-  "result": {
-    "id": "runethread:dough",
-    "count": 1
-  }
+  "results": [
+    {
+      "item": "runethread:dough",
+      "count": 3
+    }
+  ]
 }

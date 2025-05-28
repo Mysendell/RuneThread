@@ -1,9 +1,16 @@
 package io.github.runethread.recipes;
 
 import io.github.runethread.RuneThread;
-import io.github.runethread.recipes.arcanetable.ArcaneRecipeSerializer;
-import io.github.runethread.recipes.arcanetable.ArcaneRecipeShaped;
+import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeSerializer;
+import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeShaped;
+import io.github.runethread.recipes.smelting.Philosophal;
+import io.github.runethread.recipes.smelting.PhilosophalSerializer;
+import io.github.runethread.recipes.smelting.Smelting;
+import io.github.runethread.recipes.smelting.SmeltingSerializer;
+import io.github.runethread.recipes.smelting.animator.AnimatorRecipe;
+import io.github.runethread.recipes.smelting.animator.AnimatorSerializer;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -14,15 +21,40 @@ public class CustomRecipes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES =
             DeferredRegister.create(Registries.RECIPE_TYPE, RuneThread.MODID);
 
-    public static final Supplier<RecipeType<ArcaneRecipeShaped>> ARCANE_SHAPED =
-            RECIPE_TYPES.register("arcane_shaped",
-                    name -> new RecipeType<ArcaneRecipeShaped>() {
-                        @Override public String toString() { return name.toString(); }
-                    });
-
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, RuneThread.MODID);
 
+    public static final Supplier<RecipeType<CraftingRecipe>> ARCANE_SHAPED =
+            RECIPE_TYPES.register("arcane_shaped",
+                    name -> new RecipeType<CraftingRecipe>() {
+                        @Override public String toString() { return name.toString(); }
+                    });
+
     public static final Supplier<RecipeSerializer<ArcaneRecipeShaped>> ARCANE_RECIPE_SERIALIZER =
             RECIPE_SERIALIZERS.register("arcane_shaped", ArcaneRecipeSerializer::new);
+
+    public static final Supplier<RecipeType<CraftingRecipe>> SMELTING =
+            RECIPE_TYPES.register("smelting",
+                    name -> new RecipeType<>() {
+                        @Override public String toString() { return name.toString(); }
+                    });
+    public static final Supplier<RecipeSerializer<Smelting>> SMELTING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("smelting", SmeltingSerializer::new);
+
+    public static final Supplier<RecipeType<CraftingRecipe>> PHILOSOPHAL =
+            RECIPE_TYPES.register("philosophal",
+                    name -> new RecipeType<>() {
+                        @Override public String toString() { return name.toString(); }
+                    });
+    public static final Supplier<RecipeSerializer<Philosophal>> PHILOSOPHAL_SERIALIZER =
+            RECIPE_SERIALIZERS.register("philosophal", PhilosophalSerializer::new);
+
+    public static final Supplier<RecipeType<CraftingRecipe>> ANIMATOR_RECIPE =
+            RECIPE_TYPES.register("animator",
+                    name -> new RecipeType<>() {
+                        @Override public String toString() { return name.toString(); }
+                    });
+    public static final Supplier<RecipeSerializer<AnimatorRecipe>> ANIMATOR_SERIALIZER =
+            RECIPE_SERIALIZERS.register("animator", AnimatorSerializer::new);
+
 }

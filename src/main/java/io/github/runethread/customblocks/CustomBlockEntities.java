@@ -1,6 +1,7 @@
 package io.github.runethread.customblocks;
 
 import io.github.runethread.RuneThread;
+import io.github.runethread.customblocks.craftingtable.animator.AnimatorEntity;
 import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableEntity;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.minecraft.core.registries.Registries;
@@ -15,4 +16,8 @@ public class CustomBlockEntities {
     public static final Supplier<BlockEntityType<ArcaneTableEntity>> ARCANE_TABLE =
             BLOCK_ENTITY_TYPES.register("arcane_tablee", () -> new BlockEntityType<>(
                     ArcaneTableEntity::new, CustomBlocks.ARCANE_TABLE_BLOCK.get()));
+
+    public static final Supplier<BlockEntityType<AnimatorEntity>> ANIMATOR =
+            BLOCK_ENTITY_TYPES.register("animator", () -> new BlockEntityType<>(
+                    AnimatorEntity::new, CustomBlocks.ANIMATOR_BLOCK.get()));
 }

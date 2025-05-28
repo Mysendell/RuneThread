@@ -1,8 +1,11 @@
-package io.github.runethread.recipes.arcanetable;
+package io.github.runethread.recipes.Crafting.arcanetable;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.runethread.recipes.RecipeResult;
+import io.github.runethread.recipes.smelting.Philosophal;
+import io.github.runethread.recipes.smelting.animator.AnimatorRecipe;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,18 +16,16 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 
 public class ArcaneRecipeSerializer implements RecipeSerializer<ArcaneRecipeShaped> {
     public static final MapCodec<ArcaneRecipeShaped> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            ResourceLocation.CODEC.fieldOf("id").forGetter(ArcaneRecipeShaped::getId),
             Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(ArcaneRecipeShaped::getIngredients),
-            ItemStack.CODEC.fieldOf("result").forGetter(ArcaneRecipeShaped::getResult),
+            RecipeResult.CODEC.listOf().fieldOf("results").forGetter(ArcaneRecipeShaped::getResultStack),
             Codec.INT.fieldOf("width").forGetter(ArcaneRecipeShaped::getWidth),
             Codec.INT.fieldOf("height").forGetter(ArcaneRecipeShaped::getHeight)
     ).apply(inst, ArcaneRecipeShaped::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ArcaneRecipeShaped> STREAM_CODEC =
             StreamCodec.composite(
-                    ResourceLocation.STREAM_CODEC, ArcaneRecipeShaped::getId,
                     ByteBufCodecs.<RegistryFriendlyByteBuf, Ingredient>list().apply(Ingredient.CONTENTS_STREAM_CODEC), ArcaneRecipeShaped::getIngredients,
-                    ItemStack.STREAM_CODEC, ArcaneRecipeShaped::getResult,
+                    ByteBufCodecs.<RegistryFriendlyByteBuf, RecipeResult>list().apply(RecipeResult.STREAM_CODEC), ArcaneRecipeShaped::getResultStack,
                     ByteBufCodecs.INT, ArcaneRecipeShaped::getWidth,
                     ByteBufCodecs.INT, ArcaneRecipeShaped::getHeight,
                     ArcaneRecipeShaped::new

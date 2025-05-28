@@ -1,17 +1,18 @@
-package io.github.runethread.customblocks.craftingtable.arcanetable;
+package io.github.runethread.recipes;
 
 import io.github.runethread.ItemStackHandlerContainer;
+import io.github.runethread.customblocks.craftingtable.FurnaceEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class ArcaneCraftResultSlot extends Slot {
-    private final ArcaneTableEntity blockEntity;
+public class FurnaceOutputSlot<J extends FurnaceEntity> extends Slot {
+    private final J blockEntity;
     private final Level level;
     private final Player player;
 
-    public ArcaneCraftResultSlot(ArcaneTableEntity blockEntity, Player player, Level level, int slotIndex, int x, int y) {
+    public FurnaceOutputSlot(J blockEntity, Player player, Level level, int slotIndex, int x, int y) {
         super(new ItemStackHandlerContainer(blockEntity.getOutput()), slotIndex, x, y);
         this.blockEntity = blockEntity;
         this.level = level;
@@ -21,17 +22,5 @@ public class ArcaneCraftResultSlot extends Slot {
     @Override
     public boolean mayPlace(ItemStack stack) {
         return false; // Prevent placing items in output
-    }
-
-    @Override
-    public void onTake(Player player, ItemStack stack) {
-        blockEntity.doCraft(level);
-        super.onTake(player, stack);
-    }
-
-    @Override
-    public void onQuickCraft(ItemStack stack, int amount) {
-        blockEntity.doCraftShift(level, player);
-        super.onQuickCraft(stack, amount);
     }
 }

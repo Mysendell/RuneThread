@@ -27,6 +27,11 @@ public class Screen<T extends AbstractContainerMenu> extends AbstractContainerSc
         int y = (height - imageHeight) / 2;
 
         guiGraphics.blit(RenderType.GUI_TEXTURED, GUI_TEXTURE, x, y, offsetX, offsetY, imageWidth, imageHeight, textureWidth, textureHeight);
+        drawExtras(guiGraphics, pMouseX, pMouseY);
+    }
+
+    protected void drawExtras(GuiGraphics guiGraphics, int mouseX, int mouseY){
+        // Override this method in subclasses to draw additional elements
     }
 
     @Override

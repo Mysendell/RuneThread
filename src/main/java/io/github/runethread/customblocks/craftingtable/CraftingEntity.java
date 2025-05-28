@@ -1,11 +1,15 @@
 package io.github.runethread.customblocks.craftingtable;
 
-import io.github.runethread.recipes.Recipe;
-import io.github.runethread.recipes.RecipeInput;
+import io.github.runethread.recipes.Crafting.RecipeShaped;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -18,18 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class CraftingEntity<T extends RecipeInput, J extends Recipe<T>> extends BlockEntity implements MenuProvider {
-    protected final ItemStackHandler inventory = new ItemStackHandler(9) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            super.onContentsChanged(slot);
-            if (!level.isClientSide()) {
-                tryCraft(level);
-            }
-        }
-    };
+public abstract class CraftingEntity extends BlockEntity implements MenuProvider {
     protected final ItemStackHandler output = new ItemStackHandler(1);
     protected final int width = 3, height = 3;
+    protected ItemStackHandler inventory = new ItemStackHandler(width * height);
+    private boolean needsCraftingUpdate = false;
 
     public CraftingEntity(BlockEntityType<?> blockEntity, BlockPos pos, BlockState state) {
         super(blockEntity, pos, state);
@@ -45,12 +42,12 @@ public abstract class CraftingEntity<T extends RecipeInput, J extends Recipe<T>>
 
     public void tryCraft(Level level) {
         List<ItemStack> items = getCraftingItems();
-        T input = (T) getRecipeInput(items);
+        CraftingInput input = getRecipeInput(items);
 
-        Optional<RecipeHolder<J>> recipeOpt = getRecipeOpt(level, input);
+        Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, input);
 
         if (recipeOpt.isPresent()) {
-            J recipe = recipeOpt.get().value();
+            CraftingRecipe recipe = recipeOpt.get().value();
             ItemStack result = recipe.assemble(input, level.registryAccess());
             output.setStackInSlot(0, result.copy());
         } else {
@@ -58,15 +55,17 @@ public abstract class CraftingEntity<T extends RecipeInput, J extends Recipe<T>>
         }
     }
 
-    protected abstract Optional<RecipeHolder<J>> getRecipeOpt(Level level, T input);
+    protected abstract Optional<RecipeHolder<CraftingRecipe>> getRecipeOpt(Level level, CraftingInput input);
 
-    protected abstract T getRecipeInput(List<ItemStack> items);
+    protected CraftingInput getRecipeInput(List<ItemStack> items) {
+        return CraftingInput.of(width, height, items);
+    }
 
     protected List<ItemStack> getCraftingItems() {
-        List<ItemStack> items = new ArrayList<>(9);
+        List<ItemStack> items = new ArrayList<>(width * height);
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
-                int idx = col * height + row;
+                int idx = row * width + col;
                 items.add(inventory.getStackInSlot(idx));
             }
         }
@@ -76,9 +75,7 @@ public abstract class CraftingEntity<T extends RecipeInput, J extends Recipe<T>>
     public boolean doCraft(Level level) {
         if (level.isClientSide) return false;
         for (int i = 0; i < width * height; i++) {
-            ItemStack stack = inventory.getStackInSlot(i);
-            stack.shrink(1);
-            inventory.setStackInSlot(i, stack);
+            inventory.extractItem(i, 1, false);
         }
         output.setStackInSlot(0, ItemStack.EMPTY);
         tryCraft(level);
@@ -93,36 +90,17 @@ public abstract class CraftingEntity<T extends RecipeInput, J extends Recipe<T>>
         List<ItemStack> items;
 
         while (true) {
-            items = new ArrayList<>(9);
-            for (int row = 0; row < height; row++) {
-                for (int col = 0; col < width; col++) {
-                    int idx = col * height + row;
-                    items.add(inventory.getStackInSlot(idx));
-                }
-            }
-            T input = (T) getRecipeInput(items);
-            Optional<RecipeHolder<J>> recipeOpt = getRecipeOpt(level, input);
+            items = getCraftingItems();
+            CraftingInput input = getRecipeInput(items);
+            Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, input);
             if (recipeOpt.isEmpty()) break;
 
-            J recipe = recipeOpt.get().value();
+            RecipeShaped recipe = (RecipeShaped) recipeOpt.get().value();
             boolean canCraft = true;
-            for (int i = 0; i < recipe.getIngredients().size(); i++) {
-                Ingredient ing = recipe.getIngredients().get(i);
-                ItemStack stack = inventory.getStackInSlot(i);
-                if (!ing.isEmpty() && (!ing.test(stack) || stack.getCount() < 1)) {
-                    canCraft = false;
-                    break;
-                }
-            }
             if (!canCraft) break;
 
             for (int i = 0; i < recipe.getIngredients().size(); i++) {
-                Ingredient ing = recipe.getIngredients().get(i);
-                ItemStack stack = inventory.getStackInSlot(i);
-                if (!ing.isEmpty() && ing.test(stack) && !stack.isEmpty()) {
-                    stack.shrink(1);
-                    inventory.setStackInSlot(i, stack);
-                }
+                inventory.extractItem(i, 1, false);
             }
             player.addItem(recipe.assemble(input, level.registryAccess()));
             maxCrafts--;
@@ -132,5 +110,37 @@ public abstract class CraftingEntity<T extends RecipeInput, J extends Recipe<T>>
         tryCraft(level);
 
         return Integer.MAX_VALUE - maxCrafts;
+    }
+
+
+
+    public void tick() {
+        if (needsCraftingUpdate) {
+            needsCraftingUpdate = false;
+            tryCraft(level);
+            this.setChanged();
+        }
+    }
+
+    public void scheduleCraftingUpdate() {
+        needsCraftingUpdate = true;
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.put("Inventory", inventory.serializeNBT(registries));
+        tag.put("Output", output.serializeNBT(registries));
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains("Inventory", Tag.TAG_COMPOUND)) {
+            inventory.deserializeNBT(registries, tag.getCompound("Inventory"));
+        }
+        if (tag.contains("Output", Tag.TAG_COMPOUND)) {
+            output.deserializeNBT(registries, tag.getCompound("Output"));
+        }
     }
 }
