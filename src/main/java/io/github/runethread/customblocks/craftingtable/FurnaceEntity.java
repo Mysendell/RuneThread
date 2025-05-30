@@ -8,7 +8,10 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -18,7 +21,6 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> extends BlockEntity implements MenuProvider {
@@ -230,7 +232,11 @@ public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> 
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int idx = row * width + col;
-                inventory.extractItem(idx, 1, false);
+                ItemStack item = inventory.extractItem(idx, 1, false);
+                ItemStack remainder = item.getCraftingRemainder();
+                if (!remainder.isEmpty()) {
+                    inventory.insertItem(idx, remainder, false);
+                }
             }
         }
     }

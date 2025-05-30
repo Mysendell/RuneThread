@@ -10,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -75,7 +74,7 @@ public abstract class CraftingEntity extends BlockEntity implements MenuProvider
     public boolean doCraft(Level level) {
         if (level.isClientSide) return false;
         for (int i = 0; i < width * height; i++) {
-            inventory.extractItem(i, 1, false);
+            removeItem(i, inventory);
         }
         output.setStackInSlot(0, ItemStack.EMPTY);
         tryCraft(level);
@@ -100,7 +99,7 @@ public abstract class CraftingEntity extends BlockEntity implements MenuProvider
             if (!canCraft) break;
 
             for (int i = 0; i < recipe.getIngredients().size(); i++) {
-                inventory.extractItem(i, 1, false);
+                removeItem(i, inventory);
             }
             player.addItem(recipe.assemble(input, level.registryAccess()));
             maxCrafts--;
@@ -112,7 +111,13 @@ public abstract class CraftingEntity extends BlockEntity implements MenuProvider
         return Integer.MAX_VALUE - maxCrafts;
     }
 
-
+    private void removeItem(int index, ItemStackHandler inventory){
+        ItemStack item = inventory.extractItem(index, 1, false);
+        ItemStack remainder = item.getCraftingRemainder();
+        if (!remainder.isEmpty()) {
+            inventory.insertItem(index, remainder, false);
+        }
+    }
 
     public void tick() {
         if (needsCraftingUpdate) {

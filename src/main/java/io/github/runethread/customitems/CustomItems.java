@@ -1,10 +1,12 @@
 package io.github.runethread.customitems;
 
 import io.github.runethread.RuneThread;
+import io.github.runethread.customentities.customEntities;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -18,10 +20,19 @@ public class CustomItems {
                     .nutrition(1).saturationModifier(0.5f).build()));
     public static final DeferredItem<Item> CAKE = ITEMS.registerSimpleItem("cake",
             new Item.Properties().food(new FoodProperties.Builder().alwaysEdible().nutrition(1).saturationModifier(1f).build()));
+    public static final DeferredItem<SpawnEggItem> CAKE_GOLEM_SPAWN_EGG =
+            ITEMS.registerItem("cake_golem_spawn_egg",
+                    properties -> new SpawnEggItem(
+                            customEntities.CAKE_GOLEM.get(),
+                            properties
+                    )
+            );
+
 
     public static void CreativeTabItems(CreativeModeTab.Output output){
         output.accept(new ItemStack(HAMPTER_ITEM.get()));
         output.accept(new ItemStack(DOUGH_ITEM.get()));
         output.accept(new ItemStack(CAKE.get()));
+        output.accept(new ItemStack(CAKE_GOLEM_SPAWN_EGG.get()));
     }
 }

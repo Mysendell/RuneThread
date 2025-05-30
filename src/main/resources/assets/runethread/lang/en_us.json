@@ -7,5 +7,7 @@
   "item.runethread.dough": "dough",
   "item.runethread.cake": "cake",
   "BlockItem.runethread.animator": "Animator",
-  "block.runethread.animator": "Animator"
+  "block.runethread.animator": "Animator",
+  "entity.runethread.cake_golem": "Cake Golem",
+  "item.runethread.cake_golem_spawn_egg": "Cake Golem Spawn Egg"
 }
