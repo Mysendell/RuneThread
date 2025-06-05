@@ -95,8 +95,6 @@ public abstract class CraftingEntity extends BlockEntity implements MenuProvider
             if (recipeOpt.isEmpty()) break;
 
             RecipeShaped recipe = (RecipeShaped) recipeOpt.get().value();
-            boolean canCraft = true;
-            if (!canCraft) break;
 
             for (int i = 0; i < recipe.getIngredients().size(); i++) {
                 removeItem(i, inventory);

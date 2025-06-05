@@ -2,16 +2,13 @@ package io.github.runethread.customblocks.craftingtable.arcanetable;
 
 import com.mojang.serialization.MapCodec;
 import io.github.runethread.customblocks.CustomBlockEntities;
-import io.github.runethread.customblocks.craftingtable.animator.AnimatorEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -21,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
@@ -28,10 +26,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class ArcaneTableBlock extends BaseEntityBlock {
     public static final MapCodec<ArcaneTableBlock> CODEC = simpleCodec(ArcaneTableBlock::new);
-    public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public ArcaneTableBlock(Properties p_49795_) {
         super(p_49795_);
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -41,6 +40,7 @@ public class ArcaneTableBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
     }
 
@@ -66,7 +66,6 @@ public class ArcaneTableBlock extends BaseEntityBlock {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(this));
             if (be instanceof ArcaneTableEntity arcaneTable) {
                 System.out.println("Dropping ArcaneTable inventory at " + pos);
                 for (int i = 0; i < arcaneTable.getInventory().getSlots(); i++) {

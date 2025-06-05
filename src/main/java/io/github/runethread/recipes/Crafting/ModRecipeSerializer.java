@@ -1,24 +1,21 @@
-package io.github.runethread.recipes.Crafting.arcanetable;
+package io.github.runethread.recipes.Crafting;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.runethread.recipes.Crafting.Recipe;
 import io.github.runethread.recipes.RecipeResult;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
-public class ArcaneRecipeSerializer<T extends Recipe> implements RecipeSerializer<T> {
+public class ModRecipeSerializer<T extends Recipe> implements net.minecraft.world.item.crafting.RecipeSerializer<T> {
     private final MapCodec<T> codec;
     private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
 
-    public ArcaneRecipeSerializer(RecipeFactory<T> factory) {
+    public ModRecipeSerializer(RecipeFactory<T> factory) {
         // Construct the CODEC and STREAM_CODEC using the factory
         this.codec = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(Recipe::getIngredients),

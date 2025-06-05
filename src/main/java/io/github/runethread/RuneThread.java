@@ -15,8 +15,14 @@ import io.github.runethread.recipes.CustomRecipes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -82,7 +88,17 @@ public class RuneThread {
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        LOGGER.info("HELLO from server starting");
+        MinecraftServer server = event.getServer();
+        RecipeManager recipeManager = server.getRecipeManager();
+
+        System.out.println("Recipes registered by runethread:");
+        for (RecipeHolder<?> recipeHolder : recipeManager.getRecipes()) {
+            ResourceKey<Recipe<?>> idKey = recipeHolder.id();
+            ResourceLocation id = idKey.location();
+            if (!id.getNamespace().equals("minecraft")) {
+                System.out.println(id);
+            }
+        }
     }
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

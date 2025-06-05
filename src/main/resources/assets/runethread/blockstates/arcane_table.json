@@ -1,8 +1,0 @@
-{
-  "variants": {
-    "facing=north": { "model": "runethread:block/arcane_table", "y": 0 },
-    "facing=south": { "model": "runethread:block/arcane_table", "y": 180 },
-    "facing=west":  { "model": "runethread:block/arcane_table", "y": 270 },
-    "facing=east":  { "model": "runethread:block/arcane_table", "y": 90 }
-  }
-}

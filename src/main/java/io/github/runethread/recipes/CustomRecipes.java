@@ -1,7 +1,7 @@
 package io.github.runethread.recipes;
 
 import io.github.runethread.RuneThread;
-import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeSerializer;
+import io.github.runethread.recipes.Crafting.ModRecipeSerializer;
 import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeShaped;
 import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeShapeless;
 import io.github.runethread.recipes.smelting.Philosophal;
@@ -9,7 +9,6 @@ import io.github.runethread.recipes.smelting.PhilosophalSerializer;
 import io.github.runethread.recipes.smelting.Smelting;
 import io.github.runethread.recipes.smelting.SmeltingSerializer;
 import io.github.runethread.recipes.smelting.animator.AnimatorRecipe;
-import io.github.runethread.recipes.smelting.animator.AnimatorSerializer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -22,7 +21,7 @@ public class CustomRecipes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES =
             DeferredRegister.create(Registries.RECIPE_TYPE, RuneThread.MODID);
 
-    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
+    public static final DeferredRegister<net.minecraft.world.item.crafting.RecipeSerializer<?>> RECIPE_SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, RuneThread.MODID);
 
     public static final Supplier<RecipeType<CraftingRecipe>> ARCANE_SHAPED =
@@ -38,10 +37,13 @@ public class CustomRecipes {
                     });
 
     public static final Supplier<RecipeSerializer<ArcaneRecipeShaped>> ARCANE_SHAPED_SERIALIZER =
-            RECIPE_SERIALIZERS.register("arcane_shaped", () -> new ArcaneRecipeSerializer<>(ArcaneRecipeShaped::new));
+            RECIPE_SERIALIZERS.register("arcane_shaped", () -> new ModRecipeSerializer<>(ArcaneRecipeShaped::new));
 
     public static final Supplier<RecipeSerializer<ArcaneRecipeShapeless>> ARCANE_SHAPELESS_SERIALIZER =
-            RECIPE_SERIALIZERS.register("arcane_shapeless", () -> new ArcaneRecipeSerializer<>(ArcaneRecipeShapeless::new));
+            RECIPE_SERIALIZERS.register("arcane_shapeless", () -> new ModRecipeSerializer<>(ArcaneRecipeShapeless::new));
+
+    public static final Supplier<RecipeSerializer<AnimatorRecipe>> ANIMATOR_SERIALIZER =
+            RECIPE_SERIALIZERS.register("animator", () -> new PhilosophalSerializer<>(AnimatorRecipe::new));
 
     public static final Supplier<RecipeType<CraftingRecipe>> SMELTING =
             RECIPE_TYPES.register("smelting",
@@ -49,7 +51,7 @@ public class CustomRecipes {
                         @Override public String toString() { return name.toString(); }
                     });
     public static final Supplier<RecipeSerializer<Smelting>> SMELTING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("smelting", SmeltingSerializer::new);
+            RECIPE_SERIALIZERS.register("smelting", () -> new SmeltingSerializer<>(Smelting::new));
 
     public static final Supplier<RecipeType<CraftingRecipe>> PHILOSOPHAL =
             RECIPE_TYPES.register("philosophal",
@@ -57,14 +59,11 @@ public class CustomRecipes {
                         @Override public String toString() { return name.toString(); }
                     });
     public static final Supplier<RecipeSerializer<Philosophal>> PHILOSOPHAL_SERIALIZER =
-            RECIPE_SERIALIZERS.register("philosophal", PhilosophalSerializer::new);
+            RECIPE_SERIALIZERS.register("philosophal", () -> new PhilosophalSerializer<>(Philosophal::new));
 
     public static final Supplier<RecipeType<CraftingRecipe>> ANIMATOR_RECIPE =
             RECIPE_TYPES.register("animator",
                     name -> new RecipeType<>() {
                         @Override public String toString() { return name.toString(); }
                     });
-    public static final Supplier<RecipeSerializer<AnimatorRecipe>> ANIMATOR_SERIALIZER =
-            RECIPE_SERIALIZERS.register("animator", AnimatorSerializer::new);
-
 }
