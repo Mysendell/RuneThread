@@ -1,8 +1,8 @@
 package io.github.runethread.recipes.smelting;
 
 import io.github.runethread.recipes.Crafting.RecipeShaped;
+import io.github.runethread.recipes.CustomRecipes;
 import io.github.runethread.recipes.RecipeResult;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.List;
@@ -43,4 +43,8 @@ public class Smelting extends RecipeShaped {
         return SMELTING.get();
     }
 
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return CustomRecipes.RUNETHREAD_CATEGORY.get();
+    }
 }

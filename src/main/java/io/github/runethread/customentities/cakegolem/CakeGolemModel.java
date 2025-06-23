@@ -3,8 +3,6 @@ package io.github.runethread.customentities.cakegolem;// Made with Blockbench 4.
 // Paste this class into your mod and generate all required imports
 
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -18,21 +16,21 @@ import static io.github.runethread.customentities.cakegolem.CakeGolemAnimation.c
 public class CakeGolemModel extends EntityModel<LivingEntityRenderState> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("runethread","textures/entities/cake_golem"), "main");
-    private final ModelPart left_leg;
+    /*private final ModelPart left_leg;
     private final ModelPart right_leg;
     private final ModelPart torso;
     private final ModelPart gut;
     private final ModelPart right_arm;
-    private final ModelPart left_arm;
+    private final ModelPart left_arm;*/
 
     public CakeGolemModel(ModelPart root) {
         super(root);
-        this.left_leg = root.getChild("left_leg");
+        /*this.left_leg = root.getChild("left_leg");
         this.right_leg = root.getChild("right_leg");
         this.torso = root.getChild("torso");
         this.gut = root.getChild("gut");
         this.right_arm = root.getChild("right_arm");
-        this.left_arm = root.getChild("left_arm");
+        this.left_arm = root.getChild("left_arm");*/
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -64,14 +62,5 @@ public class CakeGolemModel extends EntityModel<LivingEntityRenderState> {
                 1.0f,
                 1.0f
         );
-    }
-
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        left_leg.render(poseStack, vertexConsumer, packedLight, packedOverlay);
-        right_leg.render(poseStack, vertexConsumer, packedLight, packedOverlay);
-        torso.render(poseStack, vertexConsumer, packedLight, packedOverlay);
-        gut.render(poseStack, vertexConsumer, packedLight, packedOverlay);
-        right_arm.render(poseStack, vertexConsumer, packedLight, packedOverlay);
-        left_arm.render(poseStack, vertexConsumer, packedLight, packedOverlay);
     }
 }

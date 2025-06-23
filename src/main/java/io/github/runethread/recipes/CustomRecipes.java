@@ -11,6 +11,7 @@ import io.github.runethread.recipes.smelting.SmeltingSerializer;
 import io.github.runethread.recipes.smelting.animator.AnimatorRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -23,6 +24,13 @@ public class CustomRecipes {
 
     public static final DeferredRegister<net.minecraft.world.item.crafting.RecipeSerializer<?>> RECIPE_SERIALIZERS =
             DeferredRegister.create(Registries.RECIPE_SERIALIZER, RuneThread.MODID);
+
+    public static final DeferredRegister<RecipeBookCategory> RECIPE_BOOK_CATEGORIES =
+            DeferredRegister.create(Registries.RECIPE_BOOK_CATEGORY, RuneThread.MODID);
+
+    public static final Supplier<RecipeBookCategory> RUNETHREAD_CATEGORY = RECIPE_BOOK_CATEGORIES.register(
+            "runethread", RecipeBookCategory::new
+    );
 
     public static final Supplier<RecipeType<CraftingRecipe>> ARCANE_SHAPED =
             RECIPE_TYPES.register("arcane_shaped",

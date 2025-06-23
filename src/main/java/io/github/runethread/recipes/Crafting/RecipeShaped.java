@@ -1,7 +1,6 @@
 package io.github.runethread.recipes.Crafting;
 
 import io.github.runethread.recipes.RecipeResult;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;

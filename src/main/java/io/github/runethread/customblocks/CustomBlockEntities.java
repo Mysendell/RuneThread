@@ -1,11 +1,12 @@
 package io.github.runethread.customblocks;
 
 import io.github.runethread.RuneThread;
+import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntity;
 import io.github.runethread.customblocks.craftingtable.animator.AnimatorEntity;
 import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableEntity;
-import net.neoforged.neoforge.registries.DeferredRegister;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
@@ -20,4 +21,8 @@ public class CustomBlockEntities {
     public static final Supplier<BlockEntityType<AnimatorEntity>> ANIMATOR =
             BLOCK_ENTITY_TYPES.register("animator", () -> new BlockEntityType<>(
                     AnimatorEntity::new, CustomBlocks.ANIMATOR_BLOCK.get()));
+
+    public static final Supplier<BlockEntityType<RunicAltarEntity>> RUNIC_ALTAR =
+            BLOCK_ENTITY_TYPES.register("runic_altar", () -> new BlockEntityType<>(
+                    RunicAltarEntity::new, CustomBlocks.RUNIC_ALTAR_BLOCK.get()));
 }

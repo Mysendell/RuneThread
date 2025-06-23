@@ -1,24 +1,22 @@
 package io.github.runethread.customblocks.craftingtable.animator;
 
-import com.mojang.serialization.MapCodec;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.craftingtable.FurnaceBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +27,6 @@ public class Animator extends FurnaceBlock {
 
     public Animator(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(LIT, false));
     }
 
     @Override
@@ -67,5 +64,20 @@ public class Animator extends FurnaceBlock {
                 CustomBlockEntities.ANIMATOR.get(),
                 AnimatorEntity::serverTick
         );
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AnimatorEntity animator) {
+                for (int i = 0; i < animator.getInput().getSlots(); i++) {
+                    var stack = animator.getInput().getStackInSlot(i);
+                    Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+                }
+                level.removeBlockEntity(pos);
+                super.onRemove(state, level, pos, newState, isMoving);
+            }
+        }
     }
 }

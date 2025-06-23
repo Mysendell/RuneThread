@@ -1,13 +1,13 @@
 package io.github.runethread.recipes.smelting;
 
+import io.github.runethread.recipes.CustomRecipes;
 import io.github.runethread.recipes.RecipeResult;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.List;
 
-import static io.github.runethread.recipes.CustomRecipes.*;
+import static io.github.runethread.recipes.CustomRecipes.PHILOSOPHAL;
+import static io.github.runethread.recipes.CustomRecipes.PHILOSOPHAL_SERIALIZER;
 
 public class Philosophal extends Smelting{
 
@@ -24,5 +24,10 @@ public class Philosophal extends Smelting{
     @Override
     public RecipeType<CraftingRecipe> getType() {
         return PHILOSOPHAL.get();
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return CustomRecipes.RUNETHREAD_CATEGORY.get();
     }
 }

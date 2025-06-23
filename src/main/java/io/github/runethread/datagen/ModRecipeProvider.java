@@ -54,7 +54,7 @@ public class ModRecipeProvider implements DataProvider {
                 "arcane_shapeless"
         ), path.resolve("cake.json")));
 
-        futures.add(saveRecipe(cache, "hampter", createPhilosphalFurnaceRecipe(
+        futures.add(saveRecipe(cache, "hampter", createPhilosophalFurnaceRecipe(
                 1, 1,
                 List.of(
                         "runethread:dough"
@@ -102,7 +102,7 @@ public class ModRecipeProvider implements DataProvider {
         return json;
     }
 
-    private static JsonElement createPhilosphalFurnaceRecipe(
+    private static JsonElement createPhilosophalFurnaceRecipe(
             int width, int height, List<String> ingredients, List<Map<String, Object>> results, String type,
     int burnTime, int fuelBurnMultiplier) {
         JsonObject json = new JsonObject();

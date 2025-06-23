@@ -27,6 +27,8 @@ public class DataGenerators {
 
         event.getGenerator().addProvider(true, new ModRecipeProvider(packOutput));
 
+        generator.addProvider(true, new ModItemTagProvider(packOutput, lookupProvider));
+
         generator.addProvider(true, new ModDataMapProvider(packOutput, lookupProvider));
 
         generator.addProvider(true, new ModModelProvider(packOutput));
@@ -43,6 +45,8 @@ public class DataGenerators {
                 List.of(new LootTableProvider.SubProviderEntry(ModBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
 
         event.getGenerator().addProvider(true, new ModRecipeProvider(packOutput));
+
+        generator.addProvider(true, new ModItemTagProvider(packOutput, lookupProvider));
 
         generator.addProvider(true, new ModDataMapProvider(packOutput, lookupProvider));
 

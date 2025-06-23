@@ -1,13 +1,35 @@
 {
-  "item.runethread.hampter": "Hampter",
-  "block.runethread.arcane_table": "Arcane Table",
-  "BlockItem.runethread.arcane_table": "Arcane Table",
-  "itemGroup.runethread.runethread_tab": "RuneThread",
   "gui.runethread.arcane_category": "RuneThread",
+  "itemGroup.runethread.runethread_tab": "RuneThread",
+
+  "item.runethread.hampter": "Hampter",
   "item.runethread.dough": "dough",
   "item.runethread.cake": "cake",
+
   "BlockItem.runethread.animator": "Animator",
+  "entity.neoforge.cake_golem": "Cake Golem",
+
+  "item.runethread.cake_golem_spawn_egg": "Cake Golem Spawn Egg",
+  "item.runethread.up_rune": "Up Rune",
+  "item.runethread.down_rune": "Down Rune",
+  "item.runethread.left_rune": "Left Rune",
+  "item.runethread.right_rune": "Right Rune",
+  "item.runethread.alpha_rune": "Alpha Rune",
+  "item.runethread.beta_rune": "Beta Rune",
+  "item.runethread.destruction_rune": "Destruction Rune",
+  "item.runethread.lambda_rune": "Lambda Rune",
+  "item.runethread.living_rune": "Living Rune",
+  "item.runethread.portal_rune": "Portal Rune",
+  "item.runethread.protection_rune": "Protection Rune",
+  "item.runethread.tau_rune": "Tau Rune",
+  "item.runethread.power_rune": "Power Rune",
+  "item.runethread.power_gem": "Power Gem",
+
   "block.runethread.animator": "Animator",
-  "entity.runethread.cake_golem": "Cake Golem",
-  "item.runethread.cake_golem_spawn_egg": "Cake Golem Spawn Egg"
+  "block.runethread.arcane_table": "Arcane Table",
+  "block.runethread.runic_altar": "Runic Altar",
+  "block.runethread.limestone": "Limestone",
+  "block.runethread.charged_limestone": "Charged Limestone",
+  "effect.runethread.immunity": "Immunity"
+
 }

@@ -1,15 +1,11 @@
 package io.github.runethread.gui.screens;
 
-import io.github.runethread.RuneThread;
 import io.github.runethread.gui.Screen;
 import io.github.runethread.gui.menus.AnimatorMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-
-import java.util.List;
 
 public class AnimatorScreen extends Screen<AnimatorMenu> {
     int fuel = menu.getFuelBurnTime();
@@ -24,7 +20,7 @@ public class AnimatorScreen extends Screen<AnimatorMenu> {
 
     public AnimatorScreen(AnimatorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "textures/gui/animator.png");
+        GUI_TEXTURE = menu.getBackgroundTexture();
     }
 
     protected void drawExtras(GuiGraphics guiGraphics, int mouseX, int mouseY) {

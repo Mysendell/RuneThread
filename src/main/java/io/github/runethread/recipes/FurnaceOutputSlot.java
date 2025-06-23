@@ -1,6 +1,6 @@
 package io.github.runethread.recipes;
 
-import io.github.runethread.ItemStackHandlerContainer;
+import io.github.runethread.util.ItemStackHandlerContainer;
 import io.github.runethread.customblocks.craftingtable.FurnaceEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;

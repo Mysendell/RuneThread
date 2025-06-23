@@ -67,14 +67,12 @@ public class ArcaneTableBlock extends BaseEntityBlock {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof ArcaneTableEntity arcaneTable) {
-                System.out.println("Dropping ArcaneTable inventory at " + pos);
                 for (int i = 0; i < arcaneTable.getInventory().getSlots(); i++) {
                     var stack = arcaneTable.getInventory().getStackInSlot(i);
                     Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
                 }
-            } else {
-                System.out.println("No ArcaneTableEntity at " + pos);
             }
+            level.removeBlockEntity(pos);
             super.onRemove(state, level, pos, newState, isMoving);
         }
     }

@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
@@ -21,14 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class CraftingEntity extends BlockEntity implements MenuProvider {
+public abstract class CraftingEntity extends BlockEntity{
     protected final ItemStackHandler output = new ItemStackHandler(1);
-    protected final int width = 3, height = 3;
-    protected ItemStackHandler inventory = new ItemStackHandler(width * height);
+    protected final int width, height;
+    protected ItemStackHandler inventory;
     private boolean needsCraftingUpdate = false;
 
-    public CraftingEntity(BlockEntityType<?> blockEntity, BlockPos pos, BlockState state) {
+    public CraftingEntity(BlockEntityType<?> blockEntity, BlockPos pos, BlockState state, int width, int height) {
         super(blockEntity, pos, state);
+        this.width = width;
+        this.height = height;
+        inventory = new ItemStackHandler(width * height);
     }
 
     public ItemStackHandler getInventory() {
@@ -71,21 +73,19 @@ public abstract class CraftingEntity extends BlockEntity implements MenuProvider
         return items;
     }
 
-    public boolean doCraft(Level level) {
-        if (level.isClientSide) return false;
+    public void doCraft(Level level) {
+        if (level.isClientSide) return;
         for (int i = 0; i < width * height; i++) {
             removeItem(i, inventory);
         }
         output.setStackInSlot(0, ItemStack.EMPTY);
         tryCraft(level);
-        return true;
     }
 
-    public int doCraftShift(Level level, Player player) {
+    public void doCraftShift(Level level, Player player) {
         ItemStack preview = output.getStackInSlot(0);
-        if (preview.isEmpty()) return 0;
+        if (preview.isEmpty()) return;
 
-        int maxCrafts = Integer.MAX_VALUE;
         List<ItemStack> items;
 
         while (true) {
@@ -100,13 +100,9 @@ public abstract class CraftingEntity extends BlockEntity implements MenuProvider
                 removeItem(i, inventory);
             }
             player.addItem(recipe.assemble(input, level.registryAccess()));
-            maxCrafts--;
-            if (maxCrafts <= 0) break;
         }
 
         tryCraft(level);
-
-        return Integer.MAX_VALUE - maxCrafts;
     }
 
     private void removeItem(int index, ItemStackHandler inventory){

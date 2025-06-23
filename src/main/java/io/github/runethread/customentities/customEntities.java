@@ -1,7 +1,6 @@
 package io.github.runethread.customentities;
 
 import io.github.runethread.customentities.cakegolem.CakeGolem;
-import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -29,8 +28,8 @@ public class customEntities {
                             ResourceLocation.fromNamespaceAndPath(MOD_ID, "cake_golem")
                     ))
     );
-    public static final ModelLayerLocation CAKE_GOLEM_LAYER = new ModelLayerLocation(
+    /*public static final ModelLayerLocation CAKE_GOLEM_LAYER = new ModelLayerLocation(
             ResourceLocation.fromNamespaceAndPath(MOD_ID, "cake_golem"),
             "main"
-    );
+    );*/
 }

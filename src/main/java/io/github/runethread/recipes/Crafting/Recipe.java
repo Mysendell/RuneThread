@@ -1,12 +1,18 @@
 package io.github.runethread.recipes.Crafting;
 
+import io.github.runethread.datacomponents.DataComponentRegistry;
+import io.github.runethread.datacomponents.PowerData;
+import io.github.runethread.recipes.CustomRecipes;
 import io.github.runethread.recipes.RecipeResult;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.github.runethread.customitems.CustomItems.POWER_RUNE;
 
 public abstract class Recipe implements CraftingRecipe {
     protected final List<Ingredient> ingredients;
@@ -26,11 +32,9 @@ public abstract class Recipe implements CraftingRecipe {
     public int getWidth() {
         return width;
     }
-
     public int getHeight() {
         return height;
     }
-
     public int getGridWidth() {
         return gridWidth;
     }
@@ -52,7 +56,7 @@ public abstract class Recipe implements CraftingRecipe {
 
     public ItemStack getResult(HolderLookup.Provider registries) {
         if (results.isEmpty()) return ItemStack.EMPTY;
-        return results.get(0).toStack();
+        return results.getFirst().toStack();
     }
 
     public List<Ingredient> getIngredients() {
@@ -65,7 +69,11 @@ public abstract class Recipe implements CraftingRecipe {
 
     @Override
     public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
-        return getResult(registries);
+        ItemStack itemStack = getResult(registries);
+        Item item = itemStack.getItem();
+        if(item == POWER_RUNE.get())
+            itemStack.set(DataComponentRegistry.POWER_DATA.get(), new PowerData(results.getFirst().variation()));
+        return itemStack;
     }
 
 
@@ -79,6 +87,6 @@ public abstract class Recipe implements CraftingRecipe {
 
     @Override
     public RecipeBookCategory recipeBookCategory() {
-        return null;
+        return CustomRecipes.RUNETHREAD_CATEGORY.get();
     }
 }

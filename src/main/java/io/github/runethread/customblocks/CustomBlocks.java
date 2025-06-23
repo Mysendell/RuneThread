@@ -1,6 +1,7 @@
 package io.github.runethread.customblocks;
 
 import io.github.runethread.RuneThread;
+import io.github.runethread.customblocks.craftingtable.altar.RunicAltar;
 import io.github.runethread.customblocks.craftingtable.animator.Animator;
 import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableBlock;
 import net.minecraft.world.item.BlockItem;
@@ -30,8 +31,27 @@ public class CustomBlocks {
                     .strength(1f).sound(SoundType.DEEPSLATE)));
     public static final DeferredItem<BlockItem> ANIMATOR_ITEM = ITEMS.registerSimpleBlockItem("animator", ANIMATOR_BLOCK);
 
+    public static final DeferredBlock<Block> LIMESTONE_BLOCK = BLOCKS.registerBlock("limestone",
+            properties -> new Block(properties.mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1f, 6.0f)
+                    .sound(SoundType.STONE)));
+    public static final DeferredItem<BlockItem> LIMESTONE_ITEM = ITEMS.registerSimpleBlockItem("limestone", LIMESTONE_BLOCK);
+
+    public static final DeferredBlock<Block> CHARGED_LIMESTONE_BLOCK = BLOCKS.registerBlock("charged_limestone",
+            properties -> new Block(properties.mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1f, 6.0f)
+                    .sound(SoundType.STONE)));
+    public static final DeferredItem<BlockItem> CHARGED_LIMESTONE_ITEM = ITEMS.registerSimpleBlockItem("charged_limestone", CHARGED_LIMESTONE_BLOCK);
+
+    public static final DeferredBlock<Block> RUNIC_ALTAR_BLOCK = BLOCKS.registerBlock("runic_altar",
+            properties -> new RunicAltar(properties
+                    .mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1f, 6.0f).sound(SoundType.STONE)
+                    .noOcclusion()));
+    public static final DeferredItem<BlockItem> RUNIC_ALTAR_ITEM = ITEMS.registerSimpleBlockItem("runic_altar", RUNIC_ALTAR_BLOCK);
+
     public static void CreativeTabBlocks(CreativeModeTab.Output output) {
         output.accept(new ItemStack(ARCANE_TABLE_ITEM.get()));
         output.accept(new ItemStack(ANIMATOR_ITEM.get()));
+        output.accept(new ItemStack(LIMESTONE_ITEM.get()));
+        output.accept(new ItemStack(CHARGED_LIMESTONE_ITEM.get()));
+        output.accept(new ItemStack(RUNIC_ALTAR_ITEM.get()));
     }
 }

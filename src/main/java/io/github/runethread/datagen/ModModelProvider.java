@@ -2,8 +2,10 @@ package io.github.runethread.datagen;
 
 import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.CustomBlocks;
+import io.github.runethread.customblocks.craftingtable.altar.RunicAltar;
 import io.github.runethread.customblocks.craftingtable.animator.Animator;
 import io.github.runethread.customitems.CustomItems;
+import io.github.runethread.datagen.properties.PowerRune;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
@@ -11,7 +13,12 @@ import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.blockstates.Variant;
 import net.minecraft.client.data.models.blockstates.VariantProperties;
+import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.renderer.item.ClientItem;
+import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.item.RangeSelectItemModel;
+import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -19,11 +26,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ModModelProvider extends ModelProvider {
+    private final PackOutput output;
+
     public ModModelProvider(PackOutput output) {
         super(output, RuneThread.MODID);
+        this.output = output;
     }
 
     @Override
@@ -34,7 +46,52 @@ public class ModModelProvider extends ModelProvider {
         itemModels.generateFlatItem(CustomItems.CAKE.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(CustomItems.CAKE_GOLEM_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
 
+        itemModels.generateFlatItem(CustomItems.POWER_GEM.get(), ModelTemplates.FLAT_ITEM);
+
+        Optional<ItemModel.Unbaked> fallbackModel = Optional.of(ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), ModelTemplates.FLAT_ITEM)));
+
+        List<RangeSelectItemModel.Entry> entries = List.of(
+                new RangeSelectItemModel.Entry(1, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_1", ModelTemplates.FLAT_ITEM))),
+                new RangeSelectItemModel.Entry(2, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_2", ModelTemplates.FLAT_ITEM))),
+                new RangeSelectItemModel.Entry(3, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_3", ModelTemplates.FLAT_ITEM))),
+                new RangeSelectItemModel.Entry(4, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_4", ModelTemplates.FLAT_ITEM))),
+                new RangeSelectItemModel.Entry(5, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_5", ModelTemplates.FLAT_ITEM)))
+        );
+
+        RangeSelectItemModelProperty rangeSelectItemModelProperty = new PowerRune();
+
+        itemModels.itemModelOutput.register(CustomItems.POWER_RUNE.get(),
+                new ClientItem(
+                        new RangeSelectItemModel.Unbaked(
+                                rangeSelectItemModelProperty,
+                                1.0f,
+                                entries,
+                                fallbackModel),
+                        new ClientItem.Properties(true)));
+
+        itemModels.declareCustomModelItem(CustomItems.RITUAL_INDICATOR_FAIL.get());
+        itemModels.declareCustomModelItem(CustomItems.RITUAL_INDICATOR_SUCCESS.get());
+        itemModels.declareCustomModelItem(CustomItems.RITUAL_INDICATOR_NEUTRAL.get());
+
+        itemModels.generateFlatItem(CustomItems.UP_RUNE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CustomItems.DOWN_RUNE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CustomItems.LEFT_RUNE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CustomItems.RIGHT_RUNE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CustomItems.LIVING_RUNE.get(), ModelTemplates.FLAT_ITEM);
+
+        itemModels.generateFlatItem(CustomItems.ALPHA_RUNE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CustomItems.BETA_RUNE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CustomItems.LAMBDA_RUNE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CustomItems.TAU_RUNE.get(), ModelTemplates.FLAT_ITEM);
+
+        itemModels.generateFlatItem(CustomItems.DESTRUCTION_RUNE.get(), ModelTemplates.FLAT_ITEM);
+
+        itemModels.generateFlatItem(CustomItems.PORTAL_RUNE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CustomItems.PROTECTION_RUNE.get(), ModelTemplates.FLAT_ITEM);
+
         /* BLOCKS */
+        blockModels.createTrivialCube(CustomBlocks.LIMESTONE_BLOCK.get());
+        blockModels.createTrivialCube(CustomBlocks.CHARGED_LIMESTONE_BLOCK.get());
 
         blockModels.blockStateOutput.accept(
                 MultiVariantGenerator.multiVariant(CustomBlocks.ANIMATOR_BLOCK.get())
@@ -48,9 +105,12 @@ public class ModModelProvider extends ModelProvider {
                                             // Add rotation based on facing
                                             switch (facing) {
                                                 case NORTH -> { /* no rotation needed */ }
-                                                case SOUTH -> variant = variant.with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180);
-                                                case WEST  -> variant = variant.with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
-                                                case EAST  -> variant = variant.with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
+                                                case SOUTH ->
+                                                        variant = variant.with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180);
+                                                case WEST ->
+                                                        variant = variant.with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270);
+                                                case EAST ->
+                                                        variant = variant.with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90);
                                             }
                                             return variant;
                                         })
@@ -74,7 +134,16 @@ public class ModModelProvider extends ModelProvider {
                                         })
                         )
         );
-
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.multiVariant(CustomBlocks.RUNIC_ALTAR_BLOCK.get())
+                        .with(
+                                PropertyDispatch.property(RunicAltar.STRUCTURED)
+                                        .generate((structured) -> {
+                                            ResourceLocation model = ResourceLocation.fromNamespaceAndPath("runethread", "block/runic_altar");
+                                            return Variant.variant().with(VariantProperties.MODEL, model);
+                                        })
+                        )
+        );
     }
 
     @Override
@@ -86,6 +155,6 @@ public class ModModelProvider extends ModelProvider {
 
     @Override
     protected Stream<? extends Holder<Item>> getKnownItems() {
-        return CustomItems.ITEMS.getEntries().stream().filter(x -> x.get()  != null);
+        return CustomItems.ITEMS.getEntries().stream().filter(x -> x.get() != null);
     }
 }

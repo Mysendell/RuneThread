@@ -9,7 +9,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.List;
 
-import static io.github.runethread.recipes.CustomRecipes.*;
+import static io.github.runethread.recipes.CustomRecipes.ANIMATOR_RECIPE;
+import static io.github.runethread.recipes.CustomRecipes.ANIMATOR_SERIALIZER;
 
 public class AnimatorRecipe extends Philosophal {
     public AnimatorRecipe(List<Ingredient> ingredients, List<RecipeResult> result, int width, int height, int burnTime, int fuelBurnMultiplier) {

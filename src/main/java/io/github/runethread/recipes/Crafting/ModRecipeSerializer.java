@@ -16,7 +16,6 @@ public class ModRecipeSerializer<T extends Recipe> implements net.minecraft.worl
     private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
 
     public ModRecipeSerializer(RecipeFactory<T> factory) {
-        // Construct the CODEC and STREAM_CODEC using the factory
         this.codec = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(Recipe::getIngredients),
                 RecipeResult.CODEC.listOf().fieldOf("results").forGetter(Recipe::getResultStack),
@@ -39,7 +38,6 @@ public class ModRecipeSerializer<T extends Recipe> implements net.minecraft.worl
     @Override
     public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() { return streamCodec; }
 
-    // Factory for constructing recipe instances
     public interface RecipeFactory<T> {
         T create(List<Ingredient> ingredients, List<RecipeResult> results, int width, int height);
     }

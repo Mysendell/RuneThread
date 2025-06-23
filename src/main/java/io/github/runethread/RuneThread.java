@@ -3,26 +3,26 @@ package io.github.runethread;
 import com.mojang.logging.LogUtils;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
+import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntityRenderer;
+import io.github.runethread.customeffects.CustomEffects;
 import io.github.runethread.customentities.cakegolem.CakeGolem;
 import io.github.runethread.customentities.cakegolem.CakeGolemModel;
 import io.github.runethread.customentities.cakegolem.CakeGolemRenderer;
 import io.github.runethread.customentities.customEntities;
 import io.github.runethread.customitems.CustomItems;
+import io.github.runethread.datacomponents.DataComponentRegistry;
+import io.github.runethread.datagen.properties.PowerRune;
 import io.github.runethread.gui.CustomMenus;
 import io.github.runethread.gui.screens.AnimatorScreen;
 import io.github.runethread.gui.screens.ArcaneScreen;
+import io.github.runethread.gui.screens.RusticAltarScreen;
 import io.github.runethread.recipes.CustomRecipes;
-import net.minecraft.client.Minecraft;
+import io.github.runethread.util.RuneConfig;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -30,9 +30,9 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -46,9 +46,6 @@ import static io.github.runethread.customitems.CustomItems.ITEMS;
 
 @Mod(RuneThread.MODID)
 public class RuneThread {
-/*
-    public static final RecipeBookCategory ARCANE_CATEGORY = RecipeBookCategory.create("arcane");
-*/
 
     public static final String MODID = "runethread";
 
@@ -66,53 +63,40 @@ public class RuneThread {
                     })
                     .build());
 
-    /*public void registerRecipeBookCategory() {
-        RecipeBookRegistry.registerBookCategory(ARCANE_CATEGORY,
-                new ItemStack(HAMPTER_ITEM.get()), // icon
-                Component.translatable("gui.runethread.arcane_category") // name
-        );
-    }*/
-
     public RuneThread(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.CLIENT, RuneConfig.SPEC);
+        DataComponentRegistry.DATA_COMPONENTS.register(modEventBus);
         CustomRecipes.RECIPE_TYPES.register(modEventBus);
         CustomRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         BLOCKS.register(modEventBus);
         customEntities.ENTITY_TYPES.register(modEventBus);
-        ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         CustomMenus.MENUS.register(modEventBus);
         CustomBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
+        ITEMS.register(modEventBus);
+        CustomEffects.EFFECTS.register(modEventBus);
         NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        MinecraftServer server = event.getServer();
-        RecipeManager recipeManager = server.getRecipeManager();
-
-        System.out.println("Recipes registered by runethread:");
-        for (RecipeHolder<?> recipeHolder : recipeManager.getRecipes()) {
-            ResourceKey<Recipe<?>> idKey = recipeHolder.id();
-            ResourceLocation id = idKey.location();
-            if (!id.getNamespace().equals("minecraft")) {
-                System.out.println(id);
-            }
-        }
+        /*Runs on server start*/
     }
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
-
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        public static void registerRangeProps(RegisterRangeSelectItemModelPropertyEvent event) {
+            event.register(
+                    ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "power_rune"),  // use your ID
+                    PowerRune.MAP_CODEC
+            );
         }
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(CustomMenus.ARCANE_MENU.get(), ArcaneScreen::new);
             event.register(CustomMenus.ANIMATOR_MENU.get(), AnimatorScreen::new);
+            event.register(CustomMenus.RUSTIC_ALTAR_MENU.get(), RusticAltarScreen::new);
         }
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -122,10 +106,16 @@ public class RuneThread {
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event){
             event.registerLayerDefinition(CakeGolemModel.LAYER_LOCATION, CakeGolemModel::createBodyLayer);
         }
-
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
             event.put(customEntities.CAKE_GOLEM.get(), CakeGolem.createAttributes().build());
         }
-    } //ShapedRecipePattern#setCraftingSize(int width, int height)
+        @SubscribeEvent
+        public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(
+                    CustomBlockEntities.RUNIC_ALTAR.get(),
+                    RunicAltarEntityRenderer::new
+            );
+        }
+    }
 }

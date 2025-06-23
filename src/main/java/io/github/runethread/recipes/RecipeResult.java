@@ -10,17 +10,19 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public record RecipeResult(Item item, int count) {
+public record RecipeResult(Item item, int count, int variation) {
 
     public static final Codec<RecipeResult> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             BuiltInRegistries.ITEM.byNameCodec().fieldOf("item").forGetter(RecipeResult::item),
-            Codec.INT.optionalFieldOf("count", 1).forGetter(RecipeResult::count)
+            Codec.INT.optionalFieldOf("count", 1).forGetter(RecipeResult::count),
+            Codec.INT.optionalFieldOf("variation", 0).forGetter(RecipeResult::variation)
     ).apply(inst, RecipeResult::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, RecipeResult> STREAM_CODEC =
             StreamCodec.composite(
                     ByteBufCodecs.registry(Registries.ITEM), RecipeResult::item,
                     ByteBufCodecs.VAR_INT, RecipeResult::count,
+                    OptionalIntStreamCodec.of(0), RecipeResult::variation,
                     RecipeResult::new
             );
 
