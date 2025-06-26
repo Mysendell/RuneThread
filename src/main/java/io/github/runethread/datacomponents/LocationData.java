@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 
 // TODO ADD DIMENSIONS
-public record LocationData(Integer posX, Integer posY, Integer posZ) {
+public record LocationData(Integer posX, Integer posY, Integer posZ){
 
     public LocationData(Integer posX, Integer posY, Integer posZ) {
         this.posX = posX;

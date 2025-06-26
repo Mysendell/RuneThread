@@ -39,49 +39,54 @@ public class ExplosionUtil {
         List<BlockPos> loadedChunkList = new ArrayList<>();
 
         if(destroyBlocks)
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    for (int z = minZ; z <= maxZ; z++) {
-                        double dx = x + 0.5 - center.getX();
-                        double dy = y + 0.5 - center.getY();
-                        double dz = z + 0.5 - center.getZ();
-                        if (dx * dx + dy * dy + dz * dz <= radiusSq) {
-                            BlockPos pos = new BlockPos(x, y, z);
-                            ChunkUtils.forceLoadChunk(level, pos);
-                            loadedChunkList.add(pos);
-                            BlockState state = level.getBlockState(pos);
-                            if (!state.isAir()) {
-                                if (dropBlocks) {
-                                    level.destroyBlock(pos, true);
-                                } else {
-                                    level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-
-        if (damageEntities) {
-            AABB bounds = new AABB(
-                    center.getX() - radius, center.getY() - radius, center.getZ() - radius,
-                    center.getX() + radius, center.getY() + radius, center.getZ() + radius
-            );
-            List<Entity> entities = level.getEntities((Entity) null, bounds, (entity) -> entity.distanceToSqr(center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5) <= radiusSq);
-            DamageSource explosionSource = level.damageSources().source(DamageTypes.EXPLOSION, null);
-            for (Entity entity : entities) {
-                if (entity instanceof LivingEntity living) {
-                    living.hurt(explosionSource, damage);
-                }
-            }
-        }
+            explodeBlocks(level, center, dropBlocks, minX, maxX, minY, maxY, minZ, maxZ, radiusSq, loadedChunkList);
+        if (damageEntities)
+            damageEntities(level, center, radius, damage, radiusSq);
 
         level.playSound(null ,center, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS);
         level.sendParticles(ParticleTypes.EXPLOSION, center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5, 1, 0, 0, 0, 0.1);
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5, 1, 0, 0, 0, 0.1);
         for(BlockPos pos : loadedChunkList) {
             ChunkUtils.removeForceLoadChunk(level, pos);
+        }
+    }
+
+    private static void damageEntities(ServerLevel level, BlockPos center, float radius, float damage, double radiusSq) {
+        AABB bounds = new AABB(
+                center.getX() - radius, center.getY() - radius, center.getZ() - radius,
+                center.getX() + radius, center.getY() + radius, center.getZ() + radius
+        );
+        List<Entity> entities = level.getEntities((Entity) null, bounds, (entity) -> entity.distanceToSqr(center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5) <= radiusSq);
+        DamageSource explosionSource = level.damageSources().source(DamageTypes.EXPLOSION, null);
+        for (Entity entity : entities) {
+            if (entity instanceof LivingEntity living) {
+                living.hurt(explosionSource, damage);
+            }
+        }
+    }
+
+    private static void explodeBlocks(ServerLevel level, BlockPos center, boolean dropBlocks, int minX, int maxX, int minY, int maxY, int minZ, int maxZ, double radiusSq, List<BlockPos> loadedChunkList) {
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    double dx = x + 0.5 - center.getX();
+                    double dy = y + 0.5 - center.getY();
+                    double dz = z + 0.5 - center.getZ();
+                    if (dx * dx + dy * dy + dz * dz <= radiusSq) {
+                        BlockPos pos = new BlockPos(x, y, z);
+                        ChunkUtils.forceLoadChunk(level, pos);
+                        loadedChunkList.add(pos);
+                        BlockState state = level.getBlockState(pos);
+                        if (!state.isAir()) {
+                            if (dropBlocks) {
+                                level.destroyBlock(pos, true);
+                            } else {
+                                level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -1,12 +1,15 @@
 package io.github.runethread.customitems;
 
 import io.github.runethread.RuneThread;
+import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntity;
 import io.github.runethread.customeffects.CustomEffects;
 import io.github.runethread.customentities.customEntities;
 import io.github.runethread.customitems.runes.LocationRuneItem;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.datacomponents.PowerData;
+import io.github.runethread.util.Barrier;
+import io.github.runethread.util.BarrierManager;
 import io.github.runethread.util.ExplosionUtil;
 import io.github.runethread.util.TeleportUtil;
 import net.minecraft.ChatFormatting;
@@ -80,24 +83,35 @@ public class CustomItems {
 
     public static final DeferredItem<Item> DESTRUCTION_RUNE = ITEMS.registerItem("destruction_rune",
             (properties) -> new MainRuneItem(properties.stacksTo(16).fireResistant(), 10, 2, 1.5f,
-                    (level, player, item, finalScale, posX, posY, posZ, additionalData) -> {
-                        ExplosionUtil.accurateExplosion(level, new BlockPos(posX, posY, posZ), finalScale * item.getScale(),
+                    (level, player, item, finalScale, destination, reference, additionalData) -> {
+                        ExplosionUtil.accurateExplosion(level, new BlockPos(destination.locationX(), destination.locationY(), destination.locationY()), finalScale * item.getScale(),
                                 false, true, true, item.getScale() * finalScale * 1.5f);
                     }));
 
     public static final DeferredItem<Item> PORTAL_RUNE = ITEMS.registerItem("portal_rune",
             (properties) -> new MainRuneItem(properties.stacksTo(16).fireResistant(), 15, 1, 1.5f,
-                    (level, player, item, finalScale, posX, posY, posZ, additionalData) -> {
-                        if(!TeleportUtil.teleportToNearestSafe(player, level, new BlockPos(posX, posY, posZ),
+                    (level, player, item, finalScale, destination, reference, additionalData) -> {
+                        if(!TeleportUtil.teleportToNearestSafe(player, level,  new BlockPos(destination.locationX(), destination.locationY(), destination.locationY()),
                                 20 , 20))
                             player.sendSystemMessage(Component.literal("Teleport failed: No safe location found!").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
                     }));
     public static final DeferredItem<Item> PROTECTION_RUNE = ITEMS.registerItem("protection_rune",
             (properties) -> new MainRuneItem(properties.stacksTo(16).fireResistant(), 10, 10, 1.5f,
-                    (level, player, item, finalScale, posX, posY, posZ, additionalData) -> {
-                        LivingEntity entity = (LivingEntity) additionalData[0];
+                    (level, player, item, finalScale, destination, reference, additionalData) -> {
+                        LivingEntity entity = (LivingEntity) destination.entity();
                         if (entity != null) {
                             entity.addEffect(new MobEffectInstance(CustomEffects.IMMUNITY, 20 * finalScale * item.getScale()));
+                        }
+                        else{
+                            RunicAltarEntity runicAltarEntity = (RunicAltarEntity) additionalData[0];
+                            Barrier barrier = new Barrier(
+                                    new BlockPos(destination.locationX(), destination.locationY(), destination.locationZ()),
+                                    item.getScale(),
+                                    runicAltarEntity,
+                                    20 * finalScale * item.getScale()
+                            );
+                            BarrierManager.addBarrier(barrier);
+                            runicAltarEntity.addBarrier(barrier);
                         }
                     }));
 

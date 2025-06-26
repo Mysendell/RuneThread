@@ -3,7 +3,9 @@ package io.github.runethread.customitems.runes;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.datacomponents.EntityData;
 import io.github.runethread.datacomponents.LocationData;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -14,6 +16,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -27,58 +31,72 @@ public class LocationRuneItem extends Item {
     }
 
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-        if(stack.get(DataComponentRegistry.ENTITY_DATA.get()) != null) {
+        if (stack.get(DataComponentRegistry.ENTITY_DATA.get()) != null) {
             stack.remove(DataComponentRegistry.ENTITY_DATA.get());
         }
 
-        if(context.getPlayer().isCrouching())
-            return interactLivingEntity(stack, context.getPlayer(), context.getPlayer(), context.getHand());
+        if (context.getPlayer().isCrouching())
+            return InteractionResult.PASS;
 
-        BlockPos blockPos = context.getClickedPos();
-        int posX = blockPos.getX();
-        int posY = blockPos.getY();
-        int posZ = blockPos.getZ();
+        BlockPosSpreader blockPosSpreader = spreadBlockPos(context.getClickedPos());
+        LocationData locationData = new LocationData(blockPosSpreader.posX(), blockPosSpreader.posY(), blockPosSpreader.posZ());
 
-        ItemStack newItemStack = new ItemStack(stack.getItem());
-        newItemStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-        newItemStack.set(DataComponentRegistry.LOCATION_DATA.get(), new LocationData(posX, posY, posZ));
-
-        stack.shrink(1);
-        if (stack.isEmpty()) {
-            context.getPlayer().setItemInHand(context.getHand(), newItemStack);
-        } else {
-            context.getPlayer().getInventory().placeItemBackInInventory(newItemStack);
-        }
-
-        return InteractionResult.SUCCESS;
+        return addTargetData(stack, context.getPlayer(), context.getHand(), DataComponentRegistry.LOCATION_DATA.get(), locationData);
     }
 
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
-        if(stack.get(DataComponentRegistry.LOCATION_DATA.get()) != null) {
+        if (stack.get(DataComponentRegistry.LOCATION_DATA.get()) != null) {
             stack.remove(DataComponentRegistry.LOCATION_DATA.get());
         }
 
+        int id = interactionTarget.getId();
+        String name = interactionTarget.getName().getString();
+        EntityData entityData = new EntityData(id, name);
+
+        return addTargetData(stack, player, usedHand, DataComponentRegistry.ENTITY_DATA.get(), entityData);
+    }
+
+    @Override
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        if(!player.isCrouching()) {
+            return InteractionResult.PASS;
+        }
+        if (player.getItemInHand(hand).get(DataComponentRegistry.LOCATION_DATA.get()) != null) {
+            player.getItemInHand(hand).remove(DataComponentRegistry.LOCATION_DATA.get());
+        }
+
+        int id = player.getId();
+        String name = player.getName().getString();
+        EntityData entityData = new EntityData(id, name);
+
+        return addTargetData(player.getItemInHand(hand), player, hand, DataComponentRegistry.ENTITY_DATA.get(), entityData);
+    }
+
+    private static @NotNull BlockPosSpreader spreadBlockPos(BlockPos blockPos) {
+        int posX = blockPos.getX();
+        int posY = blockPos.getY();
+        int posZ = blockPos.getZ();
+        BlockPosSpreader blockPosSpreader = new BlockPosSpreader(posX, posY, posZ);
+        return blockPosSpreader;
+    }
+
+    private record BlockPosSpreader(int posX, int posY, int posZ) {
+    }
+
+    private static <T extends Record> InteractionResult addTargetData(ItemStack stack, Player player, InteractionHand hand, DataComponentType<T> dataType, T data) {
+        if(player instanceof LocalPlayer)
+            return InteractionResult.PASS;
+
+        stack = stack.copy();
         ItemStack newItemStack = new ItemStack(stack.getItem());
         newItemStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-        int id;
-        String name;
-
-        if(player.isCrouching()) {
-            id = player.getId();
-            name = player.getName().getString();
-        }
-        else {
-            id = interactionTarget.getId();
-            name = interactionTarget.getName().getString();
-        }
-
-
-        newItemStack.set(DataComponentRegistry.ENTITY_DATA.get(), new EntityData(id, name));
+        newItemStack.set(dataType, data);
 
         stack.shrink(1);
         if (stack.isEmpty()) {
-            player.setItemInHand(usedHand, newItemStack);
+            player.setItemInHand(hand, newItemStack);
         } else {
+            player.setItemInHand(hand, stack);
             player.getInventory().placeItemBackInInventory(newItemStack);
         }
         return InteractionResult.SUCCESS;

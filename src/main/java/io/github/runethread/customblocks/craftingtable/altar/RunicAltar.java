@@ -1,6 +1,7 @@
 package io.github.runethread.customblocks.craftingtable.altar;
 
 import com.mojang.serialization.MapCodec;
+import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customitems.CustomItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -16,6 +17,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -70,18 +73,18 @@ public class RunicAltar extends BaseEntityBlock {
     protected @NotNull InteractionResult useItemOn(
             ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult
     ) {
-        if (hand.name().equals("MAIN_HAND")) {
-            this.gemInHand = false;
-        }
-
-        if(stack.getItem() == CustomItems.POWER_GEM.get())
-            this.gemInHand = true;
-
-        if (!hand.name().equals("OFF_HAND"))
+        if (hand.name().equals("OFF_HAND"))
             return InteractionResult.PASS;
 
+        InteractionHand mainHand = InteractionHand.MAIN_HAND;
+        InteractionHand offHand = InteractionHand.OFF_HAND;
+        ItemStack mainHandStack = player.getItemInHand(mainHand);
+        ItemStack offHandStack = player.getItemInHand(offHand);
+
+        gemInHand = mainHandStack.is(CustomItems.POWER_GEM.get()) || offHandStack.is(CustomItems.POWER_GEM.get());
+
         if (!this.gemInHand)
-            return useWithoutItem(state, level, pos, player, hitResult);
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         playerName = player.getName().getString();
 
@@ -96,6 +99,15 @@ public class RunicAltar extends BaseEntityBlock {
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         RunicAltarEntity runicAltarEntity = (RunicAltarEntity) level.getBlockEntity(pos);
         runicAltarEntity.onScheduledTick();
+    }
+
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return level.isClientSide ? null
+                : createTickerHelper(
+                type,
+                CustomBlockEntities.RUNIC_ALTAR.get(),
+                RunicAltarEntity::serverTick
+        );
     }
 
     @Override
@@ -123,6 +135,9 @@ public class RunicAltar extends BaseEntityBlock {
                     ItemStack stack = targetRune.getStackInSlot(i);
                     Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
                 }
+
+                runicAltarEntity.removeBarriers();
+
                 level.removeBlockEntity(pos);
                 super.onRemove(state, level, pos, newState, isMoving);
             }
