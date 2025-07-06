@@ -1,7 +1,9 @@
-package io.github.runethread.customblocks.craftingtable.altar;
+package io.github.runethread.customblocks.altar;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.runethread.customitems.CustomItems;
+import io.github.runethread.datacomponents.DataComponentRegistry;
+import io.github.runethread.datacomponents.IndicatorData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -34,14 +36,19 @@ public class RunicAltarEntityRenderer implements BlockEntityRenderer<RunicAltarE
         }
 
         if(ritualState != RunicAltarEntity.RitualState.IDLE) {
-            Item item = null;
-            switch (ritualState) {
-                case NEUTRAL -> item = CustomItems.RITUAL_INDICATOR_NEUTRAL.get();
-                case SUCCESS -> item = CustomItems.RITUAL_INDICATOR_SUCCESS.get();
-                case FAIL -> item = CustomItems.RITUAL_INDICATOR_FAIL.get();
-            }
-            ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+            Item item = CustomItems.RITUAL_INDICATOR.get();
             ItemStack stack = new ItemStack(item);
+            IndicatorData indicatorData;
+            indicatorData = switch (ritualState) {
+                case NEUTRAL -> new IndicatorData("NEUTRAL");
+                case SUCCESS -> new IndicatorData("SUCCESS");
+                case FAIL -> new IndicatorData("FAIL");
+                case ALMOST -> new IndicatorData("ALMOST");
+                default -> throw new IllegalStateException("Unexpected value: " + ritualState);
+            };
+            stack.set(DataComponentRegistry.RITUAL_STATE.get(), indicatorData);
+
+            ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
             poseStack.pushPose();
             poseStack.translate(0.5, 1.439, 0.5);
             poseStack.scale(1.0f, 1.0f, 1.0f);

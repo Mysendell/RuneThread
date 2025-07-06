@@ -18,9 +18,11 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     protected void generate() {
         dropSelf(CustomBlocks.ANIMATOR_BLOCK.get());
         dropSelf(CustomBlocks.ARCANE_TABLE_BLOCK.get());
-        dropSelf(CustomBlocks.LIMESTONE_BLOCK.get());
-        dropSelf(CustomBlocks.CHARGED_LIMESTONE_BLOCK.get());
+        dropSelf(CustomBlocks.MARBLE_BLOCK.get());
+        dropSelf(CustomBlocks.TSAVORITE_ORE_BLOCK.get());
         dropSelf(CustomBlocks.RUNIC_ALTAR_BLOCK.get());
+        dropSelf(CustomBlocks.MARBLE_BRICK_BLOCK.get());
+        dropSelf(CustomBlocks.MARBLE_BRICK_STAIR_BLOCK.get());
     }
     @Override
     protected Iterable<Block> getKnownBlocks() {

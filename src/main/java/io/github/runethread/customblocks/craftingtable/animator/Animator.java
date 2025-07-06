@@ -1,11 +1,11 @@
 package io.github.runethread.customblocks.craftingtable.animator;
 
+import com.mojang.serialization.MapCodec;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.craftingtable.FurnaceBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -23,10 +23,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Animator extends FurnaceBlock {
+    public static final MapCodec<Animator> CODEC = simpleCodec(Animator::new);
     public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);
 
     public Animator(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<Animator> codec() {
+        return CODEC;
     }
 
     @Override
@@ -70,14 +76,11 @@ public class Animator extends FurnaceBlock {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof AnimatorEntity animator) {
-                for (int i = 0; i < animator.getInput().getSlots(); i++) {
-                    var stack = animator.getInput().getStackInSlot(i);
-                    Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
-                }
-                level.removeBlockEntity(pos);
-                super.onRemove(state, level, pos, newState, isMoving);
-            }
+            if (be instanceof AnimatorEntity animator)
+                animator.onRemove();
+            level.removeBlockEntity(pos);
+            super.onRemove(state, level, pos, newState, isMoving);
+
         }
     }
 }

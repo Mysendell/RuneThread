@@ -32,8 +32,8 @@ public class TeleportUtil {
                     double y = pos.getY();
                     double z = pos.getZ() + 0.5;
                     BlockPos blockPos = new BlockPos((int) x, (int) y, (int) z);
-                    loadedChunkList.add(blockPos);
-                    ChunkUtils.forceLoadChunk(level, pos);
+                    if(ChunkUtils.forceLoadChunk(level, pos))
+                        loadedChunkList.add(blockPos);
                     if (entity.randomTeleport(x, y, z, true)) {
                         for(BlockPos loadedPos : loadedChunkList) {
                             ChunkUtils.removeForceLoadChunk(level, loadedPos);

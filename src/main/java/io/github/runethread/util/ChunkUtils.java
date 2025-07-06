@@ -5,9 +5,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 
 public class ChunkUtils {
-    public static void forceLoadChunk(ServerLevel level, BlockPos pos) {
+    public static boolean forceLoadChunk(ServerLevel level, BlockPos pos) {
         ChunkPos chunkPos = new ChunkPos(pos);
+        if(level.getChunkSource().hasChunk(chunkPos.x, chunkPos.z)) {
+            return false;
+        }
         level.setChunkForced(chunkPos.x, chunkPos.z, true);
+        return true;
     }
     public static void removeForceLoadChunk(ServerLevel level, BlockPos pos) {
         ChunkPos chunkPos = new ChunkPos(pos);

@@ -1,7 +1,5 @@
 package io.github.runethread.customblocks.craftingtable;
 
-import com.mojang.serialization.MapCodec;
-import io.github.runethread.customblocks.craftingtable.animator.Animator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -12,7 +10,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class FurnaceBlock  extends BaseEntityBlock {
-    public static final MapCodec<Animator> CODEC = simpleCodec(Animator::new);
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
 
 
@@ -24,11 +21,6 @@ public abstract class FurnaceBlock  extends BaseEntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT);
-    }
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
     }
 
     @Override

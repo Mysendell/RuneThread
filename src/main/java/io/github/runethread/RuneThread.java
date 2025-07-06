@@ -5,8 +5,8 @@ import io.github.runethread.attachments.BarrierTracker;
 import io.github.runethread.attachments.CustomDataAttachments;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
-import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntity;
-import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntityRenderer;
+import io.github.runethread.customblocks.altar.RunicAltarEntity;
+import io.github.runethread.customblocks.altar.RunicAltarEntityRenderer;
 import io.github.runethread.customeffects.CustomEffects;
 import io.github.runethread.customentities.cakegolem.CakeGolem;
 import io.github.runethread.customentities.cakegolem.CakeGolemModel;
@@ -15,10 +15,12 @@ import io.github.runethread.customentities.customEntities;
 import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.datagen.properties.PowerRune;
+import io.github.runethread.datagen.properties.RitualIndicator;
 import io.github.runethread.gui.CustomMenus;
 import io.github.runethread.gui.screens.AnimatorScreen;
 import io.github.runethread.gui.screens.ArcaneScreen;
 import io.github.runethread.gui.screens.RusticAltarScreen;
+import io.github.runethread.gui.screens.TempleAltarScreen;
 import io.github.runethread.recipes.CustomRecipes;
 import io.github.runethread.util.Barrier;
 import io.github.runethread.util.BarrierManager;
@@ -55,7 +57,6 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import static io.github.runethread.customblocks.CustomBlocks.BLOCKS;
@@ -80,6 +81,8 @@ public class RuneThread {
                         CustomItems.CreativeTabItems(output);
                     })
                     .build());
+
+    double scale = 0.5;
 
     public RuneThread(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.CLIENT, RuneConfig.SPEC);
@@ -127,16 +130,24 @@ public class RuneThread {
         Barrier crossedBarrier = BarrierManager.isCrossingAnyBarrier(now, lastPos);
         if (crossedBarrier != null && lastPos != Vec3.ZERO) {
             Vec3 clampedVec = crossedBarrier.clampToCubeBarrier(lastPos, now);
+            Vec3 deltaMob = entity.getDeltaMovement();
+            Vec3 deltaProjectile;
+
             if (clampedVec == null) {
-                Vec3 delta = entity.getDeltaMovement();
-                entity.setDeltaMovement(delta.x, 1, delta.z);
-            } else
+                clampedVec = lastPos;
+                deltaMob = new Vec3(deltaMob.x, -deltaMob.y, deltaMob.z);
+                deltaProjectile = deltaMob.scale(scale);
+            } else {
+                deltaProjectile = new Vec3(0, -0.3, 0);
                 entity.setPos(clampedVec);
-            if (entity instanceof Projectile)
+            }
+
+            if (entity instanceof Projectile) {
+                entity.setPos(clampedVec);
                 switch (entity) {
                     case AbstractArrow arrow -> {
                         arrow.setCritArrow(false);
-                        arrow.setDeltaMovement(new Vec3(0, -0.3, 0));
+                        arrow.setDeltaMovement(deltaProjectile);
                         arrow.setNoPhysics(false);
                     }
                     case FishingHook hook -> {
@@ -148,58 +159,17 @@ public class RuneThread {
                         enderPearl.discard();
                     }
                     default -> {
-                        entity.setDeltaMovement(new Vec3(0, -0.3, 0));
+                        entity.setDeltaMovement(deltaProjectile);
                     }
                 }
+            } else
+                entity.setDeltaMovement(deltaMob);
+
         } else {
             barrierTracker.setLastBarrierCheckPos(now);
             entity.setData(CustomDataAttachments.BARRIER_TRACKER_STORAGE, barrierTracker);
         }
     }
-
-    /*@SubscribeEvent
-    public void onEntityUpdate(LivingBreatheEvent event) {
-        Entity entity = event.getEntity();
-        Vec3 now = entity.position();
-        BarrierTracker barrierTracker = entity.getData(CustomDataAttachments.BARRIER_TRACKER_STORAGE);
-        Barrier crossedBarrier = BarrierManager.isCrossingAnyBarrier(now, barrierTracker.getLastBarrierCheckPos());
-        if (crossedBarrier != null) {
-            Vec3 lastPos = barrierTracker.getLastBarrierCheckPos();
-            Vec3 movement = now.subtract(lastPos);
-            Vec3 reverse = movement.normalize().scale(-1);
-            double pushDistance = 4.0;
-        Vec3 heightCorrection = Vec3.ZERO;
-        if (now.y >= crossedBarrier.getCenter().getY() + crossedBarrier.getRadius()) {
-            double distX = Math.abs(now.x - crossedBarrier.getCenter().getX());
-            double distZ = Math.abs(now.z - crossedBarrier.getCenter().getZ());
-            heightCorrection = new Vec3(crossedBarrier.getRadius() - distX, 0, crossedBarrier.getRadius() - distZ);
-        }
-        Vec3 correctedPos = now.add(reverse.scale(pushDistance)).add(heightCorrection.scale(pushDistance / 2));
-        entity.setPos(lastPos.add(heightCorrection.scale(2)));
-            entity.setPos(crossedBarrier.clampToCubeBarrier(lastPos, now));
-        } else {
-            barrierTracker.setLastBarrierCheckPos(now);
-            entity.setData(CustomDataAttachments.BARRIER_TRACKER_STORAGE, barrierTracker);
-        }
-    }*/
-
-    private static @NotNull Vec3 getValidLocation(Barrier crossedBarrier, Vec3 now) {
-        double epsilon = -1;
-        // Clamp the entity to the nearest valid position on the barrier's surface
-        double minX = crossedBarrier.getCenter().getX() - crossedBarrier.getRadius();
-        double maxX = crossedBarrier.getCenter().getX() + crossedBarrier.getRadius();
-        double minY = crossedBarrier.getCenter().getY() - crossedBarrier.getRadius();
-        double maxY = crossedBarrier.getCenter().getY() + crossedBarrier.getRadius();
-        double minZ = crossedBarrier.getCenter().getZ() - crossedBarrier.getRadius();
-        double maxZ = crossedBarrier.getCenter().getZ() + crossedBarrier.getRadius();
-
-        double clampedX = Math.max(minX + epsilon, Math.min(maxX - epsilon, now.x));
-        double clampedY = Math.max(minY + epsilon, Math.min(maxY - epsilon, now.y));
-        double clampedZ = Math.max(minZ + epsilon, Math.min(maxZ - epsilon, now.z));
-
-        return new Vec3(clampedX, clampedY, clampedZ);
-    }
-
 
     @EventBusSubscriber(value = Dist.CLIENT)
     public static class ClientEvents {
@@ -216,8 +186,12 @@ public class RuneThread {
         @SubscribeEvent
         public static void registerRangeProps(RegisterRangeSelectItemModelPropertyEvent event) {
             event.register(
-                    ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "power_rune"),  // use your ID
+                    ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "power_rune"),
                     PowerRune.MAP_CODEC
+            );
+            event.register(
+                    ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "ritual_state"),
+                    RitualIndicator.MAP_CODEC
             );
         }
 
@@ -226,6 +200,7 @@ public class RuneThread {
             event.register(CustomMenus.ARCANE_MENU.get(), ArcaneScreen::new);
             event.register(CustomMenus.ANIMATOR_MENU.get(), AnimatorScreen::new);
             event.register(CustomMenus.RUSTIC_ALTAR_MENU.get(), RusticAltarScreen::new);
+            event.register(CustomMenus.TEMPLE_ALTAR_MENU.get(), TempleAltarScreen::new);
         }
 
         @SubscribeEvent

@@ -6,7 +6,9 @@ import io.github.runethread.recipes.FurnaceOutputSlot;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
@@ -77,10 +79,58 @@ public class AnimatorMenu extends Menu<AnimatorEntity> {
     }
 
     private void addAnimatorTableSlots() {
-        this.addSlot(new FurnaceOutputSlot(blockEntity, player, level, 0, 98, 39));
-        this.addSlot(new SlotItemHandler(input, 0, 17, 21));
+        this.addSlot(new FurnaceOutputSlot(blockEntity, player, level, 0, 98, 39) {
+            @Override
+            public void set(ItemStack stack) {
+                super.set(stack);
+                if (!blockEntity.getLevel().isClientSide()) {
+                    blockEntity.scheduleCraftingUpdate();
+                }
+            }
+
+            @Override
+            public void onTake(Player player, ItemStack stack) {
+                super.onTake(player, stack);
+                if (!blockEntity.getLevel().isClientSide()) {
+                    blockEntity.scheduleCraftingUpdate();
+                }
+            }
+        });
+        this.addSlot(new SlotItemHandler(input, 0, 17, 21) {
+            @Override
+            public void set(ItemStack stack) {
+                super.set(stack);
+                if (!blockEntity.getLevel().isClientSide()) {
+                    blockEntity.scheduleCraftingUpdate();
+                }
+            }
+
+            @Override
+            public void onTake(Player player, ItemStack stack) {
+                super.onTake(player, stack);
+                if (!blockEntity.getLevel().isClientSide()) {
+                    blockEntity.scheduleCraftingUpdate();
+                }
+            }
+        });
         this.addSlot(new SlotItemHandler(fuel, 0, 17, 57));
-        this.addSlot(new SlotItemHandler(lifeEnergy, 0, 44, 21));
+        this.addSlot(new SlotItemHandler(lifeEnergy, 0, 44, 21) {
+            @Override
+            public void set(ItemStack stack) {
+                super.set(stack);
+                if (!blockEntity.getLevel().isClientSide()) {
+                    blockEntity.scheduleCraftingUpdate();
+                }
+            }
+
+            @Override
+            public void onTake(Player player, ItemStack stack) {
+                super.onTake(player, stack);
+                if (!blockEntity.getLevel().isClientSide()) {
+                    blockEntity.scheduleCraftingUpdate();
+                }
+            }
+        });
     }
 
     @Override

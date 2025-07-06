@@ -1,7 +1,7 @@
 package io.github.runethread.gui.menus;
 
 import io.github.runethread.customTags.RuneTags;
-import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntity;
+import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.gui.CustomMenus;
 import io.github.runethread.gui.Menu;
 import io.github.runethread.gui.TagRestrictedSlot;
@@ -12,9 +12,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 
 public class RusticAltarMenu extends Menu<RunicAltarEntity> {
-    private IItemHandler mainRune;
-    private IItemHandler destinationRune;
-    private IItemHandler powerRune;
+    private final IItemHandler mainRune;
+    private final IItemHandler destinationRune;
+    private final IItemHandler power;
 
     public RusticAltarMenu(int id, Inventory playerInv, FriendlyByteBuf buf) {
         this(id, playerInv, playerInv.player.level().getBlockEntity(buf.readBlockPos()));
@@ -24,7 +24,7 @@ public class RusticAltarMenu extends Menu<RunicAltarEntity> {
         super(id, playerInv, blockEntity, CustomMenus.RUSTIC_ALTAR_MENU.get());
             mainRune = ((RunicAltarEntity) blockEntity).getMainRune();
             destinationRune = ((RunicAltarEntity) blockEntity).getDestinationRune();
-            powerRune = ((RunicAltarEntity) blockEntity).getPower();
+            power = ((RunicAltarEntity) blockEntity).getPower();
 
             addPlayerInventory(playerInv, 8, 84, 18, 18);
             addPlayerHotbar(playerInv, 8, 142, 18);
@@ -34,9 +34,9 @@ public class RusticAltarMenu extends Menu<RunicAltarEntity> {
     }
 
     private void addRunicAltarSlots() {
-        this.addSlot(new TagRestrictedSlot(mainRune, 0, 80, 31, RuneTags.Items.FUNCTION_RUNE_TAG, RuneTags.Items.NATURE_RUNE_TAG));
-        this.addSlot(new TagRestrictedSlot(destinationRune, 0, 35, 31, RuneTags.Items.LOCATON_RUNE_TAG));
-        this.addSlot(new TagRestrictedSlot(powerRune, 0, 125, 31, RuneTags.Items.POWER_TAG));
+        this.addSlot(new TagRestrictedSlot(mainRune, 0, 80, 31, blockEntity, RuneTags.Items.FUNCTION_RUNE_TAG, RuneTags.Items.NATURE_RUNE_TAG));
+        this.addSlot(new TagRestrictedSlot(destinationRune, 0, 35, 31, blockEntity, RuneTags.Items.LOCATON_RUNE_TAG));
+        this.addSlot(new TagRestrictedSlot(power, 0, 125, 31, blockEntity, RuneTags.Items.POWER_TAG));
     }
 
     @Override

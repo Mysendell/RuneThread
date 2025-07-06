@@ -5,7 +5,6 @@ import io.github.runethread.customblocks.CustomBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +33,7 @@ public class ArcaneTableBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
+    protected MapCodec<ArcaneTableBlock> codec() {
         return CODEC;
     }
 
@@ -66,12 +65,8 @@ public class ArcaneTableBlock extends BaseEntityBlock {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ArcaneTableEntity arcaneTable) {
-                for (int i = 0; i < arcaneTable.getInventory().getSlots(); i++) {
-                    var stack = arcaneTable.getInventory().getStackInSlot(i);
-                    Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
-                }
-            }
+            if (be instanceof ArcaneTableEntity arcaneTable)
+                arcaneTable.onRemove();
             level.removeBlockEntity(pos);
             super.onRemove(state, level, pos, newState, isMoving);
         }

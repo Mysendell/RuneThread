@@ -1,5 +1,6 @@
 package io.github.runethread.customentities;
 
+import io.github.runethread.RuneThread;
 import io.github.runethread.customentities.cakegolem.CakeGolem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -25,7 +26,7 @@ public class customEntities {
                     .eyeHeight(1.4375f)
                     .build(ResourceKey.create(
                             Registries.ENTITY_TYPE,
-                            ResourceLocation.fromNamespaceAndPath(MOD_ID, "cake_golem")
+                            ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "cake_golem")
                     ))
     );
     /*public static final ModelLayerLocation CAKE_GOLEM_LAYER = new ModelLayerLocation(

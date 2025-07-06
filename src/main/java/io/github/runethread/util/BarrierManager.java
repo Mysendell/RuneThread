@@ -1,6 +1,6 @@
 package io.github.runethread.util;
 
-import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntity;
+import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 

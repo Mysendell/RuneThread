@@ -1,7 +1,7 @@
 package io.github.runethread.customblocks;
 
 import io.github.runethread.RuneThread;
-import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntity;
+import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customblocks.craftingtable.animator.AnimatorEntity;
 import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableEntity;
 import net.minecraft.core.registries.Registries;

@@ -1,6 +1,8 @@
-package io.github.runethread.customblocks.craftingtable.altar;
+package io.github.runethread.customblocks.altar;
 
 import io.github.runethread.customblocks.CustomBlockEntities;
+import io.github.runethread.customblocks.CustomBlocks;
+import io.github.runethread.customblocks.StructureCenterEntity;
 import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.customitems.runes.LocationRuneItem;
 import io.github.runethread.customitems.runes.MainRuneItem;
@@ -8,16 +10,14 @@ import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.datacomponents.EntityData;
 import io.github.runethread.datacomponents.LocationData;
 import io.github.runethread.gui.menus.RusticAltarMenu;
-import io.github.runethread.util.Barrier;
-import io.github.runethread.util.BarrierManager;
-import net.minecraft.ChatFormatting;
+import io.github.runethread.gui.menus.TempleAltarMenu;
+import io.github.runethread.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
@@ -26,19 +26,20 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RunicAltarEntity extends BlockEntity implements MenuProvider {
+public class RunicAltarEntity extends StructureCenterEntity implements MenuProvider {
     public enum RitualState implements StringRepresentable {
         IDLE,
         NEUTRAL,
         SUCCESS,
+        ALMOST,
         FAIL;
 
         @Override
@@ -48,13 +49,132 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
     }
 
     private final ItemStackHandler mainRune = new ItemStackHandler(1);
-    private ItemStackHandler destinationRune = new ItemStackHandler(1);
-    private ItemStackHandler targetRune = new ItemStackHandler(0);
-    private ItemStackHandler power = new ItemStackHandler(1);
+    private ItemStackHandler destinationRune = new ItemStackHandler(2);
+    private ItemStackHandler targetRune = new ItemStackHandler(18);
+    private ItemStackHandler power = new ItemStackHandler(2);
     private int energy = 0;
     private RitualState ritualState = RitualState.IDLE;
     private String playerName;
     private List<Barrier> barriers;
+    static{
+        structure = new StructureCheckerUtil.StructurePart[]{
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-2, -3, -2), new BlockPos(2, -3, 2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-1, -2, -1), new BlockPos(1, -2, 1),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(0, -1, 0), new BlockPos(0, -1, 0),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(3, -3, 3), new BlockPos(2, -3, 2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-3, -3, -3), new BlockPos(-2, -3, -2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(3, -3, -3), new BlockPos(2, -3, -2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-3, -3, 3), new BlockPos(-2, -3, 2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(2, -2, 2), new BlockPos(2, 0, 2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-2, -2, -2), new BlockPos(-2, 0, -2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-2, -2, 2), new BlockPos(-2, 0, 2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(2, -2, -2), new BlockPos(2, 0, -2),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(3, -2, 3), new BlockPos(3, 1, 3),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(3, -2, -3), new BlockPos(3, 1, -3),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-3, -2, -3), new BlockPos(-3, 1, -3),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-3, -2, 3), new BlockPos(-3, 1, 3),
+                        CustomBlocks.MARBLE_BRICK_BLOCK
+                ),
+
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(3, -3, 1), new BlockPos(3, -3, -1),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-3, -3, 1), new BlockPos(-3, -3, -1),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(1, -3, 3), new BlockPos(-1, -3, 3),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(1, -3, -3), new BlockPos(-1, -3, -3),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(2, -2, 1), new BlockPos(2, -2, -1),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-2, -2, 1), new BlockPos(-2, -2, -1),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(1, -2, 2), new BlockPos(-1, -2, 2),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(1, -2, -2), new BlockPos(-1, -2, -2),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(1, -1, 1), new BlockPos(1, -1, -1),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(-1, -1, 1), new BlockPos(-1, -1, -1),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(0, -1, 1), new BlockPos(0, -1, 1),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+                new StructureCheckerUtil.StructurePart(
+                        new BlockPos(0, -1, -1), new BlockPos(0, -1, -1),
+                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
+                ),
+        };
+        structureSize = 107;
+    }
 
     public RunicAltarEntity(BlockPos pos, BlockState blockState) {
         super(CustomBlockEntities.RUNIC_ALTAR.get(), pos, blockState);
@@ -62,12 +182,14 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public Component getDisplayName() {
+    public @NotNull Component getDisplayName() {
         return Component.translatable("container.runic_altar");
     }
 
     @Override
-    public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+    public @Nullable AbstractContainerMenu createMenu(int containerId, @NotNull Inventory playerInventory, @NotNull Player player) {
+        if(isStructured)
+            return new TempleAltarMenu(containerId, playerInventory, this);
         return new RusticAltarMenu(containerId, playerInventory, this);
     }
 
@@ -78,8 +200,11 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
             update(RitualState.IDLE);
             return;
         }
-
-        performRustic();
+        BlockState state = level.getBlockState(worldPosition);
+        if(!state.getValue(RunicAltar.STRUCTURED))
+            performRustic();
+        else
+            performTemple();
     }
 
     private void performRustic() {
@@ -99,20 +224,24 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
             if (targetRuneStack.isEmpty()) continue;
             additionalData.add(targetRuneStack);
         }
-        DestinationRuneData referenceRuneData = getDestinationRuneData(referenceRuneStack);
+        DestinationRuneData referenceRuneData = null;
+        if(!referenceRuneStack.isEmpty())
+            referenceRuneData = getDestinationRuneData(referenceRuneStack);
 
         Integer result = perform(energy, destinationRuneStack, additionalData, referenceRuneData);
         if (result == null) return;
+        if (Math.random() < 0.2) {
+            referenceRuneStack.shrink(1);
+        }
         energy = result;
     }
 
     private Integer perform(int energy, ItemStack destinationRuneStack, List<Object> additionalData, DestinationRuneData reference) {
         ItemStack mainRuneStack = mainRune.getStackInSlot(0);
-        ItemStack powerStack = power.getStackInSlot(0);
-        energy = addEnergy(powerStack, energy);
+        energy = addEnergy(power, energy);
 
         if (mainRuneStack.isEmpty() || destinationRuneStack.isEmpty()) {
-            sendErrorMessage(playerName, "Ritual failed: Main rune or destination rune is missing!");
+            ChatUtils.sendErrorMessagePlayer(playerName, "Ritual failed: Main rune or destination rune is missing!", level);
             updateRitual(RitualState.FAIL);
             return null;
         }
@@ -121,7 +250,11 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
         MainRuneItem mainRuneItem = (MainRuneItem) mainRuneStack.getItem();
 
         DestinationRuneData destinationRuneData = getDestinationRuneData(destinationRuneStack);
-        if (destinationRuneData == null) return null;
+        if (destinationRuneData == null) {
+            ChatUtils.sendErrorMessagePlayer(playerName, "Ritual failed: Destination rune is not set!", level);
+            updateRitual(RitualState.FAIL);
+            return null;
+        }
 
         int range = destinationRuneItem.getMaxRange();
         double distance = Math.sqrt(
@@ -136,18 +269,17 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
         if (maxScale == null) return null;
         int energyCost = (int) (cost * Math.pow(scalingCost, maxScale - 1));
         if (energy < energyCost) {
-            sendErrorMessage(playerName, "Ritual failed: Not enough energy!");
+            ChatUtils.sendErrorMessagePlayer(playerName, "Ritual failed: Not enough energy!", level);
             updateRitual(RitualState.FAIL);
             return null;
         }
-        energy -= energyCost;
 
-        updateRitual(RitualState.SUCCESS);
+        update(RitualState.SUCCESS);
 
         if(mainRuneItem.equals(CustomItems.PROTECTION_RUNE.get()))
             additionalData.addFirst(this);
 
-        mainRuneItem.getRuneFunction().perform(
+        updateRitual(mainRuneItem.getRuneFunction().perform(
                 (ServerLevel) level,
                 level.getServer().getPlayerList().getPlayerByName(playerName),
                 mainRuneItem,
@@ -155,12 +287,15 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
                 destinationRuneData,
                 reference,
                 additionalData.toArray()
-        );
+        ));
 
-        if(Math.random() < 0.4)
-            mainRuneStack.shrink(1);
         if(Math.random() < 0.3)
+            mainRuneStack.shrink(1);
+        if(Math.random() < 0.2)
             destinationRuneStack.shrink(1);
+
+        if(ritualState == RitualState.SUCCESS)
+            energy -= energyCost;
 
         return energy;
     }
@@ -181,7 +316,7 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
         } else if (entityData != null) {
             entity = level.getEntity(entityData.UUID());
             if (entity == null) {
-                sendErrorMessage(playerName, "Ritual failed: Target entity not found!");
+                ChatUtils.sendErrorMessagePlayer(playerName, "Ritual failed: Target entity not found!", level);
                 updateRitual(RitualState.FAIL);
                 return null;
             }
@@ -189,11 +324,9 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
             locationY = entity.blockPosition().getY();
             locationZ = entity.blockPosition().getZ();
         }
-        else{
-            sendErrorMessage(playerName, "Ritual failed: Destination rune is not set!");
-            updateRitual(RitualState.FAIL);
+        else
             return null;
-        }
+
         return new DestinationRuneData(locationX, locationY, locationZ, entity);
     }
 
@@ -203,13 +336,20 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
         }
     }
 
+    private static int addEnergy(ItemStackHandler power, int energy) {
+            for(int i=0; i < power.getSlots(); i++) {
+                ItemStack powerStack = power.getStackInSlot(i);
+                energy += addEnergy(powerStack, energy);
+            }
+        return energy;
+    }
+
     private static int addEnergy(ItemStack powerStack, int energy) {
-        if(!powerStack.isEmpty()) {
-            int energyPer = new int[]{10, 50, 100, 200, 500}[powerStack.get(DataComponentRegistry.POWER_DATA.get()).power() - 1];
-            int amount = powerStack.getCount();
-            energy += amount * energyPer;
-            powerStack.shrink(amount);
-        }
+        if (powerStack.isEmpty()) return energy;
+        int energyPer = new int[]{10, 50, 100, 200, 500}[powerStack.get(DataComponentRegistry.POWER_DATA.get()).power() - 1];
+        int amount = powerStack.getCount();
+        energy += amount * energyPer;
+        powerStack.shrink(amount);
         return energy;
     }
 
@@ -221,7 +361,7 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
             maxScale = Math.max(maxScale, 1);
         }
         else if (distance > range) {
-            sendErrorMessage(playerName, "Ritual failed: Target is out of range!");
+            ChatUtils.sendErrorMessagePlayer(playerName, "Ritual failed: Target is out of range!", level);
             updateRitual(RitualState.FAIL);
             return null;
         }
@@ -255,19 +395,16 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
         }
     }
 
+    protected void updateSelfState(boolean value){
+        if(isStructured != value)
+            dropItems();
+        isStructured = value;
+        BlockState state = level.getBlockState(worldPosition);
+        level.setBlock(worldPosition, state.setValue(RunicAltar.STRUCTURED, value), 2);
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, RunicAltarEntity entity){
         entity.serverTick();
-    }
-
-    private void sendErrorMessage(String playerName, String message) {
-        sendMessage(playerName, Component.literal(message).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
-    }
-
-    private void sendMessage(String playerName, Component messageComponent) {
-        ServerPlayer player = level.getServer().getPlayerList().getPlayerByName(playerName);
-        if (player != null) {
-            player.sendSystemMessage(messageComponent);
-        }
     }
 
     private void update(RitualState ritualState) {
@@ -290,6 +427,19 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
         } catch (Exception e) {
             System.err.println(e);
         }
+    }
+
+    public void onRemove() {
+        dropItems();
+        removeBarriers();
+        updateStructureState(false);
+    }
+
+    public void dropItems(){
+        InventoryUtil.dropStackHandler(worldPosition, level, power);
+        InventoryUtil.dropStackHandler(worldPosition, level, destinationRune);
+        InventoryUtil.dropStackHandler(worldPosition, level, targetRune);
+        InventoryUtil.dropStackHandler(worldPosition, level, mainRune);
     }
 
     @Override
@@ -359,5 +509,11 @@ public class RunicAltarEntity extends BlockEntity implements MenuProvider {
     }
     public void addBarrier(Barrier barrier) {
         barriers.add(barrier);
+    }
+    public StructureCheckerUtil.StructurePart[] getStructure() {
+        return structure;
+    }
+    public void setStructure(StructureCheckerUtil.StructurePart[] structure) {
+        this.structure = structure;
     }
 }

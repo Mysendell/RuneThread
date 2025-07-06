@@ -47,5 +47,14 @@ public class DataComponentRegistry {
                             ).apply(instance, PowerData::new)
                     ))
             );
+    public static final Supplier<DataComponentType<IndicatorData>> RITUAL_STATE =
+            DATA_COMPONENTS.registerComponentType(
+                    "ritual_state",
+                    builder -> builder.persistent(RecordCodecBuilder.create(instance ->
+                            instance.group(
+                                    Codec.STRING.fieldOf("state").forGetter(IndicatorData::ritualState)
+                            ).apply(instance, IndicatorData::new)
+                    ))
+            );
 }
 

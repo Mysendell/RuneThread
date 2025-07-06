@@ -1,7 +1,7 @@
 package io.github.runethread.customitems;
 
 import io.github.runethread.RuneThread;
-import io.github.runethread.customblocks.craftingtable.altar.RunicAltarEntity;
+import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customeffects.CustomEffects;
 import io.github.runethread.customentities.customEntities;
 import io.github.runethread.customitems.runes.LocationRuneItem;
@@ -50,11 +50,7 @@ public class CustomItems {
 
     public static final DeferredItem<Item> POWER_GEM = ITEMS.registerSimpleItem("power_gem",
             new Item.Properties().stacksTo(64).fireResistant());
-    public static final DeferredItem<Item> RITUAL_INDICATOR_NEUTRAL = ITEMS.registerSimpleItem("ritual_indicator_neutral",
-            new Item.Properties().stacksTo(64).fireResistant());
-    public static final DeferredItem<Item> RITUAL_INDICATOR_SUCCESS = ITEMS.registerSimpleItem("ritual_indicator_success",
-            new Item.Properties().stacksTo(64).fireResistant());
-    public static final DeferredItem<Item> RITUAL_INDICATOR_FAIL = ITEMS.registerSimpleItem("ritual_indicator_fail",
+    public static final DeferredItem<Item> RITUAL_INDICATOR = ITEMS.registerSimpleItem("ritual_indicator",
             new Item.Properties().stacksTo(64).fireResistant());
 
     public static final DeferredItem<Item> POWER_RUNE = ITEMS.registerSimpleItem("power_rune",
@@ -86,14 +82,19 @@ public class CustomItems {
                     (level, player, item, finalScale, destination, reference, additionalData) -> {
                         ExplosionUtil.accurateExplosion(level, new BlockPos(destination.locationX(), destination.locationY(), destination.locationY()), finalScale * item.getScale(),
                                 false, true, true, item.getScale() * finalScale * 1.5f);
+                        return RunicAltarEntity.RitualState.SUCCESS;
                     }));
 
     public static final DeferredItem<Item> PORTAL_RUNE = ITEMS.registerItem("portal_rune",
             (properties) -> new MainRuneItem(properties.stacksTo(16).fireResistant(), 15, 1, 1.5f,
                     (level, player, item, finalScale, destination, reference, additionalData) -> {
-                        if(!TeleportUtil.teleportToNearestSafe(player, level,  new BlockPos(destination.locationX(), destination.locationY(), destination.locationY()),
-                                20 , 20))
+                        if (!TeleportUtil.teleportToNearestSafe(player, level, new BlockPos(destination.locationX(), destination.locationY(), destination.locationY()),
+                                10, 10)) {
                             player.sendSystemMessage(Component.literal("Teleport failed: No safe location found!").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                            return RunicAltarEntity.RitualState.ALMOST;
+                        } else {
+                            return RunicAltarEntity.RitualState.SUCCESS;
+                        }
                     }));
     public static final DeferredItem<Item> PROTECTION_RUNE = ITEMS.registerItem("protection_rune",
             (properties) -> new MainRuneItem(properties.stacksTo(16).fireResistant(), 10, 10, 1.5f,
@@ -101,8 +102,7 @@ public class CustomItems {
                         LivingEntity entity = (LivingEntity) destination.entity();
                         if (entity != null) {
                             entity.addEffect(new MobEffectInstance(CustomEffects.IMMUNITY, 20 * finalScale * item.getScale()));
-                        }
-                        else{
+                        } else {
                             RunicAltarEntity runicAltarEntity = (RunicAltarEntity) additionalData[0];
                             Barrier barrier = new Barrier(
                                     new BlockPos(destination.locationX(), destination.locationY(), destination.locationZ()),
@@ -113,6 +113,7 @@ public class CustomItems {
                             BarrierManager.addBarrier(barrier);
                             runicAltarEntity.addBarrier(barrier);
                         }
+                        return RunicAltarEntity.RitualState.SUCCESS;
                     }));
 
     public static void CreativeTabItems(CreativeModeTab.Output output) {

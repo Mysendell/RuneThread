@@ -19,93 +19,43 @@ import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static io.github.runethread.util.InventoryUtil.*;
 
 public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> extends BlockEntity implements MenuProvider {
     protected int inputWidth = 1, inputHeight = 1;
     protected int outputWidth = 1, outputHeight = 1;
     protected int fuelWidth = 1, fuelHeight = 1;
-    protected ItemStackHandler input = new ItemStackHandler(inputWidth * inputHeight) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            super.onContentsChanged(slot);
-            if (!level.isClientSide()) {
-                isSmelting2 = false;
-                FurnaceEntity.this.setChanged();
-            }
-        }
-    };
-    protected ItemStackHandler output = new ItemStackHandler(outputWidth * outputHeight) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            super.onContentsChanged(slot);
-            if (!level.isClientSide()) {
-                FurnaceEntity.this.setChanged();
-            }
-        }
-    };
-    protected ItemStackHandler fuel = new ItemStackHandler(fuelWidth * fuelHeight) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            super.onContentsChanged(slot);
-            if (!level.isClientSide()) {
-                FurnaceEntity.this.setChanged();
-            }
-        }
-    };
+    protected ItemStackHandler input = new ItemStackHandler(inputWidth * inputHeight);
+    protected ItemStackHandler output = new ItemStackHandler(outputWidth * outputHeight);
+    protected ItemStackHandler fuel = new ItemStackHandler(fuelWidth * fuelHeight);
     protected int fuelBurnTime = 0, burnTime = 0, recipeBurnTime = 0;
     protected int furnaceSpeed = 200;
     protected HolderLookup.Provider registries;
     protected FeatureFlagSet enabledFeatures;
     protected FuelValues fuelValues;
-    protected boolean isSmelting1 = false, isSmelting2 = false;
+    protected boolean needsUpdate = true;
+    protected int fuelBurnMultiplier = 1;
+    protected T recipe;
+    protected ItemStack result;
 
 
     public FurnaceEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
     }
 
-    public ItemStackHandler getInput() {
-        return input;
-    }
-
-    public ItemStackHandler getOutput() {
-        return output;
-    }
-
-    public ItemStackHandler getFuel() {
-        return fuel;
-    }
-
-    public int getBurnTime() {
-        return burnTime;
-    }
-
-    public int getMaxBurnTime() {
-        return recipeBurnTime + furnaceSpeed;
-    }
-
-    public int getFuelBurnTime() {
-        return fuelBurnTime;
-    }
-
-    public boolean canCraft(Level level) {
-        if (isSmelting2 != isSmelting1)
-            return false;
+    public Optional<RecipeHolder<CraftingRecipe>> canCraft(Level level) {
 
         List<ItemStack> inputItems = getCraftingItems(inputWidth, inputHeight, input);
         CraftingInput inputRecipe = getRecipeInput(inputWidth, inputHeight, inputItems);
 
         Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, inputRecipe);
 
-        if (recipeOpt.isPresent()) {
-            isSmelting1 = true;
-            isSmelting2 = true;
-            return true;
-        }
-        return false;
+        setLitState(recipeOpt.isPresent());
+
+        return recipeOpt;
     }
 
     private void setLitState(boolean lit) {
@@ -124,140 +74,61 @@ public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> 
             fuelValues = FuelValues.vanillaBurnTimes(registries, enabledFeatures);
         }
 
-        if (!canCraft(level)) {
-            burnTime = 0;
-            isSmelting1 = false;
-            isSmelting2 = false;
-        }
-        List<ItemStack> inputItems = getCraftingItems(inputWidth, inputHeight, input);
-        List<ItemStack> fuelItems = getCraftingItems(fuelWidth, fuelHeight, fuel);
-        List<ItemStack> outputItems = getCraftingItems(outputWidth, outputHeight, output);
-        CraftingInput inputRecipe = getRecipeInput(inputWidth, inputHeight, inputItems);
-
-        Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, inputRecipe);
-
-        if (recipeOpt.isEmpty()) {
-            isSmelting1 = false;
-            isSmelting2 = false;
-            setLitState(false);
-            return;
+        if (needsUpdate) {
+            needsUpdate = false;
+            this.setChanged();
+            Optional<RecipeHolder<CraftingRecipe>> recipeOpt = canCraft(level);
+            recipe = (T) recipeOpt.map(RecipeHolder::value).orElse(null);
+            if (recipe != null) {
+                List<ItemStack> inputItems = getCraftingItems(inputWidth, inputHeight, input);
+                CraftingInput inputRecipe = getRecipeInput(inputWidth, inputHeight, inputItems);
+                result = recipe.assemble(inputRecipe, level.registryAccess());
+                recipeBurnTime = recipe.getBurnTime();
+                fuelBurnMultiplier = recipe.getFuelBurnMultiplier();
+            }
         }
 
-        T recipe = (T) recipeOpt.get().value();
-        ItemStack result = recipe.assemble(inputRecipe, level.registryAccess());
-
-
-        if (!canFullyOutput(outputItems, result)) {
-            isSmelting1 = false;
-            isSmelting2 = false;
-        }
-
-        setLitState(isSmelting1 && isSmelting2);
-
-        if (!isSmelting1 && !isSmelting2) {
+        if(recipe == null) {
             burnTime = 0;
             return;
         }
 
-        recipeBurnTime = recipe.getBurnTime();
-        int fuelBurnMultiplier = recipe.getFuelBurnMultiplier();
-
-        if (fuelBurnTime == 0) {
-            for (int i = 0; i < fuelItems.size(); i++) {
-                if (fuelItems.get(i).isEmpty()) continue;
-                fuelBurnTime = fuelItems.get(i).getBurnTime(getRecipeType(), fuelValues);
-                if (fuelBurnTime > 0) {
-                    fuel.extractItem(i, 1, false);
-                    break;
-                }
-            }
-            if (fuelBurnTime == 0) {
-                isSmelting1 = false;
-                isSmelting2 = false;
-                return;
-            }
-        }
         if (burnTime >= (recipeBurnTime + furnaceSpeed)) {
+            List<ItemStack> outputStacks = getCraftingItems(outputWidth, outputHeight, output);
+            if (!canFullyOutput(outputStacks, result)) return;
             burnTime = 0;
-            isSmelting1 = false;
-            isSmelting2 = false;
             distributeOutput(output, result);
             removeCraftingItems(inputWidth, inputHeight, input);
+            needsUpdate = true;
         } else {
+            if (fuelBurnTime == 0 && !updateFuel())
+                return;
             burnTime++;
             fuelBurnTime -= fuelBurnMultiplier;
         }
     }
 
-    public static boolean canFullyOutput(List<ItemStack> outputItems, ItemStack result) {
-        int remaining = result.getCount();
-
-        for (ItemStack outputStack : outputItems) {
-            if (remaining <= 0) break;
-
-            if (outputStack.isEmpty()) {
-                // Can insert up to the max stack size
-                int max = result.getMaxStackSize();
-                int canInsert = Math.min(max, remaining);
-                remaining -= canInsert;
-            } else if (ItemStack.isSameItemSameComponents(outputStack, result)) {
-                // Can fill up to max stack size
-                int space = outputStack.getMaxStackSize() - outputStack.getCount();
-                int canInsert = Math.min(space, remaining);
-                remaining -= canInsert;
+    protected boolean updateFuel() {
+        List<ItemStack> fuelItems = getCraftingItems(fuelWidth, fuelHeight, fuel);
+        for (int i = 0; i < fuelItems.size(); i++) {
+            if (fuelItems.get(i).isEmpty()) continue;
+            fuelBurnTime = fuelItems.get(i).getBurnTime(getRecipeType(), fuelValues);
+            if (fuelBurnTime > 0) {
+                fuel.extractItem(i, 1, false);
+                break;
             }
         }
-        return remaining <= 0;
-    }
-
-    public static void distributeOutput(ItemStackHandler output, ItemStack result) {
-        int toInsert = result.getCount();
-        ItemStack toDistribute = result.copy();
-
-        for (int i = 0; i < output.getSlots() && toInsert > 0; i++) {
-            // Prepare stack to try to insert
-            ItemStack attempt = toDistribute.copy();
-            attempt.setCount(toInsert);
-
-            // Try to insert in slot i
-            ItemStack remainder = output.insertItem(i, attempt, false); // simulate=false, actually insert
-
-            // Update how much is left to insert
-            int inserted = attempt.getCount() - (remainder.isEmpty() ? 0 : remainder.getCount());
-            toInsert -= inserted;
-        }
-    }
-
-    protected void removeCraftingItems(int width, int height, ItemStackHandler inventory) {
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                int idx = row * width + col;
-                ItemStack item = inventory.extractItem(idx, 1, false);
-                ItemStack remainder = item.getCraftingRemainder();
-                if (!remainder.isEmpty()) {
-                    inventory.insertItem(idx, remainder, false);
-                }
-            }
-        }
+        return fuelBurnTime != 0;
     }
 
     protected abstract RecipeType<?> getRecipeType();
 
     protected abstract Optional<RecipeHolder<CraftingRecipe>> getRecipeOpt(Level level, CraftingInput input);
 
-    protected List<ItemStack> getCraftingItems(int width, int height, ItemStackHandler inventory) {
-        List<ItemStack> items = new ArrayList<>(width * height);
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                int idx = row * width + col;
-                items.add(inventory.getStackInSlot(idx));
-            }
-        }
-        return items;
-    }
-
-    protected CraftingInput getRecipeInput(int width, int height, List<ItemStack> items) {
-        return CraftingInput.of(width, height, items);
+    public void onRemove(){
+        dropStackHandler(worldPosition, level, fuel);
+        dropStackHandler(worldPosition, level, output);
+        dropStackHandler(worldPosition, level, input);
     }
 
     @Override
@@ -284,6 +155,42 @@ public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> 
         if (tag.contains("Output", Tag.TAG_COMPOUND)) {
             output.deserializeNBT(registries, tag.getCompound("Output"));
         }
+    }
+
+    public void scheduleCraftingUpdate() {
+        needsUpdate = true;
+    }
+
+    public boolean isNeedsUpdate() {
+        return needsUpdate;
+    }
+
+    public void setNeedsUpdate(boolean needsUpdate) {
+        this.needsUpdate = needsUpdate;
+    }
+
+    public ItemStackHandler getInput() {
+        return input;
+    }
+
+    public ItemStackHandler getOutput() {
+        return output;
+    }
+
+    public ItemStackHandler getFuel() {
+        return fuel;
+    }
+
+    public int getBurnTime() {
+        return burnTime;
+    }
+
+    public int getMaxBurnTime() {
+        return recipeBurnTime + furnaceSpeed;
+    }
+
+    public int getFuelBurnTime() {
+        return fuelBurnTime;
     }
 }
 

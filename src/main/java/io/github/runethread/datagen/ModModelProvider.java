@@ -2,10 +2,11 @@ package io.github.runethread.datagen;
 
 import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.CustomBlocks;
-import io.github.runethread.customblocks.craftingtable.altar.RunicAltar;
+import io.github.runethread.customblocks.altar.RunicAltar;
 import io.github.runethread.customblocks.craftingtable.animator.Animator;
 import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.datagen.properties.PowerRune;
+import io.github.runethread.datagen.properties.RitualIndicator;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
@@ -18,7 +19,6 @@ import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.RangeSelectItemModel;
-import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -48,9 +48,10 @@ public class ModModelProvider extends ModelProvider {
 
         itemModels.generateFlatItem(CustomItems.POWER_GEM.get(), ModelTemplates.FLAT_ITEM);
 
-        Optional<ItemModel.Unbaked> fallbackModel = Optional.of(ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), ModelTemplates.FLAT_ITEM)));
+        Optional<ItemModel.Unbaked> fallbackModelPowerRune = Optional.of(ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), ModelTemplates.FLAT_ITEM)));
 
-        List<RangeSelectItemModel.Entry> entries = List.of(
+
+        List<RangeSelectItemModel.Entry> entriesPowerRune = List.of(
                 new RangeSelectItemModel.Entry(1, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_1", ModelTemplates.FLAT_ITEM))),
                 new RangeSelectItemModel.Entry(2, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_2", ModelTemplates.FLAT_ITEM))),
                 new RangeSelectItemModel.Entry(3, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_3", ModelTemplates.FLAT_ITEM))),
@@ -58,20 +59,39 @@ public class ModModelProvider extends ModelProvider {
                 new RangeSelectItemModel.Entry(5, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_5", ModelTemplates.FLAT_ITEM)))
         );
 
-        RangeSelectItemModelProperty rangeSelectItemModelProperty = new PowerRune();
-
         itemModels.itemModelOutput.register(CustomItems.POWER_RUNE.get(),
                 new ClientItem(
                         new RangeSelectItemModel.Unbaked(
-                                rangeSelectItemModelProperty,
+                                new PowerRune(),
                                 1.0f,
-                                entries,
-                                fallbackModel),
+                                entriesPowerRune,
+                                fallbackModelPowerRune),
                         new ClientItem.Properties(true)));
 
-        itemModels.declareCustomModelItem(CustomItems.RITUAL_INDICATOR_FAIL.get());
-        itemModels.declareCustomModelItem(CustomItems.RITUAL_INDICATOR_SUCCESS.get());
-        itemModels.declareCustomModelItem(CustomItems.RITUAL_INDICATOR_NEUTRAL.get());
+        ResourceLocation almostModel = ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "item/ritual_indicator_almost");
+        ResourceLocation failModel = ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "item/ritual_indicator_fail");
+        ResourceLocation successModel = ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "item/ritual_indicator_success");
+        ResourceLocation neutralModel = ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "item/ritual_indicator_neutral");
+
+        Optional<ItemModel.Unbaked> neutralItemModelOpt = Optional.of(ItemModelUtils.plainModel(neutralModel));
+
+        List<RangeSelectItemModel.Entry> entriesIndicator = List.of(
+                new RangeSelectItemModel.Entry(0, neutralItemModelOpt.get()),
+                new RangeSelectItemModel.Entry(1, ItemModelUtils.plainModel(successModel)),
+                new RangeSelectItemModel.Entry(2, ItemModelUtils.plainModel(failModel)),
+                new RangeSelectItemModel.Entry(3, ItemModelUtils.plainModel(almostModel))
+        );
+
+        itemModels.itemModelOutput.register(CustomItems.RITUAL_INDICATOR.get(),
+                new ClientItem(
+                        new RangeSelectItemModel.Unbaked(
+                                new RitualIndicator(),
+                                1.0f,
+                                entriesIndicator,
+                                neutralItemModelOpt
+                        ),
+                        new ClientItem.Properties(true)
+                ));
 
         itemModels.generateFlatItem(CustomItems.UP_RUNE.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(CustomItems.DOWN_RUNE.get(), ModelTemplates.FLAT_ITEM);
@@ -90,8 +110,10 @@ public class ModModelProvider extends ModelProvider {
         itemModels.generateFlatItem(CustomItems.PROTECTION_RUNE.get(), ModelTemplates.FLAT_ITEM);
 
         /* BLOCKS */
-        blockModels.createTrivialCube(CustomBlocks.LIMESTONE_BLOCK.get());
-        blockModels.createTrivialCube(CustomBlocks.CHARGED_LIMESTONE_BLOCK.get());
+        blockModels.createTrivialCube(CustomBlocks.MARBLE_BLOCK.get());
+        blockModels.createTrivialCube(CustomBlocks.TSAVORITE_ORE_BLOCK.get());
+        blockModels.family(CustomBlocks.MARBLE_BRICK_BLOCK.get())
+                .stairs(CustomBlocks.MARBLE_BRICK_STAIR_BLOCK.get());
 
         blockModels.blockStateOutput.accept(
                 MultiVariantGenerator.multiVariant(CustomBlocks.ANIMATOR_BLOCK.get())

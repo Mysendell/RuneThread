@@ -74,8 +74,8 @@ public class ExplosionUtil {
                     double dz = z + 0.5 - center.getZ();
                     if (dx * dx + dy * dy + dz * dz <= radiusSq) {
                         BlockPos pos = new BlockPos(x, y, z);
-                        ChunkUtils.forceLoadChunk(level, pos);
-                        loadedChunkList.add(pos);
+                        if(ChunkUtils.forceLoadChunk(level, pos))
+                            loadedChunkList.add(pos);
                         BlockState state = level.getBlockState(pos);
                         if (!state.isAir()) {
                             if (dropBlocks) {

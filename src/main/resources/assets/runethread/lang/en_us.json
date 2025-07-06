@@ -7,7 +7,7 @@
   "item.runethread.cake": "cake",
 
   "BlockItem.runethread.animator": "Animator",
-  "entity.neoforge.cake_golem": "Cake Golem",
+  "entity.runethread.cake_golem": "Cake Golem",
 
   "item.runethread.cake_golem_spawn_egg": "Cake Golem Spawn Egg",
   "item.runethread.up_rune": "Up Rune",
@@ -28,8 +28,11 @@
   "block.runethread.animator": "Animator",
   "block.runethread.arcane_table": "Arcane Table",
   "block.runethread.runic_altar": "Runic Altar",
-  "block.runethread.limestone": "Limestone",
-  "block.runethread.charged_limestone": "Charged Limestone",
+  "block.runethread.marble": "Marble",
+  "block.runethread.tsavorite_ore": "Tsavorite Ore",
+  "block.runethread.marble_bricks": "Marble Bricks",
+  "block.runethread.marble_brick_stairs": "Marble Brick Stairs",
+
   "effect.runethread.immunity": "Immunity"
 
 }
