@@ -33,6 +33,8 @@ public class DataGenerators {
 
         generator.addProvider(true, new ModModelProvider(packOutput));
 
+        generator.addProvider(true, new ModLangProvider(packOutput));
+
     }
 
     @SubscribeEvent

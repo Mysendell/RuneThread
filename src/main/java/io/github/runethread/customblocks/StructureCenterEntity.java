@@ -1,6 +1,6 @@
 package io.github.runethread.customblocks;
 
-import io.github.runethread.util.StructureCheckerUtil;
+import io.github.runethread.util.StructureUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -13,7 +13,7 @@ import java.util.Set;
 public abstract class StructureCenterEntity extends BlockEntity {
     protected Set<BlockPos> structureBlocks = null;
     protected boolean isStructured = false;
-    protected static StructureCheckerUtil.StructurePart[] structure;
+    protected static StructureUtil.StructurePart[] structure;
     protected static int structureSize;
 
     public StructureCenterEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
@@ -26,7 +26,7 @@ public abstract class StructureCenterEntity extends BlockEntity {
     }
 
     public boolean isValidStructure() {
-        structureBlocks = StructureCheckerUtil.ValidateAndAddStructure(structure, worldPosition, level, structureSize, this);
+        structureBlocks = StructureUtil.ValidateAndAddStructure(structure, worldPosition, level, structureSize, this);
         return structureBlocks.size() == structureSize;
     }
 

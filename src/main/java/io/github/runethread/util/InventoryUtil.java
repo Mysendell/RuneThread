@@ -18,6 +18,12 @@ public class InventoryUtil {
         }
     }
 
+    public static void dropStack(BlockPos pos, Level level, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+        }
+    }
+
     public static List<ItemStack> getCraftingItems(int width, int height, ItemStackHandler inventory) {
         List<ItemStack> items = new ArrayList<>(width * height);
         for (int row = 0; row < height; row++) {

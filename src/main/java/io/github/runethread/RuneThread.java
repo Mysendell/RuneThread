@@ -14,6 +14,7 @@ import io.github.runethread.customentities.cakegolem.CakeGolemRenderer;
 import io.github.runethread.customentities.customEntities;
 import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.datacomponents.DataComponentRegistry;
+import io.github.runethread.datagen.properties.CollapseRune;
 import io.github.runethread.datagen.properties.PowerRune;
 import io.github.runethread.datagen.properties.RitualIndicator;
 import io.github.runethread.gui.CustomMenus;
@@ -26,10 +27,12 @@ import io.github.runethread.util.Barrier;
 import io.github.runethread.util.BarrierManager;
 import io.github.runethread.util.BarrierRenderManager;
 import io.github.runethread.util.RuneConfig;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -45,10 +48,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -62,6 +62,7 @@ import org.slf4j.Logger;
 import static io.github.runethread.customblocks.CustomBlocks.BLOCKS;
 import static io.github.runethread.customitems.CustomItems.HAMPTER_ITEM;
 import static io.github.runethread.customitems.CustomItems.ITEMS;
+import static io.github.runethread.customitems.runes.ScaleRuneItem.incrementScale;
 
 @Mod(RuneThread.MODID)
 public class RuneThread {
@@ -179,6 +180,12 @@ public class RuneThread {
                 BarrierRenderManager.renderBarriers(event.getPoseStack(), event.getCamera());
             }
         }
+        @SubscribeEvent
+        public static void scrollWheelScroll(InputEvent.MouseScrollingEvent event){
+            Player player = Minecraft.getInstance().player;
+            event.setCanceled(incrementScale(event.getScrollDeltaY(), player));
+        }
+
     }
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -192,6 +199,10 @@ public class RuneThread {
             event.register(
                     ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "ritual_state"),
                     RitualIndicator.MAP_CODEC
+            );
+            event.register(
+                    ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "collapse_rune"),
+                    CollapseRune.MAP_CODEC
             );
         }
 
