@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.StructurePartBlock;
 import io.github.runethread.customitems.CustomItems;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -92,7 +93,10 @@ public class RunicAltar extends StructurePartBlock {
 
         if (level.getBlockEntity(pos) instanceof RunicAltarEntity runicAltarEntity) {
             if (!level.isClientSide) {
-                runicAltarEntity.startRitual(playerName);
+                if(Minecraft.getInstance().options.keySprint.isDown())
+                    runicAltarEntity.testRitual(playerName);
+                else
+                    runicAltarEntity.startRitual(playerName);
             }
         }
         return InteractionResult.SUCCESS;
