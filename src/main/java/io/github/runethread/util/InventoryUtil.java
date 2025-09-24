@@ -5,16 +5,24 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class InventoryUtil {
-    public static void dropStackHandler(BlockPos pos, Level level, ItemStackHandler stackHandler){
+    public static void dropStackHandler(BlockPos pos, Level level, IItemHandler stackHandler){
         for (int i = 0; i < stackHandler.getSlots(); i++) {
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stackHandler.getStackInSlot(i));
-            stackHandler.setStackInSlot(i, ItemStack.EMPTY);
+            ItemStack stack = stackHandler.extractItem(i, Integer.MAX_VALUE, false);
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+        }
+    }
+
+    public static void dropStack(BlockPos pos, Level level, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
         }
     }
 
@@ -82,5 +90,27 @@ public class InventoryUtil {
                 }
             }
         }
+    }
+
+    public static void addItemHandlerInventory(Level level, BlockPos pos, IItemHandler inventory, IItemHandler stacksToAdd) {
+        for(int i=0; i < stacksToAdd.getSlots(); i++) {
+            ItemStack itemStack = stacksToAdd.extractItem(i, Integer.MAX_VALUE, false);
+            for(int j=0; j < inventory.getSlots(); j++) {
+                itemStack = inventory.insertItem(j, itemStack, false);
+            }
+            if(!itemStack.isEmpty())
+                dropStack(pos, level, itemStack);
+        }
+    }
+
+
+
+    public static void addItemStackHandlerToBlock(Level level, BlockPos pos, IItemHandler stacksToAdd) {
+        IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
+
+        if (itemHandler == null)
+            dropStackHandler(pos, level, stacksToAdd);
+        else
+            addItemHandlerInventory(level, pos, itemHandler, stacksToAdd);
     }
 }

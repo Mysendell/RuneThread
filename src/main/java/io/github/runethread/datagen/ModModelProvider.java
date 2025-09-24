@@ -4,7 +4,7 @@ import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.CustomBlocks;
 import io.github.runethread.customblocks.altar.RunicAltar;
 import io.github.runethread.customblocks.craftingtable.animator.Animator;
-import io.github.runethread.customitems.CustomItems;
+import io.github.runethread.datagen.properties.CollapseRune;
 import io.github.runethread.datagen.properties.PowerRune;
 import io.github.runethread.datagen.properties.RitualIndicator;
 import net.minecraft.client.data.models.BlockModelGenerators;
@@ -25,10 +25,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static io.github.runethread.customitems.CustomItems.*;
 
 public class ModModelProvider extends ModelProvider {
     private final PackOutput output;
@@ -41,25 +44,42 @@ public class ModModelProvider extends ModelProvider {
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         /* ITEMS */
-        itemModels.generateFlatItem(CustomItems.HAMPTER_ITEM.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.DOUGH_ITEM.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.CAKE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.CAKE_GOLEM_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(HAMPTER_ITEM.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(DOUGH_ITEM.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CAKE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(CAKE_GOLEM_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
 
-        itemModels.generateFlatItem(CustomItems.POWER_GEM.get(), ModelTemplates.FLAT_ITEM);
+        for(DeferredItem<Item> item : simpleItems) {
+            itemModels.generateFlatItem(item.get(), ModelTemplates.FLAT_ITEM);
+        }
 
-        Optional<ItemModel.Unbaked> fallbackModelPowerRune = Optional.of(ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), ModelTemplates.FLAT_ITEM)));
+        Optional<ItemModel.Unbaked> fallbackModelCollapse = Optional.of(ItemModelUtils.plainModel(itemModels.createFlatItemModel(COLLAPSE_RUNE.get(), ModelTemplates.FLAT_ITEM)));
 
-
-        List<RangeSelectItemModel.Entry> entriesPowerRune = List.of(
-                new RangeSelectItemModel.Entry(1, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_1", ModelTemplates.FLAT_ITEM))),
-                new RangeSelectItemModel.Entry(2, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_2", ModelTemplates.FLAT_ITEM))),
-                new RangeSelectItemModel.Entry(3, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_3", ModelTemplates.FLAT_ITEM))),
-                new RangeSelectItemModel.Entry(4, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_4", ModelTemplates.FLAT_ITEM))),
-                new RangeSelectItemModel.Entry(5, ItemModelUtils.plainModel(itemModels.createFlatItemModel(CustomItems.POWER_RUNE.get(), "_5", ModelTemplates.FLAT_ITEM)))
+        List<RangeSelectItemModel.Entry> entriesCollapse = List.of(
+                new RangeSelectItemModel.Entry(1, fallbackModelCollapse.get()),
+                new RangeSelectItemModel.Entry(2, ItemModelUtils.plainModel(itemModels.createFlatItemModel(COLLAPSE_RUNE.get(), "_full", ModelTemplates.FLAT_ITEM)))
         );
 
-        itemModels.itemModelOutput.register(CustomItems.POWER_RUNE.get(),
+        itemModels.itemModelOutput.register(COLLAPSE_RUNE.get(),
+                new ClientItem(
+                        new RangeSelectItemModel.Unbaked(
+                                new CollapseRune(),
+                                1.0f,
+                                entriesCollapse,
+                                fallbackModelCollapse),
+                        new ClientItem.Properties(true)));
+
+        Optional<ItemModel.Unbaked> fallbackModelPowerRune = Optional.of(ItemModelUtils.plainModel(itemModels.createFlatItemModel(POWER_RUNE.get(), ModelTemplates.FLAT_ITEM)));
+
+        List<RangeSelectItemModel.Entry> entriesPowerRune = List.of(
+                new RangeSelectItemModel.Entry(1, ItemModelUtils.plainModel(itemModels.createFlatItemModel(POWER_RUNE.get(), "_1", ModelTemplates.FLAT_ITEM))),
+                new RangeSelectItemModel.Entry(2, ItemModelUtils.plainModel(itemModels.createFlatItemModel(POWER_RUNE.get(), "_2", ModelTemplates.FLAT_ITEM))),
+                new RangeSelectItemModel.Entry(3, ItemModelUtils.plainModel(itemModels.createFlatItemModel(POWER_RUNE.get(), "_3", ModelTemplates.FLAT_ITEM))),
+                new RangeSelectItemModel.Entry(4, ItemModelUtils.plainModel(itemModels.createFlatItemModel(POWER_RUNE.get(), "_4", ModelTemplates.FLAT_ITEM))),
+                new RangeSelectItemModel.Entry(5, ItemModelUtils.plainModel(itemModels.createFlatItemModel(POWER_RUNE.get(), "_5", ModelTemplates.FLAT_ITEM)))
+        );
+
+        itemModels.itemModelOutput.register(POWER_RUNE.get(),
                 new ClientItem(
                         new RangeSelectItemModel.Unbaked(
                                 new PowerRune(),
@@ -82,7 +102,7 @@ public class ModModelProvider extends ModelProvider {
                 new RangeSelectItemModel.Entry(3, ItemModelUtils.plainModel(almostModel))
         );
 
-        itemModels.itemModelOutput.register(CustomItems.RITUAL_INDICATOR.get(),
+        itemModels.itemModelOutput.register(RITUAL_INDICATOR.get(),
                 new ClientItem(
                         new RangeSelectItemModel.Unbaked(
                                 new RitualIndicator(),
@@ -93,21 +113,7 @@ public class ModModelProvider extends ModelProvider {
                         new ClientItem.Properties(true)
                 ));
 
-        itemModels.generateFlatItem(CustomItems.UP_RUNE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.DOWN_RUNE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.LEFT_RUNE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.RIGHT_RUNE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.LIVING_RUNE.get(), ModelTemplates.FLAT_ITEM);
 
-        itemModels.generateFlatItem(CustomItems.ALPHA_RUNE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.BETA_RUNE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.LAMBDA_RUNE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.TAU_RUNE.get(), ModelTemplates.FLAT_ITEM);
-
-        itemModels.generateFlatItem(CustomItems.DESTRUCTION_RUNE.get(), ModelTemplates.FLAT_ITEM);
-
-        itemModels.generateFlatItem(CustomItems.PORTAL_RUNE.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(CustomItems.PROTECTION_RUNE.get(), ModelTemplates.FLAT_ITEM);
 
         /* BLOCKS */
         blockModels.createTrivialCube(CustomBlocks.MARBLE_BLOCK.get());
@@ -177,6 +183,9 @@ public class ModModelProvider extends ModelProvider {
 
     @Override
     protected Stream<? extends Holder<Item>> getKnownItems() {
-        return CustomItems.ITEMS.getEntries().stream().filter(x -> x.get() != null);
+        return ITEMS.getEntries().stream().filter(x -> {
+            x.get();
+            return true;
+        });
     }
 }

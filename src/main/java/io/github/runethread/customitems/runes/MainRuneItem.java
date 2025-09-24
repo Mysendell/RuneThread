@@ -4,16 +4,18 @@ import net.minecraft.world.item.Item;
 
 public class MainRuneItem extends Item {
     private final int cost;
-    private final int scale;
-    private final float scalingCost;
+    private final double scale;
+    private final double scalingCost;
     private final RuneFunction runeFunction;
+    private final double breakChance;
 
-    public MainRuneItem(Properties properties, int cost, int scale, float scalingCost, RuneFunction runeFunction) {
+    public MainRuneItem(Properties properties, int cost, double scale, double scalingCost, double breakChance , RuneFunction runeFunction) {
         super(properties);
         this.cost = cost;
         this.scale = scale;
         this.scalingCost = scalingCost;
         this.runeFunction = runeFunction;
+        this.breakChance = breakChance;
     }
 
     public RuneFunction getRuneFunction() {
@@ -24,11 +26,15 @@ public class MainRuneItem extends Item {
         return cost;
     }
 
-    public int getScale() {
+    public double getScale() {
         return scale;
     }
 
-    public float getScalingCost() {
+    public double getScalingCost() {
         return scalingCost;
+    }
+
+    public double getBreakChance() {
+        return breakChance;
     }
 }

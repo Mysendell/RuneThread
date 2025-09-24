@@ -1,7 +1,9 @@
 package io.github.runethread.customblocks;
 
-import io.github.runethread.util.StructureCheckerUtil;
+import io.github.runethread.util.StructureUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,8 +12,8 @@ import java.util.Set;
 
 public abstract class StructureCenterEntity extends BlockEntity {
     protected Set<BlockPos> structureBlocks = null;
-    protected boolean isStructured = true;
-    protected static StructureCheckerUtil.StructurePart[] structure;
+    protected boolean isStructured = false;
+    protected static StructureUtil.StructurePart[] structure;
     protected static int structureSize;
 
     public StructureCenterEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
@@ -24,7 +26,7 @@ public abstract class StructureCenterEntity extends BlockEntity {
     }
 
     public boolean isValidStructure() {
-        structureBlocks = StructureCheckerUtil.ValidateAndAddStructure(structure, worldPosition, level, structureSize, this);
+        structureBlocks = StructureUtil.ValidateAndAddStructure(structure, worldPosition, level, structureSize, this);
         return structureBlocks.size() == structureSize;
     }
 
@@ -54,6 +56,19 @@ public abstract class StructureCenterEntity extends BlockEntity {
     public void onLoad() {
         super.onLoad();
         createStructure();
+    }
+
+    @Override
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        isStructured = tag.getBoolean("Structured");
+    }
+
+    @Override
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putBoolean("Structured", isStructured);
+
     }
 
     public Set<BlockPos> getStructureBlocks() {

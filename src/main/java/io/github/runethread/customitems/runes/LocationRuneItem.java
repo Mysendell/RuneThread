@@ -3,6 +3,7 @@ package io.github.runethread.customitems.runes;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.datacomponents.EntityData;
 import io.github.runethread.datacomponents.LocationData;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
@@ -31,10 +32,6 @@ public class LocationRuneItem extends Item {
     }
 
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-        if (stack.get(DataComponentRegistry.ENTITY_DATA.get()) != null) {
-            stack.remove(DataComponentRegistry.ENTITY_DATA.get());
-        }
-
         if (context.getPlayer().isCrouching())
             return InteractionResult.PASS;
 
@@ -45,10 +42,6 @@ public class LocationRuneItem extends Item {
     }
 
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
-        if (stack.get(DataComponentRegistry.LOCATION_DATA.get()) != null) {
-            stack.remove(DataComponentRegistry.LOCATION_DATA.get());
-        }
-
         int id = interactionTarget.getId();
         String name = interactionTarget.getName().getString();
         EntityData entityData = new EntityData(id, name);
@@ -58,12 +51,8 @@ public class LocationRuneItem extends Item {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        if(!player.isCrouching()) {
+        if(!player.isCrouching())
             return InteractionResult.PASS;
-        }
-        if (player.getItemInHand(hand).get(DataComponentRegistry.LOCATION_DATA.get()) != null) {
-            player.getItemInHand(hand).remove(DataComponentRegistry.LOCATION_DATA.get());
-        }
 
         int id = player.getId();
         String name = player.getName().getString();
@@ -102,14 +91,18 @@ public class LocationRuneItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
+    @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        Component modName = Component.translatable("itemGroup.runethread.runethread_tab").withStyle(ChatFormatting.BLUE);
         LocationData locationData = stack.get(DataComponentRegistry.LOCATION_DATA.get());
         if (locationData != null) {
             locationData.addToTooltip(context, tooltipComponents::add, tooltipFlag);
+            tooltipComponents.add(modName);
         }
         EntityData entityData = stack.get(DataComponentRegistry.ENTITY_DATA.get());
         if (entityData != null) {
             entityData.addToTooltip(context, tooltipComponents::add, tooltipFlag);
+            tooltipComponents.add(modName);
         }
     }
 
