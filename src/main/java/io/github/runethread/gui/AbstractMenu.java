@@ -10,20 +10,41 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class Menu<T extends BlockEntity> extends AbstractContainerMenu{
+
+/***
+ * Base class for all menus
+ * Defines common player inventory slot creation methods and quick move logic
+ * @param <T> BlockEntity type
+ */
+@SuppressWarnings("unchecked")
+public abstract class AbstractMenu<T extends BlockEntity> extends AbstractContainerMenu {
     protected final T blockEntity;
     protected final Level level;
     protected final Player player;
 
 
-    public Menu(int id, Inventory playerInv, BlockEntity blockEntity, MenuType<?> Menu) {
+    /*** @param id        Window id
+     * @param playerInv Player inventory
+     * @param blockEntity  Block entity instance
+     * @param Menu      Menu type
+     */
+    public AbstractMenu(int id, Inventory playerInv, BlockEntity blockEntity, MenuType<?> Menu) {
         super(Menu, id);
         this.blockEntity = (T) blockEntity;
         this.level = playerInv.player.level();
         this.player = playerInv.player;
     }
 
+    /***
+     * Adds the player inventory slots to the menu
+     * @param playerInv player inventory instance
+     * @param startX starting X position
+     * @param startY starting Y position
+     * @param spaceX spacing between slots in X direction
+     * @param spaceY spacing between slots in Y direction
+     */
     protected void addPlayerInventory(Inventory playerInv, int startX, int startY, int spaceX, int spaceY) {
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
@@ -32,6 +53,13 @@ public abstract class Menu<T extends BlockEntity> extends AbstractContainerMenu{
         }
     }
 
+    /***
+     * Adds the player hotbar slots to the menu
+     * @param playerInv player inventory instance
+     * @param startX starting X position
+     * @param startY starting Y position
+     * @param spaceX spacing between slots in X direction
+     */
     protected void addPlayerHotbar(Inventory playerInv, int startX, int startY, int spaceX) {
         for (int col = 0; col < 9; ++col) {
             this.addSlot(new Slot(playerInv, col, startX + col * spaceX, startY));
@@ -47,12 +75,15 @@ public abstract class Menu<T extends BlockEntity> extends AbstractContainerMenu{
     private static final int VANILLA_FIRST_SLOT_INDEX = 0;
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
 
-    protected static int TE_INVENTORY_SLOT_COUNT = 9;  // must be the number of slots you have!
+    /***
+     * Number of slots in the block entity's inventory that are quick move valid
+     */
+    protected static int TE_INVENTORY_SLOT_COUNT = 9;
 
     @Override
-    public ItemStack quickMoveStack(Player playerIn, int pIndex) {
+    public @NotNull ItemStack quickMoveStack(@NotNull Player playerIn, int pIndex) {
         Slot sourceSlot = slots.get(pIndex);
-        if (sourceSlot == null || !sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
+        if (!sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyOfSourceStack = sourceStack.copy();
 
@@ -83,7 +114,7 @@ public abstract class Menu<T extends BlockEntity> extends AbstractContainerMenu{
     }
 
     @Override
-    public boolean stillValid(Player player) {
+    public boolean stillValid(@NotNull Player player) {
         return AbstractContainerMenu.stillValid(
                 ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
                 player,

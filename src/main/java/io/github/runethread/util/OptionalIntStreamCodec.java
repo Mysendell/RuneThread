@@ -1,4 +1,4 @@
-package io.github.runethread.recipes;
+package io.github.runethread.util;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

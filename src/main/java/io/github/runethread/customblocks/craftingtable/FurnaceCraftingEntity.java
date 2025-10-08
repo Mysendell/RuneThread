@@ -1,12 +1,10 @@
 package io.github.runethread.customblocks.craftingtable;
 
-import io.github.runethread.recipes.smelting.Smelting;
+import io.github.runethread.recipes.smelting.SmeltingRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -24,7 +22,7 @@ import java.util.Optional;
 
 import static io.github.runethread.util.InventoryUtil.*;
 
-public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> extends BlockEntity implements MenuProvider {
+public abstract class FurnaceCraftingEntity<T extends SmeltingRecipe, J extends FurnaceBlock> extends BlockEntity implements ICraftingEntity {
     protected int inputWidth = 1, inputHeight = 1;
     protected int outputWidth = 1, outputHeight = 1;
     protected int fuelWidth = 1, fuelHeight = 1;
@@ -33,17 +31,16 @@ public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> 
     protected ItemStackHandler fuel = new ItemStackHandler(fuelWidth * fuelHeight);
     protected int fuelBurnTime = 0, burnTime = 0, recipeBurnTime = 0;
     protected int furnaceSpeed = 200;
-    protected HolderLookup.Provider registries;
-    protected FeatureFlagSet enabledFeatures;
     protected FuelValues fuelValues;
     protected boolean needsUpdate = true;
-    protected int fuelBurnMultiplier = 1;
     protected T recipe;
     protected ItemStack result;
 
 
-    public FurnaceEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+    public FurnaceCraftingEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
+        assert level != null;
+        fuelValues = FuelValues.vanillaBurnTimes(level.registryAccess(), level.enabledFeatures());
     }
 
     public Optional<RecipeHolder<CraftingRecipe>> canCraft(Level level) {
@@ -68,12 +65,6 @@ public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> 
     }
 
     protected void serverTick(Level level) {
-        if (registries == null) {
-            registries = level.registryAccess();
-            enabledFeatures = level.enabledFeatures();
-            fuelValues = FuelValues.vanillaBurnTimes(registries, enabledFeatures);
-        }
-
         if (needsUpdate) {
             needsUpdate = false;
             this.setChanged();
@@ -84,7 +75,6 @@ public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> 
                 CraftingInput inputRecipe = getRecipeInput(inputWidth, inputHeight, inputItems);
                 result = recipe.assemble(inputRecipe, level.registryAccess());
                 recipeBurnTime = recipe.getBurnTime();
-                fuelBurnMultiplier = recipe.getFuelBurnMultiplier();
             }
         }
 
@@ -104,7 +94,7 @@ public abstract class FurnaceEntity<T extends Smelting, J extends FurnaceBlock> 
             if (fuelBurnTime == 0 && !updateFuel())
                 return;
             burnTime++;
-            fuelBurnTime -= fuelBurnMultiplier;
+            fuelBurnTime -= recipe.getFuelBurnMultiplier();
         }
     }
 

@@ -79,7 +79,6 @@ public class TeleportUtil {
                 }
             }
         }
-        //Collections.shuffle(positions);
         return positions;
     }
 }

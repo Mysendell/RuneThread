@@ -2,7 +2,7 @@ package io.github.runethread.customblocks.altar;
 
 import com.mojang.serialization.MapCodec;
 import io.github.runethread.customblocks.CustomBlockEntities;
-import io.github.runethread.customblocks.StructurePartBlock;
+import io.github.runethread.customblocks.structure.StructurePartBlock;
 import io.github.runethread.customitems.CustomItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

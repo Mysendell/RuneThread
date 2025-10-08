@@ -2,6 +2,7 @@ package io.github.runethread.datagen.properties;
 
 import com.mojang.serialization.MapCodec;
 import io.github.runethread.datacomponents.DataComponentRegistry;
+import io.github.runethread.datacomponents.PowerData;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,7 +14,7 @@ public record  PowerRune() implements RangeSelectItemModelProperty {
 
     @Override
     public float get(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity entity, int seed) {
-        return stack.get(DataComponentRegistry.POWER_DATA.get()).power();
+        return stack.getOrDefault(DataComponentRegistry.POWER_DATA.get(), new PowerData(0)).power();
     }
 
     @Override

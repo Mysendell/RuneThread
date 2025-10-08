@@ -18,16 +18,16 @@ public class ModRecipeSerializer<T extends Recipe> implements net.minecraft.worl
     public ModRecipeSerializer(RecipeFactory<T> factory) {
         this.codec = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(Recipe::getIngredients),
-                RecipeResult.CODEC.listOf().fieldOf("results").forGetter(Recipe::getResultStack),
-                Codec.INT.fieldOf("width").forGetter(Recipe::getWidth),
-                Codec.INT.fieldOf("height").forGetter(Recipe::getHeight)
+                RecipeResult.CODEC.listOf().fieldOf("results").forGetter(Recipe::getResults),
+                Codec.INT.fieldOf("width").forGetter(Recipe::getRecipeWidth),
+                Codec.INT.fieldOf("height").forGetter(Recipe::getRecipeHeight)
         ).apply(inst, factory::create));
 
         this.streamCodec = StreamCodec.composite(
                 ByteBufCodecs.<RegistryFriendlyByteBuf, Ingredient>list().apply(Ingredient.CONTENTS_STREAM_CODEC), Recipe::getIngredients,
-                ByteBufCodecs.<RegistryFriendlyByteBuf, RecipeResult>list().apply(RecipeResult.STREAM_CODEC), Recipe::getResultStack,
-                ByteBufCodecs.INT, Recipe::getWidth,
-                ByteBufCodecs.INT, Recipe::getHeight,
+                ByteBufCodecs.<RegistryFriendlyByteBuf, RecipeResult>list().apply(RecipeResult.STREAM_CODEC), Recipe::getResults,
+                ByteBufCodecs.INT, Recipe::getRecipeWidth,
+                ByteBufCodecs.INT, Recipe::getRecipeHeight,
                 factory::create
         );
     }

@@ -1,4 +1,4 @@
-package io.github.runethread.customblocks;
+package io.github.runethread.customblocks.structure;
 
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 

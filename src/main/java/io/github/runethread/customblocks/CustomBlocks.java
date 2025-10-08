@@ -4,6 +4,8 @@ import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.altar.RunicAltar;
 import io.github.runethread.customblocks.craftingtable.animator.Animator;
 import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableBlock;
+import io.github.runethread.customblocks.structure.StructurePartBlock;
+import io.github.runethread.customblocks.structure.StructurePartStairs;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;

@@ -11,8 +11,8 @@ public class RuneTags {
         public static final TagKey<Item> RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "rune_tag"));
         public static final TagKey<Item> LOCATON_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "locator_rune_tag"));
         public static final TagKey<Item> POWER_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "power_tag"));
-        public static final TagKey<Item> TARGET_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "target_rune_tag"));
+        public static final TagKey<Item> MODIFIER_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "modifier_rune_tag"));
         public static final TagKey<Item> NATURE_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "nature_rune_tag"));
         public static final TagKey<Item> FUNCTION_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "function_rune_tag"));
-    } // TODO Change target to modifier
+    }
 }

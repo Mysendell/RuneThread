@@ -41,7 +41,7 @@ public class ModItemTagProvider extends ItemTagsProvider {
         tag(RuneTags.Items.POWER_TAG)
                 .add(POWER_RUNE.get());
 
-        tag(RuneTags.Items.TARGET_RUNE_TAG)
+        tag(RuneTags.Items.MODIFIER_RUNE_TAG)
                 .add(UP_RUNE.get())
                 .add(DOWN_RUNE.get())
                 .add(LEFT_RUNE.get())

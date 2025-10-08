@@ -2,13 +2,12 @@ package io.github.runethread.recipes;
 
 import io.github.runethread.RuneThread;
 import io.github.runethread.recipes.Crafting.ModRecipeSerializer;
-import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeShaped;
-import io.github.runethread.recipes.Crafting.arcanetable.ArcaneRecipeShapeless;
-import io.github.runethread.recipes.smelting.Philosophal;
+import io.github.runethread.recipes.Crafting.RecipeShaped;
+import io.github.runethread.recipes.Crafting.RecipeShapeless;
+import io.github.runethread.recipes.smelting.PhilosophalRecipe;
 import io.github.runethread.recipes.smelting.PhilosophalSerializer;
-import io.github.runethread.recipes.smelting.Smelting;
+import io.github.runethread.recipes.smelting.SmeltingRecipe;
 import io.github.runethread.recipes.smelting.SmeltingSerializer;
-import io.github.runethread.recipes.smelting.animator.AnimatorRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
@@ -32,46 +31,37 @@ public class CustomRecipes {
             "runethread", RecipeBookCategory::new
     );
 
-    public static final Supplier<RecipeType<CraftingRecipe>> ARCANE_SHAPED =
-            RECIPE_TYPES.register("arcane_shaped",
-                    name -> new RecipeType<CraftingRecipe>() {
-                        @Override public String toString() { return name.toString(); }
-                    });
-    
-    public static final Supplier<RecipeType<CraftingRecipe>> ARCANE_SHAPELESS =
-            RECIPE_TYPES.register("arcane_shapeless",
+    public static final Supplier<RecipeType<CraftingRecipe>> RECIPE_SHAPED =
+            RECIPE_TYPES.register("recipe_shaped",
                     name -> new RecipeType<CraftingRecipe>() {
                         @Override public String toString() { return name.toString(); }
                     });
 
-    public static final Supplier<RecipeSerializer<ArcaneRecipeShaped>> ARCANE_SHAPED_SERIALIZER =
-            RECIPE_SERIALIZERS.register("arcane_shaped", () -> new ModRecipeSerializer<>(ArcaneRecipeShaped::new));
+    public static final Supplier<RecipeType<CraftingRecipe>> RECIPE_SHAPELESS =
+            RECIPE_TYPES.register("recipe_shapeless",
+                    name -> new RecipeType<CraftingRecipe>() {
+                        @Override public String toString() { return name.toString(); }
+                    });
 
-    public static final Supplier<RecipeSerializer<ArcaneRecipeShapeless>> ARCANE_SHAPELESS_SERIALIZER =
-            RECIPE_SERIALIZERS.register("arcane_shapeless", () -> new ModRecipeSerializer<>(ArcaneRecipeShapeless::new));
+    public static final Supplier<RecipeSerializer<RecipeShaped>> RECIPE_SHAPED_SERIALIZER =
+            RECIPE_SERIALIZERS.register("recipe_shaped", () -> new ModRecipeSerializer<>(RecipeShaped::new));
 
-    public static final Supplier<RecipeSerializer<AnimatorRecipe>> ANIMATOR_SERIALIZER =
-            RECIPE_SERIALIZERS.register("animator", () -> new PhilosophalSerializer<>(AnimatorRecipe::new));
+    public static final Supplier<RecipeSerializer<RecipeShapeless>> RECIPE_SHAPELESS_SERIALIZER =
+            RECIPE_SERIALIZERS.register("recipe_shapeless", () -> new ModRecipeSerializer<>(RecipeShapeless::new));
 
     public static final Supplier<RecipeType<CraftingRecipe>> SMELTING =
             RECIPE_TYPES.register("smelting",
                     name -> new RecipeType<>() {
                         @Override public String toString() { return name.toString(); }
                     });
-    public static final Supplier<RecipeSerializer<Smelting>> SMELTING_SERIALIZER =
-            RECIPE_SERIALIZERS.register("smelting", () -> new SmeltingSerializer<>(Smelting::new));
+    public static final Supplier<RecipeSerializer<SmeltingRecipe>> SMELTING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("smelting", () -> new SmeltingSerializer<>(SmeltingRecipe::new));
 
     public static final Supplier<RecipeType<CraftingRecipe>> PHILOSOPHAL =
             RECIPE_TYPES.register("philosophal",
                     name -> new RecipeType<>() {
                         @Override public String toString() { return name.toString(); }
                     });
-    public static final Supplier<RecipeSerializer<Philosophal>> PHILOSOPHAL_SERIALIZER =
-            RECIPE_SERIALIZERS.register("philosophal", () -> new PhilosophalSerializer<>(Philosophal::new));
-
-    public static final Supplier<RecipeType<CraftingRecipe>> ANIMATOR_RECIPE =
-            RECIPE_TYPES.register("animator",
-                    name -> new RecipeType<>() {
-                        @Override public String toString() { return name.toString(); }
-                    });
+    public static final Supplier<RecipeSerializer<PhilosophalRecipe>> PHILOSOPHAL_SERIALIZER =
+            RECIPE_SERIALIZERS.register("philosophal", () -> new PhilosophalSerializer<>(PhilosophalRecipe::new));
 }

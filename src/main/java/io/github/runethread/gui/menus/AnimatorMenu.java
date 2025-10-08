@@ -1,21 +1,20 @@
 package io.github.runethread.gui.menus;
 
-import io.github.runethread.customblocks.craftingtable.animator.AnimatorEntity;
-import io.github.runethread.gui.Menu;
-import io.github.runethread.recipes.FurnaceOutputSlot;
+import io.github.runethread.customblocks.craftingtable.animator.AnimatorCraftingEntity;
+import io.github.runethread.gui.AbstractMenu;
+import io.github.runethread.gui.slots.CraftingSlot;
+import io.github.runethread.gui.slots.OutputSlot;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 import static io.github.runethread.gui.CustomMenus.ANIMATOR_MENU;
 
-public class AnimatorMenu extends Menu<AnimatorEntity> {
+public class AnimatorMenu extends AbstractMenu<AnimatorCraftingEntity> {
     private final IItemHandler input;
     private final IItemHandler output;
     private final IItemHandler fuel;
@@ -32,10 +31,10 @@ public class AnimatorMenu extends Menu<AnimatorEntity> {
     public AnimatorMenu(int id, Inventory playerInv, BlockEntity blockEntity) {
         super(id, playerInv, blockEntity, ANIMATOR_MENU.get());
 
-        this.input = ((AnimatorEntity) blockEntity).getInput();
-        this.output = ((AnimatorEntity) blockEntity).getOutput();
-        this.fuel = ((AnimatorEntity) blockEntity).getFuel();
-        this.lifeEnergy = ((AnimatorEntity) blockEntity).getLifeEnergy();
+        this.input = ((AnimatorCraftingEntity) blockEntity).getInput();
+        this.output = ((AnimatorCraftingEntity) blockEntity).getOutput();
+        this.fuel = ((AnimatorCraftingEntity) blockEntity).getFuel();
+        this.lifeEnergy = ((AnimatorCraftingEntity) blockEntity).getLifeEnergy();
 
         TE_INVENTORY_SLOT_COUNT = 4;
 
@@ -46,7 +45,7 @@ public class AnimatorMenu extends Menu<AnimatorEntity> {
         this.addDataSlot(new DataSlot() {
             @Override
             public int get() {
-                return ((AnimatorEntity) blockEntity).getBurnTime();
+                return ((AnimatorCraftingEntity) blockEntity).getBurnTime();
             }
 
             @Override
@@ -57,7 +56,7 @@ public class AnimatorMenu extends Menu<AnimatorEntity> {
         this.addDataSlot(new DataSlot() {
             @Override
             public int get() {
-                return ((AnimatorEntity) blockEntity).getFuelBurnTime();
+                return ((AnimatorCraftingEntity) blockEntity).getFuelBurnTime();
             }
 
             @Override
@@ -68,7 +67,7 @@ public class AnimatorMenu extends Menu<AnimatorEntity> {
         this.addDataSlot(new DataSlot() {
             @Override
             public int get() {
-                return ((AnimatorEntity) blockEntity).getMaxBurnTime();
+                return ((AnimatorCraftingEntity) blockEntity).getMaxBurnTime();
             }
 
             @Override
@@ -79,58 +78,10 @@ public class AnimatorMenu extends Menu<AnimatorEntity> {
     }
 
     private void addAnimatorTableSlots() {
-        this.addSlot(new FurnaceOutputSlot(blockEntity, player, level, 0, 98, 39) {
-            @Override
-            public void set(ItemStack stack) {
-                super.set(stack);
-                if (!blockEntity.getLevel().isClientSide()) {
-                    blockEntity.scheduleCraftingUpdate();
-                }
-            }
-
-            @Override
-            public void onTake(Player player, ItemStack stack) {
-                super.onTake(player, stack);
-                if (!blockEntity.getLevel().isClientSide()) {
-                    blockEntity.scheduleCraftingUpdate();
-                }
-            }
-        });
-        this.addSlot(new SlotItemHandler(input, 0, 17, 21) {
-            @Override
-            public void set(ItemStack stack) {
-                super.set(stack);
-                if (!blockEntity.getLevel().isClientSide()) {
-                    blockEntity.scheduleCraftingUpdate();
-                }
-            }
-
-            @Override
-            public void onTake(Player player, ItemStack stack) {
-                super.onTake(player, stack);
-                if (!blockEntity.getLevel().isClientSide()) {
-                    blockEntity.scheduleCraftingUpdate();
-                }
-            }
-        });
+        this.addSlot(new OutputSlot(output, 0, 98, 39, blockEntity));
+        this.addSlot(new CraftingSlot(input, 0, 17, 21, blockEntity));
         this.addSlot(new SlotItemHandler(fuel, 0, 17, 57));
-        this.addSlot(new SlotItemHandler(lifeEnergy, 0, 44, 21) {
-            @Override
-            public void set(ItemStack stack) {
-                super.set(stack);
-                if (!blockEntity.getLevel().isClientSide()) {
-                    blockEntity.scheduleCraftingUpdate();
-                }
-            }
-
-            @Override
-            public void onTake(Player player, ItemStack stack) {
-                super.onTake(player, stack);
-                if (!blockEntity.getLevel().isClientSide()) {
-                    blockEntity.scheduleCraftingUpdate();
-                }
-            }
-        });
+        this.addSlot(new CraftingSlot(lifeEnergy, 0, 44, 21, blockEntity));
     }
 
     @Override

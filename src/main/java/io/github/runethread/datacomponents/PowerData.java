@@ -14,4 +14,5 @@ public record PowerData(int power) {
     public int getRealPower() {
         return new int[]{10, 50, 100, 200, 500, Integer.MAX_VALUE}[power - 1];
     }
+
 }

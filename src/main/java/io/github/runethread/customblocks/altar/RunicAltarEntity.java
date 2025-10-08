@@ -2,7 +2,7 @@ package io.github.runethread.customblocks.altar;
 
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
-import io.github.runethread.customblocks.StructureCenterEntity;
+import io.github.runethread.customblocks.structure.StructureCenterEntity;
 import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.customitems.runes.LocationRuneItem;
 import io.github.runethread.customitems.runes.MainRuneItem;
@@ -221,7 +221,6 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     }
 
     private void performRustic() {
-        ItemStack destinationRuneStack = destinationRune.getStackInSlot(0);
         Map<String, Object> additionalData = new HashMap<>();
 
         perform(0, additionalData);
@@ -229,8 +228,6 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     }
 
     private void performTemple() {
-        ItemStack destinationRuneStack = destinationRune.getStackInSlot(0);
-        ItemStack referenceRuneStack = destinationRune.getStackInSlot(1);
         Map<String, Object> additionalData = new HashMap<>();
 
         for (int i = 0; i < targetRune.getSlots(); i++) {
@@ -269,10 +266,10 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
                 reference = getDestinationRuneDataFromItem(referenceRuneStack);
 
             if (mainRuneItem.equals(CustomItems.PORTAL_RUNE.get()) && additionalData.containsKey("Reverse Rune")) {
-                if (lastDest == null || lastRef == null) // TODO check when chunk is unloaded
+                if (lastDest == null || lastRef == null)
                     throw new GenericRuneException("Ritual failed: No previous teleport to reverse!");
                 destination = lastRef;
-                reference = new DestinationRuneData(lastRef.getBlockPos(), lastRef.entity);
+                reference = new DestinationRuneData(lastRef.entity.getOnPos(), lastRef.entity);
                 range = lastRange;
             } else {
                 if (destinationRuneStack.isEmpty())

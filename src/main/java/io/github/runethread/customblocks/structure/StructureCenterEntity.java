@@ -1,4 +1,4 @@
-package io.github.runethread.customblocks;
+package io.github.runethread.customblocks.structure;
 
 import io.github.runethread.util.StructureUtil;
 import net.minecraft.core.BlockPos;

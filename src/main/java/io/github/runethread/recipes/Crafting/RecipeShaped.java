@@ -1,55 +1,74 @@
 package io.github.runethread.recipes.Crafting;
 
+import io.github.runethread.recipes.CustomRecipes;
 import io.github.runethread.recipes.RecipeResult;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public abstract class RecipeShaped extends Recipe{
+/***
+ * A shaped crafting recipe. The arrangement of ingredients matters.
+ * @see Recipe
+ */
+public class RecipeShaped extends Recipe{
 
 
-    public RecipeShaped(List<Ingredient> ingredients, List<RecipeResult> result, int width, int height) {
-        super(ingredients, result, width, height);
+    public RecipeShaped(List<Ingredient> ingredients, List<RecipeResult> result, int recipeWidth, int recipeHeight) {
+        super(ingredients, result, recipeWidth, recipeHeight);
     }
 
+    /***
+     * Checks if the given crafting input matches this recipe. Checks all possible offsets in the input.
+     * @param input the crafting input to check
+     * @param level the level the crafting is taking place in
+     * @return true if the input matches this recipe, false otherwise
+     */
     @Override
-    public boolean matches(CraftingInput input, Level level) {
-        // Vanilla-style: grid might be smaller than recipe
+    public boolean matches(CraftingInput input, @NotNull Level level) {
         int inputWidth = input.width();
         int inputHeight = input.height();
 
-        if (inputWidth < width || inputHeight < height) return false;
+        if (inputWidth < recipeWidth || inputHeight < recipeHeight) return false;
 
-        // Try all possible subgrids where the recipe could fit
-        for (int xOffset = 0; xOffset <= inputWidth - width; ++xOffset) {
-            for (int yOffset = 0; yOffset <= inputHeight - height; ++yOffset) {
-                if (matchesAt(input, xOffset, yOffset)) {
-                    return true;
-                }
+        for (int xOffset = 0; xOffset <= inputWidth - recipeWidth; ++xOffset) {
+            for (int yOffset = 0; yOffset <= inputHeight - recipeHeight; ++yOffset) {
+                if (matchesAt(input, xOffset, yOffset)) return true;
             }
         }
         return false;
     }
 
     private boolean matchesAt(CraftingInput input, int xOffset, int yOffset) {
-        // Only access inside input's bounds!
         int inputWidth = input.width();
         int inputHeight = input.height();
 
-        if (xOffset + width > inputWidth || yOffset + height > inputHeight) return false;
+        if (xOffset + recipeWidth > inputWidth || yOffset + recipeHeight > inputHeight) return false;
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int subX = x + xOffset;
-                int subY = y + yOffset;
-                Ingredient expected = ingredients.get(y * width + x);
-                ItemStack inSlot = input.getItem(subX, subY); // Use (x, y) form, not flat index
+        for (int y = yOffset; y < recipeHeight; y++) {
+            for (int x = xOffset; x < recipeWidth; x++) {
+                Ingredient expected = ingredients.get(y * recipeWidth + x);
+                ItemStack inSlot = input.getItem(x, y);
                 if (!expected.test(inSlot)) return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public @NotNull RecipeSerializer<? extends CraftingRecipe> getSerializer() {
+        return CustomRecipes.RECIPE_SHAPED_SERIALIZER.get();
+    }
+
+    @Override
+    public @NotNull CraftingBookCategory category() {
+        return null; // TODO implement categories
+    }
+
+    @Override
+    public @NotNull RecipeType<CraftingRecipe> getType() {
+        return CustomRecipes.RECIPE_SHAPED.get();
     }
 }

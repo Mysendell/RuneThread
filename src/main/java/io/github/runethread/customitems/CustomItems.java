@@ -102,6 +102,9 @@ public class CustomItems {
             (properties) -> new CollapseRuneItem(properties.stacksTo(16).fireResistant(), 10, 2, 1.5f, -1,
                     (level, player, stack, finalScale, destination, reference, additionalData) -> {
                         ListTag listTag = new ListTag();
+                        ItemStack finalStack = stack.copy();
+                        finalStack.setCount(1);
+                        stack.shrink(1);
                         BlockPos origin = ((RunicAltarEntity.DestinationRuneData) additionalData.get("origin")).getBlockPos();
                         MainRuneItem item = (MainRuneItem) stack.getItem();
                         AreaUtil.IterateAreaBox(level, destination.getBlockPos(), finalScale * item.getScale(), (args) -> {
@@ -109,12 +112,9 @@ public class CustomItems {
                             listTag.add(StructureUtil.serializeBlock(pos, destination.getBlockPos(), level));
                             level.removeBlock(pos, false);
                         });
-                        CompoundTag radius = new CompoundTag();
+                        CompoundTag radius = new CompoundTag(); // TODO save structure using structureData not saving every block
                         radius.putDouble("radius", finalScale * item.getScale());
                         listTag.addLast(radius);
-                        ItemStack finalStack = stack.copy();
-                        finalStack.setCount(1);
-                        stack.shrink(1);
                         finalStack.set(DataComponentRegistry.STRUCTURE_DATA, new StructureData(listTag));
                         finalStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
                         InventoryUtil.dropStack(origin, level, finalStack);

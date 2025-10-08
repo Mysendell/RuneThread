@@ -1,4 +1,4 @@
-package io.github.runethread.customblocks;
+package io.github.runethread.customblocks.structure;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;

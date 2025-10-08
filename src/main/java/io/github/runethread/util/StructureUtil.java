@@ -1,7 +1,7 @@
 package io.github.runethread.util;
 
-import io.github.runethread.customblocks.StructureCenterEntity;
-import io.github.runethread.customblocks.StructurePartBlock;
+import io.github.runethread.customblocks.structure.StructureCenterEntity;
+import io.github.runethread.customblocks.structure.StructurePartBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;

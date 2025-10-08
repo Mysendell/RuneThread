@@ -1,47 +1,37 @@
 package io.github.runethread.recipes.Crafting;
 
-import io.github.runethread.datacomponents.DataComponentRegistry;
-import io.github.runethread.datacomponents.PowerData;
 import io.github.runethread.recipes.CustomRecipes;
 import io.github.runethread.recipes.RecipeResult;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.github.runethread.customitems.CustomItems.POWER_RUNE;
-
+/***
+ * A base class for custom crafting recipes.
+ * Implements CraftingRecipe and provides common functionality for handling ingredients and results.
+ * Does not implement matches(), for that check specific recipe types.
+ */
 public abstract class Recipe implements CraftingRecipe {
     protected final List<Ingredient> ingredients;
     protected final List<RecipeResult> results;
-    protected final int width, height;
-    protected int gridWidth = 3;
-    protected int gridHeight = 3;
+    protected final int recipeWidth, recipeHeight;
     protected PlacementInfo placementInfo;
 
-    public Recipe(List<Ingredient> ingredients, List<RecipeResult> results, int width, int height) {
+    public Recipe(List<Ingredient> ingredients, List<RecipeResult> results, int recipeWidth, int recipeHeight) {
         this.ingredients = ingredients;
         this.results = results;
-        this.width = width;
-        this.height = height;
+        this.recipeWidth = recipeWidth;
+        this.recipeHeight = recipeHeight;
     }
 
-    public int getWidth() {
-        return width;
-    }
-    public int getHeight() {
-        return height;
-    }
-    public int getGridWidth() {
-        return gridWidth;
-    }
-    public int getGridHeight() {
-        return gridHeight;
-    }
-
+    /***
+     * Gets a list of all result ItemStacks for this recipe.
+     * @return A list of ItemStacks representing the results of this recipe.
+     */
     public List<ItemStack> getResultItemStacks() {
         List<ItemStack> stacks = new ArrayList<>();
         for (RecipeResult result : results) {
@@ -50,35 +40,23 @@ public abstract class Recipe implements CraftingRecipe {
         return stacks;
     }
 
-    public List<RecipeResult> getResultStack() {
-        return results;
-    }
-
-    public ItemStack getResult(HolderLookup.Provider registries) {
+    public ItemStack getResultItemStack() {
         if (results.isEmpty()) return ItemStack.EMPTY;
         return results.getFirst().toStack();
     }
 
-    public List<Ingredient> getIngredients() {
-        return ingredients;
-    }
-
-    public List<ItemStack> assembleStack(CraftingInput input, HolderLookup.Provider registries) {
+    public List<ItemStack> assembleStacks() {
         return getResultItemStacks();
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
-        ItemStack itemStack = getResult(registries);
-        Item item = itemStack.getItem();
-        if(item == POWER_RUNE.get())
-            itemStack.set(DataComponentRegistry.POWER_DATA.get(), new PowerData(results.getFirst().variation()));
-        return itemStack;
+    public @NotNull ItemStack assemble(@NotNull CraftingInput input, HolderLookup.@NotNull Provider registries) {
+        return getResultItemStack();
     }
 
 
     @Override
-    public PlacementInfo placementInfo() {
+    public @NotNull PlacementInfo placementInfo() {
         if (this.placementInfo == null) {
             this.placementInfo = PlacementInfo.create(this.ingredients);
         }
@@ -86,7 +64,26 @@ public abstract class Recipe implements CraftingRecipe {
     }
 
     @Override
-    public RecipeBookCategory recipeBookCategory() {
+    public @NotNull RecipeBookCategory recipeBookCategory() {
         return CustomRecipes.RUNETHREAD_CATEGORY.get();
+    }
+
+    /***
+     * Gets the list of RecipeResult objects for this recipe. Only used by serializers.
+     * @return A list of RecipeResult objects representing the results of this recipe.
+     */
+    public List<RecipeResult> getResults() {
+        return results;
+    }
+
+    public int getRecipeWidth() {
+        return recipeWidth;
+    }
+    public int getRecipeHeight() {
+        return recipeHeight;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
     }
 }

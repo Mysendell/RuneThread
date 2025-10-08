@@ -22,21 +22,21 @@ import java.util.Optional;
 
 import static io.github.runethread.util.InventoryUtil.*;
 
-public abstract class CraftingEntity extends BlockEntity{
+public abstract class CraftingEntity extends BlockEntity implements ICraftingEntity {
     protected final ItemStackHandler output = new ItemStackHandler(1);
     protected final int width, height;
-    protected ItemStackHandler inventory;
+    protected ItemStackHandler input;
     private boolean needsCraftingUpdate = false;
 
     public CraftingEntity(BlockEntityType<?> blockEntity, BlockPos pos, BlockState state, int width, int height) {
         super(blockEntity, pos, state);
         this.width = width;
         this.height = height;
-        inventory = new ItemStackHandler(width * height);
+        input = new ItemStackHandler(width * height);
     }
 
     public void tryCraft(Level level) {
-        List<ItemStack> items = getCraftingItems(width, height, inventory);
+        List<ItemStack> items = getCraftingItems(width, height, input);
         CraftingInput input = getRecipeInput(width, height, items);
 
         Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, input);
@@ -54,7 +54,7 @@ public abstract class CraftingEntity extends BlockEntity{
 
     public void doCraft(Level level) {
         if (level.isClientSide) return;
-        removeCraftingItems(width, height, inventory);
+        removeCraftingItems(width, height, input);
         output.setStackInSlot(0, ItemStack.EMPTY);
         tryCraft(level);
     }
@@ -64,14 +64,14 @@ public abstract class CraftingEntity extends BlockEntity{
         if (preview.isEmpty()) return;
 
         while (true) {
-            List<ItemStack> items = getCraftingItems(width, height, inventory);
+            List<ItemStack> items = getCraftingItems(width, height, input);
             CraftingInput input = getRecipeInput(width, height, items);
             Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, input);
             if (recipeOpt.isEmpty()) break;
 
             RecipeShaped recipe = (RecipeShaped) recipeOpt.get().value();
 
-            removeCraftingItems(width, height, inventory);
+            removeCraftingItems(width, height, this.input);
             player.addItem(recipe.assemble(input, level.registryAccess()));
         }
 
@@ -87,7 +87,7 @@ public abstract class CraftingEntity extends BlockEntity{
     }
 
     public void onRemove(){
-        InventoryUtil.dropStackHandler(worldPosition, level, inventory);
+        InventoryUtil.dropStackHandler(worldPosition, level, input);
         InventoryUtil.dropStackHandler(worldPosition, level, output);
     }
 
@@ -98,7 +98,7 @@ public abstract class CraftingEntity extends BlockEntity{
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("Inventory", inventory.serializeNBT(registries));
+        tag.put("Inventory", input.serializeNBT(registries));
         tag.put("Output", output.serializeNBT(registries));
     }
 
@@ -106,15 +106,15 @@ public abstract class CraftingEntity extends BlockEntity{
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("Inventory", Tag.TAG_COMPOUND)) {
-            inventory.deserializeNBT(registries, tag.getCompound("Inventory"));
+            input.deserializeNBT(registries, tag.getCompound("Inventory"));
         }
         if (tag.contains("Output", Tag.TAG_COMPOUND)) {
             output.deserializeNBT(registries, tag.getCompound("Output"));
         }
     }
 
-    public ItemStackHandler getInventory() {
-        return inventory;
+    public ItemStackHandler getInput() {
+        return input;
     }
 
     public ItemStackHandler getOutput() {

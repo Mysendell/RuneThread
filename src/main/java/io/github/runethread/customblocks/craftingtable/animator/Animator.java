@@ -43,7 +43,7 @@ public class Animator extends FurnaceBlock {
 
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (level.getBlockEntity(pos) instanceof AnimatorEntity animatorEntity) {
+        if (level.getBlockEntity(pos) instanceof AnimatorCraftingEntity animatorEntity) {
             if (!level.isClientSide) {
                 (player).openMenu(new SimpleMenuProvider(animatorEntity, Component.literal("Animator")), pos);
                 return InteractionResult.SUCCESS;
@@ -60,7 +60,7 @@ public class Animator extends FurnaceBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new AnimatorEntity(blockPos, blockState);
+        return new AnimatorCraftingEntity(blockPos, blockState);
     }
 
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
@@ -68,7 +68,7 @@ public class Animator extends FurnaceBlock {
                 : createTickerHelper(
                 type,
                 CustomBlockEntities.ANIMATOR.get(),
-                AnimatorEntity::serverTick
+                AnimatorCraftingEntity::serverTick
         );
     }
 
@@ -76,7 +76,7 @@ public class Animator extends FurnaceBlock {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof AnimatorEntity animator)
+            if (be instanceof AnimatorCraftingEntity animator)
                 animator.onRemove();
             level.removeBlockEntity(pos);
             super.onRemove(state, level, pos, newState, isMoving);

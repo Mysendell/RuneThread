@@ -12,29 +12,29 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import java.util.List;
 
-public class SmeltingSerializer<T extends Smelting>  implements RecipeSerializer<T> {
+public class SmeltingSerializer<T extends SmeltingRecipe>  implements RecipeSerializer<T> {
     public  final MapCodec<T> CODEC;
 
     public  final StreamCodec<RegistryFriendlyByteBuf, T> STREAM_CODEC;
 
     public SmeltingSerializer(RecipeFactory<T> factory) {
         CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-                Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(Smelting::getIngredients),
-                RecipeResult.CODEC.listOf().fieldOf("results").forGetter(Smelting::getResultStack),
-                Codec.INT.fieldOf("width").forGetter(Smelting::getWidth),
-                Codec.INT.fieldOf("height").forGetter(Smelting::getHeight),
-                Codec.INT.fieldOf("burnTime").forGetter(Smelting::getBurnTime),
-                Codec.INT.fieldOf("fuelBurnMultiplier").forGetter(Smelting::getFuelBurnMultiplier)
+                Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(SmeltingRecipe::getIngredients),
+                RecipeResult.CODEC.listOf().fieldOf("results").forGetter(SmeltingRecipe::getResults),
+                Codec.INT.fieldOf("width").forGetter(SmeltingRecipe::getRecipeWidth),
+                Codec.INT.fieldOf("height").forGetter(SmeltingRecipe::getRecipeHeight),
+                Codec.INT.fieldOf("burnTime").forGetter(SmeltingRecipe::getBurnTime),
+                Codec.INT.fieldOf("fuelBurnMultiplier").forGetter(SmeltingRecipe::getFuelBurnMultiplier)
         ).apply(inst, factory::create));
 
         STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.<RegistryFriendlyByteBuf, Ingredient>list().apply(Ingredient.CONTENTS_STREAM_CODEC), Smelting::getIngredients,
-                ByteBufCodecs.<RegistryFriendlyByteBuf, RecipeResult>list().apply(RecipeResult.STREAM_CODEC), Smelting::getResultStack,
+                ByteBufCodecs.<RegistryFriendlyByteBuf, Ingredient>list().apply(Ingredient.CONTENTS_STREAM_CODEC), SmeltingRecipe::getIngredients,
+                ByteBufCodecs.<RegistryFriendlyByteBuf, RecipeResult>list().apply(RecipeResult.STREAM_CODEC), SmeltingRecipe::getResults,
 
-                ByteBufCodecs.INT, Smelting::getWidth,
-                ByteBufCodecs.INT, Smelting::getHeight,
-                ByteBufCodecs.INT, Smelting::getBurnTime,
-                ByteBufCodecs.INT, Smelting::getFuelBurnMultiplier,
+                ByteBufCodecs.INT, SmeltingRecipe::getRecipeWidth,
+                ByteBufCodecs.INT, SmeltingRecipe::getRecipeHeight,
+                ByteBufCodecs.INT, SmeltingRecipe::getBurnTime,
+                ByteBufCodecs.INT, SmeltingRecipe::getFuelBurnMultiplier,
                 factory::create
         );
     }

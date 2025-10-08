@@ -39,12 +39,12 @@
         @Override
         protected Optional<RecipeHolder<CraftingRecipe>> getRecipeOpt(Level level, CraftingInput input) {
             Optional<RecipeHolder<CraftingRecipe>> shaped = level.getServer().getRecipeManager()
-                    .getRecipeFor(CustomRecipes.ARCANE_SHAPED.get(), input, level);
+                    .getRecipeFor(CustomRecipes.RECIPE_SHAPED.get(), input, level);
             if (shaped.isPresent())
                 return shaped;
 
             Optional<RecipeHolder<CraftingRecipe>> shapeless = level.getServer().getRecipeManager()
-                    .getRecipeFor(CustomRecipes.ARCANE_SHAPELESS.get(), input, level);
+                    .getRecipeFor(CustomRecipes.RECIPE_SHAPELESS.get(), input, level);
             return shapeless;
         }
 

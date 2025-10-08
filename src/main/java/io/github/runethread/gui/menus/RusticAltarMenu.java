@@ -2,16 +2,18 @@ package io.github.runethread.gui.menus;
 
 import io.github.runethread.customTags.RuneTags;
 import io.github.runethread.customblocks.altar.RunicAltarEntity;
+import io.github.runethread.gui.AbstractMenu;
 import io.github.runethread.gui.CustomMenus;
-import io.github.runethread.gui.Menu;
-import io.github.runethread.gui.TagRestrictedSlot;
+import io.github.runethread.gui.slots.TagRestrictedSlot;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 
-public class RusticAltarMenu extends Menu<RunicAltarEntity> {
+import java.util.Set;
+
+public class RusticAltarMenu extends AbstractMenu<RunicAltarEntity> {
     private final IItemHandler mainRune;
     private final IItemHandler destinationRune;
     private final IItemHandler power;
@@ -34,9 +36,9 @@ public class RusticAltarMenu extends Menu<RunicAltarEntity> {
     }
 
     private void addRunicAltarSlots() {
-        this.addSlot(new TagRestrictedSlot(mainRune, 0, 80, 31, blockEntity, RuneTags.Items.FUNCTION_RUNE_TAG, RuneTags.Items.NATURE_RUNE_TAG));
-        this.addSlot(new TagRestrictedSlot(destinationRune, 0, 35, 31, blockEntity, RuneTags.Items.LOCATON_RUNE_TAG));
-        this.addSlot(new TagRestrictedSlot(power, 0, 125, 31, blockEntity, RuneTags.Items.POWER_TAG));
+        this.addSlot(new TagRestrictedSlot(mainRune, 0, 80, 31, blockEntity, true, false, Set.of(RuneTags.Items.FUNCTION_RUNE_TAG, RuneTags.Items.NATURE_RUNE_TAG)));
+        this.addSlot(new TagRestrictedSlot(destinationRune, 0, 35, 31, blockEntity, true, true, Set.of(RuneTags.Items.LOCATON_RUNE_TAG)));
+        this.addSlot(new TagRestrictedSlot(power, 0, 125, 31, blockEntity, true, true, Set.of(RuneTags.Items.POWER_TAG)));
     }
 
     @Override

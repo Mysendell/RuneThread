@@ -80,9 +80,9 @@ public class AreaUtil {
 
         List<BlockPos> loadedChunkList = new ArrayList<>();
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
+        for (int x = minX; x < maxX; x++) {
+            for (int y = minY; y < maxY; y++) {
+                for (int z = minZ; z < maxZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     if (ChunkUtils.forceLoadChunk(level, pos))
                         loadedChunkList.add(pos);

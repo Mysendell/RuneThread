@@ -25,7 +25,7 @@ public class ModRecipeProvider implements DataProvider {
         Path path = output.getOutputFolder().resolve("data").resolve("runethread").resolve("recipe");
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
-        futures.add(saveRecipe(cache, "dough", createArcaneRecipeJson(
+        futures.add(saveRecipe(cache, "dough", createRecipeJson(
                 3, 3,
                 List.of(
                         "minecraft:spider_eye", "minecraft:rabbit", "minecraft:spider_eye",
@@ -35,10 +35,10 @@ public class ModRecipeProvider implements DataProvider {
                 List.of(
                         Map.of("item", "runethread:dough", "count", 3)
                 )
-                ,"arcane_shaped"
+                ,"recipe_shaped"
         ), path.resolve("dough.json")));
 
-        futures.add(saveRecipe(cache, "cake", createArcaneRecipeJson(
+        futures.add(saveRecipe(cache, "cake", createRecipeJson(
                 3, 2,
                 List.of(
                         "runethread:dough",
@@ -51,7 +51,7 @@ public class ModRecipeProvider implements DataProvider {
                 List.of(
                         Map.of("item", "runethread:cake", "count", 1)
                 ),
-                "arcane_shapeless"
+                "recipe_shapeless"
         ), path.resolve("cake.json")));
 
         futures.add(saveRecipe(cache, "hampter", createPhilosophalFurnaceRecipe(
@@ -62,7 +62,7 @@ public class ModRecipeProvider implements DataProvider {
                 List.of(
                         Map.of("item", "runethread:hampter", "count", 1)
                 ),
-                "animator",
+                "philosophal",
                 0, 1
         ), path.resolve("hampter.json")));
 
@@ -79,7 +79,7 @@ public class ModRecipeProvider implements DataProvider {
         return "My Custom Recipes";
     }
 
-    private static JsonElement createArcaneRecipeJson(
+    private static JsonObject createRecipeJson(
             int width, int height, List<String> ingredients, List<Map<String, Object>> results, String type) {
         JsonObject json = new JsonObject();
         json.addProperty("type", "runethread:"+ type);
@@ -102,30 +102,12 @@ public class ModRecipeProvider implements DataProvider {
         return json;
     }
 
-    private static JsonElement createPhilosophalFurnaceRecipe(
+    private static JsonObject createPhilosophalFurnaceRecipe(
             int width, int height, List<String> ingredients, List<Map<String, Object>> results, String type,
     int burnTime, int fuelBurnMultiplier) {
-        JsonObject json = new JsonObject();
-        json.addProperty("type", "runethread:"+ type);
-        json.addProperty("width", width);
-        json.addProperty("height", height);
-
+        JsonObject json = createRecipeJson(width, height, ingredients, results, type);
         json.addProperty("burnTime", burnTime);
         json.addProperty("fuelBurnMultiplier", fuelBurnMultiplier);
-
-        JsonArray ingArr = new JsonArray();
-        for (String s : ingredients) ingArr.add(s);
-        json.add("ingredients", ingArr);
-
-        JsonArray resArr = new JsonArray();
-        for (Map<String, Object> res : results) {
-            JsonObject resObj = new JsonObject();
-            resObj.addProperty("item", (String) res.get("item"));
-            resObj.addProperty("count", (int) res.get("count"));
-            resArr.add(resObj);
-        }
-        json.add("results", resArr);
-
-        return json;
+        return  json;
     }
 }
