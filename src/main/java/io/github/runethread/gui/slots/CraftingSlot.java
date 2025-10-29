@@ -8,7 +8,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
-/***
+/**
  * A slot specific to crafting entities, causes the entity to update its recipe when changed
  * Can receive a ISlotType to restrict what items can be placed in it
  * @see ICraftingEntity
@@ -18,7 +18,7 @@ public class CraftingSlot extends SlotItemHandler {
     ICraftingEntity blockEntity;
     ISlotType slotType;
 
-    /***
+    /**
      * Creates a crafting slot with a specific slot type
      * @param itemHandler the item handler assigned to this slot
      * @param slotIndex the slot index inside that item handler
@@ -34,7 +34,7 @@ public class CraftingSlot extends SlotItemHandler {
         this.slotType = slotType;
     }
 
-    /***
+    /**
      * Creates a crafting slot with no placement restrictions
      * @param itemHandler the item handler assigned to this slot
      * @param slot the slot index inside that item handler
@@ -53,7 +53,7 @@ public class CraftingSlot extends SlotItemHandler {
         return super.mayPlace(stack) && slotType.mayPlace(stack);
     }
 
-    /***
+    /**
      * Sets the content of this slot. Schedules a crafting update in the associated block entity if not on client side.
      * @param stack the ItemStack to set in this slot
      */
@@ -65,7 +65,7 @@ public class CraftingSlot extends SlotItemHandler {
         }
     }
 
-    /***
+    /**
      * Called when the player takes an item from the slot. Schedules a crafting update in the associated block entity if not on client side.
      * @param player the player taking the item
      * @param stack the ItemStack being taken

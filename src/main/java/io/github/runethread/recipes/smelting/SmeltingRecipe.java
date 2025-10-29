@@ -11,7 +11,7 @@ import java.util.List;
 import static io.github.runethread.recipes.CustomRecipes.SMELTING;
 import static io.github.runethread.recipes.CustomRecipes.SMELTING_SERIALIZER;
 
-/***
+/**
  * A smelting recipe. Similar to a shaped crafting recipe, but includes burn time and fuel burn multiplier.
  * @see RecipeShaped
  */

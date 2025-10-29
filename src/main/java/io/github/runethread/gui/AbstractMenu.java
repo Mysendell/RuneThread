@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 
 
-/***
+/**
  * Base class for all menus
  * Defines common player inventory slot creation methods and quick move logic
  * @param <T> BlockEntity type
@@ -25,7 +25,7 @@ public abstract class AbstractMenu<T extends BlockEntity> extends AbstractContai
     protected final Player player;
 
 
-    /*** @param id        Window id
+    /** @param id        Window id
      * @param playerInv Player inventory
      * @param blockEntity  Block entity instance
      * @param Menu      Menu type
@@ -37,7 +37,7 @@ public abstract class AbstractMenu<T extends BlockEntity> extends AbstractContai
         this.player = playerInv.player;
     }
 
-    /***
+    /**
      * Adds the player inventory slots to the menu
      * @param playerInv player inventory instance
      * @param startX starting X position
@@ -53,7 +53,7 @@ public abstract class AbstractMenu<T extends BlockEntity> extends AbstractContai
         }
     }
 
-    /***
+    /**
      * Adds the player hotbar slots to the menu
      * @param playerInv player inventory instance
      * @param startX starting X position
@@ -75,7 +75,7 @@ public abstract class AbstractMenu<T extends BlockEntity> extends AbstractContai
     private static final int VANILLA_FIRST_SLOT_INDEX = 0;
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
 
-    /***
+    /**
      * Number of slots in the block entity's inventory that are quick move valid
      */
     protected static int TE_INVENTORY_SLOT_COUNT = 9;

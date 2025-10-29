@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-/***
+/**
  * A shaped crafting recipe. The arrangement of ingredients matters.
  * @see ModRecipe
  */
@@ -20,7 +20,7 @@ public class RecipeShaped extends ModRecipe {
         super(ingredients, result, recipeWidth, recipeHeight);
     }
 
-    /***
+    /**
      * Checks if the given crafting input matches this recipe. Checks all possible offsets in the input.
      * @param input the crafting input to check
      * @param level the level the crafting is taking place in

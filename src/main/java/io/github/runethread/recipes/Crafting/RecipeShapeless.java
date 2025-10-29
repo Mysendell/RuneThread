@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-/***
+/**
  * A shapeless crafting recipe. The ingredients can be in any order in the crafting grid.
  * @see RecipeShaped
  */
@@ -18,7 +18,7 @@ public class RecipeShapeless extends ModRecipe {
         super(ingredients, results, recipeWidth, recipeHeight);
     }
 
-    /***
+    /**
      * Checks if the given crafting input matches this recipe.
      * @param input the crafting input to check
      * @param level the level the crafting is taking place in

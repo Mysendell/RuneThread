@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-/***
+/**
  * A base class for custom crafting recipes.
  * Implements CraftingRecipe and provides common functionality for handling ingredients and results.
  * Does not implement matches(), for that check specific recipe types.
@@ -32,7 +32,7 @@ public abstract class ModRecipe implements CraftingRecipe {
         this.recipeHeight = recipeHeight;
     }
 
-    /***
+    /**
      * Gets a list of all result ItemStacks for this recipe.
      * @return A list of ItemStacks representing the results of this recipe.
      */
@@ -68,7 +68,7 @@ public abstract class ModRecipe implements CraftingRecipe {
         return CustomRecipes.RUNETHREAD_CATEGORY.get();
     }
 
-    /***
+    /**
      * Gets the list of RecipeResult objects for this recipe. Only used by serializers.
      * @return A list of RecipeResult objects representing the results of this recipe.
      */

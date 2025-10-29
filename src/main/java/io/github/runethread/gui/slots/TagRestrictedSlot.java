@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-/***
+/**
  * A slot that restricts item placement based on item tags.<br>
  * Can operate in whitelist or blacklist mode, and supports strict mode for tag matching.<br>
  * In strict mode <b>all</b> tags must match, otherwise <b>any</b> tag match is sufficient.
@@ -23,7 +23,7 @@ public class TagRestrictedSlot extends SlotItemHandler implements  ISlotType {
     private final boolean strictMode;
     private final BlockEntity blockEntity;
 
-    /***
+    /**
      * Creates a new TagRestrictedSlot.
      * @param itemHandler the item handler assigned to this slot
      * @param slotIndex the slot index inside that item handler
@@ -43,7 +43,7 @@ public class TagRestrictedSlot extends SlotItemHandler implements  ISlotType {
     }
 
 
-    /***
+    /**
      * Checks if the given ItemStack can be placed in this slot based on its tags and the slot's configuration.
      * @param stack the ItemStack to check
      * @return true if the item can be placed in the slot, false otherwise

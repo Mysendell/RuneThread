@@ -8,7 +8,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 
-/***
+/**
  * A CraftingSlot that only allows item extraction, not placement. Supports shift-click crafting.
  * @see CraftingEntity
  * @see CraftingSlot
@@ -18,7 +18,7 @@ public class CraftingOutputSlot extends CraftingSlot {
     private final Level level;
     private final Player player;
 
-    /***
+    /**
      * Creates a new CraftingOutputSlot.
      * @param itemHandler the item handler assigned to this slot
      * @param player the player interacting with the GUI
@@ -40,7 +40,7 @@ public class CraftingOutputSlot extends CraftingSlot {
         return false;
     }
 
-    /***
+    /**
      * Called when the player takes an item from the slot. Triggers crafting in the associated block entity.
      * @param player the player taking the item
      * @param stack the ItemStack being taken
@@ -51,7 +51,7 @@ public class CraftingOutputSlot extends CraftingSlot {
         super.onTake(player, stack);
     }
 
-    /***
+    /**
      * Called when the player shift-clicks an item from the slot. Triggers crafting in the associated block entity.
      * @param stack the ItemStack being taken
      * @param amount the amount of items being taken
