@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static io.github.runethread.util.InventoryUtil.*;
 
-public abstract class FurnaceCraftingEntity<T extends SmeltingRecipe, J extends FurnaceBlock> extends BlockEntity implements ICraftingEntity {
+public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraftingEntity {
     protected int inputWidth = 1, inputHeight = 1;
     protected int outputWidth = 1, outputHeight = 1;
     protected int fuelWidth = 1, fuelHeight = 1;
@@ -32,19 +32,23 @@ public abstract class FurnaceCraftingEntity<T extends SmeltingRecipe, J extends 
     protected int fuelBurnTime = 0, burnTime = 0, recipeBurnTime = 0;
     protected int furnaceSpeed = 200;
     protected FuelValues fuelValues;
-    protected boolean needsUpdate = true;
-    protected T recipe;
+    protected SmeltingRecipe recipe;
     protected ItemStack result;
 
 
     public FurnaceCraftingEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
-        assert level != null;
-        fuelValues = FuelValues.vanillaBurnTimes(level.registryAccess(), level.enabledFeatures());
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null) {
+            fuelValues = FuelValues.vanillaBurnTimes(level.registryAccess(), level.enabledFeatures());
+        }
     }
 
     public Optional<RecipeHolder<CraftingRecipe>> canCraft(Level level) {
-
         List<ItemStack> inputItems = getCraftingItems(inputWidth, inputHeight, input);
         CraftingInput inputRecipe = getRecipeInput(inputWidth, inputHeight, inputItems);
 
@@ -58,44 +62,32 @@ public abstract class FurnaceCraftingEntity<T extends SmeltingRecipe, J extends 
     private void setLitState(boolean lit) {
         if (level != null && !level.isClientSide) {
             BlockState state = level.getBlockState(worldPosition);
-            if (state.hasProperty(J.LIT) && state.getValue(J.LIT) != lit) {
-                level.setBlock(worldPosition, state.setValue(J.LIT, lit), 3);
+            if (state.hasProperty(FurnaceBlock.LIT) && state.getValue(FurnaceBlock.LIT) != lit) {
+                level.setBlock(worldPosition, state.setValue(FurnaceBlock.LIT, lit), 3);
             }
         }
     }
 
     protected void serverTick(Level level) {
-        if (needsUpdate) {
-            needsUpdate = false;
-            this.setChanged();
-            Optional<RecipeHolder<CraftingRecipe>> recipeOpt = canCraft(level);
-            recipe = (T) recipeOpt.map(RecipeHolder::value).orElse(null);
-            if (recipe != null) {
-                List<ItemStack> inputItems = getCraftingItems(inputWidth, inputHeight, input);
-                CraftingInput inputRecipe = getRecipeInput(inputWidth, inputHeight, inputItems);
-                result = recipe.assemble(inputRecipe, level.registryAccess());
-                recipeBurnTime = recipe.getBurnTime();
-            }
-        }
-
-        if(recipe == null) {
-            burnTime = 0;
-            return;
-        }
-
         if (burnTime >= (recipeBurnTime + furnaceSpeed)) {
-            List<ItemStack> outputStacks = getCraftingItems(outputWidth, outputHeight, output);
-            if (!canFullyOutput(outputStacks, result)) return;
+            if(!outputRecipe())
+                return;
             burnTime = 0;
-            distributeOutput(output, result);
-            removeCraftingItems(inputWidth, inputHeight, input);
-            needsUpdate = true;
         } else {
             if (fuelBurnTime == 0 && !updateFuel())
                 return;
             burnTime++;
             fuelBurnTime -= recipe.getFuelBurnMultiplier();
         }
+    }
+
+    protected boolean outputRecipe(){
+        List<ItemStack> outputStacks = getCraftingItems(outputWidth, outputHeight, output);
+        if (!canFullyOutput(outputStacks, result)) return false;
+        addItemStackInventory(level, worldPosition, output, result);
+        int[] countMap = recipe.getIngredientCountMap();
+        removeCraftingItems(inputWidth, inputHeight, input, countMap, worldPosition, level);
+        return true;
     }
 
     protected boolean updateFuel() {
@@ -148,15 +140,19 @@ public abstract class FurnaceCraftingEntity<T extends SmeltingRecipe, J extends 
     }
 
     public void scheduleCraftingUpdate() {
-        needsUpdate = true;
-    }
-
-    public boolean isNeedsUpdate() {
-        return needsUpdate;
-    }
-
-    public void setNeedsUpdate(boolean needsUpdate) {
-        this.needsUpdate = needsUpdate;
+        this.setChanged();
+        Optional<RecipeHolder<CraftingRecipe>> recipeOpt = canCraft(level);
+        if (recipeOpt.isPresent()) {
+            recipe = (SmeltingRecipe) recipeOpt.get().value();
+            List<ItemStack> inputItems = getCraftingItems(inputWidth, inputHeight, input);
+            CraftingInput inputRecipe = getRecipeInput(inputWidth, inputHeight, inputItems);
+            result = recipe.assemble(inputRecipe, level.registryAccess());
+            recipeBurnTime = recipe.getBurnTime();
+        }
+        else{
+            burnTime = 0;
+            recipe = null;
+        }
     }
 
     public ItemStackHandler getInput() {

@@ -1,6 +1,6 @@
 package io.github.runethread.customblocks.craftingtable;
 
-import io.github.runethread.recipes.Crafting.RecipeShaped;
+import io.github.runethread.recipes.Crafting.ModRecipe;
 import io.github.runethread.util.InventoryUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -26,7 +26,7 @@ public abstract class CraftingEntity extends BlockEntity implements ICraftingEnt
     protected final ItemStackHandler output = new ItemStackHandler(1);
     protected final int width, height;
     protected ItemStackHandler input;
-    private boolean needsCraftingUpdate = false;
+    protected ModRecipe recipe;
 
     public CraftingEntity(BlockEntityType<?> blockEntity, BlockPos pos, BlockState state, int width, int height) {
         super(blockEntity, pos, state);
@@ -35,17 +35,18 @@ public abstract class CraftingEntity extends BlockEntity implements ICraftingEnt
         input = new ItemStackHandler(width * height);
     }
 
-    public void tryCraft(Level level) {
+    protected void tryCraft(Level level) {
         List<ItemStack> items = getCraftingItems(width, height, input);
-        CraftingInput input = getRecipeInput(width, height, items);
+        CraftingInput craftingInput = getRecipeInput(width, height, items);
 
-        Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, input);
+        Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, craftingInput);
 
         if (recipeOpt.isPresent()) {
-            CraftingRecipe recipe = recipeOpt.get().value();
-            ItemStack result = recipe.assemble(input, level.registryAccess());
+            recipe = (ModRecipe) recipeOpt.get().value();
+            ItemStack result = recipe.assemble(craftingInput, level.registryAccess());
             output.setStackInSlot(0, result.copy());
         } else {
+            recipe = null;
             output.setStackInSlot(0, ItemStack.EMPTY);
         }
     }
@@ -54,7 +55,8 @@ public abstract class CraftingEntity extends BlockEntity implements ICraftingEnt
 
     public void doCraft(Level level) {
         if (level.isClientSide) return;
-        removeCraftingItems(width, height, input);
+        int[] countMap = recipe.getIngredientCountMap();
+        removeCraftingItems(width, height, input, countMap, worldPosition, level);
         output.setStackInSlot(0, ItemStack.EMPTY);
         tryCraft(level);
     }
@@ -65,34 +67,27 @@ public abstract class CraftingEntity extends BlockEntity implements ICraftingEnt
 
         while (true) {
             List<ItemStack> items = getCraftingItems(width, height, input);
-            CraftingInput input = getRecipeInput(width, height, items);
-            Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, input);
+            CraftingInput craftingInput = getRecipeInput(width, height, items);
+            Optional<RecipeHolder<CraftingRecipe>> recipeOpt = getRecipeOpt(level, craftingInput);
             if (recipeOpt.isEmpty()) break;
 
-            RecipeShaped recipe = (RecipeShaped) recipeOpt.get().value();
+            recipe = (ModRecipe) recipeOpt.get().value();
 
-            removeCraftingItems(width, height, this.input);
-            player.addItem(recipe.assemble(input, level.registryAccess()));
+            int[] countMap = recipe.getIngredientCountMap();
+            removeCraftingItems(width, height, input, countMap, worldPosition, level);
+            player.addItem(recipe.assemble(craftingInput, level.registryAccess()));
         }
 
         tryCraft(level);
     }
 
-    public void tick() {
-        if (needsCraftingUpdate) {
-            needsCraftingUpdate = false;
-            tryCraft(level);
-            this.setChanged();
-        }
-    }
-
     public void onRemove(){
         InventoryUtil.dropStackHandler(worldPosition, level, input);
-        InventoryUtil.dropStackHandler(worldPosition, level, output);
     }
 
     public void scheduleCraftingUpdate() {
-        needsCraftingUpdate = true;
+        tryCraft(level);
+        this.setChanged();
     }
 
     @Override

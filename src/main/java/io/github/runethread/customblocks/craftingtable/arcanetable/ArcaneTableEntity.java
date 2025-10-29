@@ -47,8 +47,4 @@
                     .getRecipeFor(CustomRecipes.RECIPE_SHAPELESS.get(), input, level);
             return shapeless;
         }
-
-        public static void tick(Level level, BlockPos blockPos, BlockState blockState, ArcaneTableEntity entity) {
-            entity.tick();
-        }
     }

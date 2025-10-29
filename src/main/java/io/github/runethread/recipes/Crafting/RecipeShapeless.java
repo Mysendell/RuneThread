@@ -1,7 +1,7 @@
 package io.github.runethread.recipes.Crafting;
 
 import io.github.runethread.recipes.CustomRecipes;
-import io.github.runethread.recipes.RecipeResult;
+import io.github.runethread.recipes.IRecipeIngredient;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -13,8 +13,8 @@ import java.util.List;
  * A shapeless crafting recipe. The ingredients can be in any order in the crafting grid.
  * @see RecipeShaped
  */
-public class RecipeShapeless extends Recipe{
-    public RecipeShapeless(List<Ingredient> ingredients, List<RecipeResult> results, int recipeWidth, int recipeHeight) {
+public class RecipeShapeless extends ModRecipe {
+    public RecipeShapeless(List<IRecipeIngredient> ingredients, List<IRecipeIngredient> results, int recipeWidth, int recipeHeight) {
         super(ingredients, results, recipeWidth, recipeHeight);
     }
 
@@ -33,10 +33,10 @@ public class RecipeShapeless extends Recipe{
 
         List<ItemStack> inputStacks = input.items();
 
-        for (Ingredient ingredient : ingredients) { // TODO possible optimization
+        for (IRecipeIngredient expected : ingredients) { // TODO possible optimization
             boolean found = false;
             for (ItemStack stack : inputStacks) {
-                if (ingredient.test(stack)) {
+                if (expected.test(stack)) {
                     found = true;
                     inputStacks.remove(stack);
                     break;

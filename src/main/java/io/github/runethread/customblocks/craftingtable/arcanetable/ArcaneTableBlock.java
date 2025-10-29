@@ -1,7 +1,6 @@
 package io.github.runethread.customblocks.craftingtable.arcanetable;
 
 import com.mojang.serialization.MapCodec;
-import io.github.runethread.customblocks.CustomBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -13,8 +12,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -75,14 +72,5 @@ public class ArcaneTableBlock extends BaseEntityBlock {
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ArcaneTableEntity(pos, state);
-    }
-
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null
-                : createTickerHelper(
-                type,
-                CustomBlockEntities.ARCANE_TABLE.get(),
-                ArcaneTableEntity::tick
-        );
     }
 }

@@ -3,7 +3,6 @@ package io.github.runethread.customblocks.craftingtable.animator;
 import io.github.runethread.customblocks.craftingtable.PhilosphalFurnaceCraftingEntity;
 import io.github.runethread.gui.menus.AnimatorMenu;
 import io.github.runethread.recipes.CustomRecipes;
-import io.github.runethread.recipes.smelting.PhilosophalRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 import static io.github.runethread.customblocks.CustomBlockEntities.ANIMATOR;
 
-public class AnimatorCraftingEntity extends PhilosphalFurnaceCraftingEntity<Animator, PhilosophalRecipe> implements MenuProvider {
+public class AnimatorCraftingEntity extends PhilosphalFurnaceCraftingEntity implements MenuProvider {
     public AnimatorCraftingEntity(BlockPos pos, BlockState blockState) {
         super(ANIMATOR.get(), pos, blockState);
     }

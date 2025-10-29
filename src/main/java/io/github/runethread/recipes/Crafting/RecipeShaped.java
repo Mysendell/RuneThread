@@ -1,7 +1,7 @@
 package io.github.runethread.recipes.Crafting;
 
 import io.github.runethread.recipes.CustomRecipes;
-import io.github.runethread.recipes.RecipeResult;
+import io.github.runethread.recipes.IRecipeIngredient;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
@@ -11,12 +11,12 @@ import java.util.List;
 
 /***
  * A shaped crafting recipe. The arrangement of ingredients matters.
- * @see Recipe
+ * @see ModRecipe
  */
-public class RecipeShaped extends Recipe{
+public class RecipeShaped extends ModRecipe {
 
 
-    public RecipeShaped(List<Ingredient> ingredients, List<RecipeResult> result, int recipeWidth, int recipeHeight) {
+    public RecipeShaped(List<IRecipeIngredient> ingredients, List<IRecipeIngredient> result, int recipeWidth, int recipeHeight) {
         super(ingredients, result, recipeWidth, recipeHeight);
     }
 
@@ -49,7 +49,7 @@ public class RecipeShaped extends Recipe{
 
         for (int y = yOffset; y < recipeHeight; y++) {
             for (int x = xOffset; x < recipeWidth; x++) {
-                Ingredient expected = ingredients.get(y * recipeWidth + x);
+                IRecipeIngredient expected = ingredients.get(y * recipeWidth + x);
                 ItemStack inSlot = input.getItem(x, y);
                 if (!expected.test(inSlot)) return false;
             }

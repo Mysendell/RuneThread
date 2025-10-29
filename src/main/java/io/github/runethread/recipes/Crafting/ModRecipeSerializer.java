@@ -3,31 +3,31 @@ package io.github.runethread.recipes.Crafting;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.runethread.recipes.RecipeResult;
+import io.github.runethread.recipes.IRecipeIngredient;
+import io.github.runethread.recipes.RecipeIngredientSerializer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.List;
 
-public class ModRecipeSerializer<T extends Recipe> implements net.minecraft.world.item.crafting.RecipeSerializer<T> {
+public class ModRecipeSerializer<T extends ModRecipe> implements net.minecraft.world.item.crafting.RecipeSerializer<T> {
     private final MapCodec<T> codec;
     private final StreamCodec<RegistryFriendlyByteBuf, T> streamCodec;
 
     public ModRecipeSerializer(RecipeFactory<T> factory) {
         this.codec = RecordCodecBuilder.mapCodec(inst -> inst.group(
-                Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(Recipe::getIngredients),
-                RecipeResult.CODEC.listOf().fieldOf("results").forGetter(Recipe::getResults),
-                Codec.INT.fieldOf("width").forGetter(Recipe::getRecipeWidth),
-                Codec.INT.fieldOf("height").forGetter(Recipe::getRecipeHeight)
+                RecipeIngredientSerializer.CODEC.listOf().fieldOf("ingredients").forGetter(ModRecipe::getIngredients),
+                RecipeIngredientSerializer.CODEC.listOf().fieldOf("results").forGetter(ModRecipe::getResults),
+                Codec.INT.fieldOf("width").forGetter(ModRecipe::getRecipeWidth),
+                Codec.INT.fieldOf("height").forGetter(ModRecipe::getRecipeHeight)
         ).apply(inst, factory::create));
 
         this.streamCodec = StreamCodec.composite(
-                ByteBufCodecs.<RegistryFriendlyByteBuf, Ingredient>list().apply(Ingredient.CONTENTS_STREAM_CODEC), Recipe::getIngredients,
-                ByteBufCodecs.<RegistryFriendlyByteBuf, RecipeResult>list().apply(RecipeResult.STREAM_CODEC), Recipe::getResults,
-                ByteBufCodecs.INT, Recipe::getRecipeWidth,
-                ByteBufCodecs.INT, Recipe::getRecipeHeight,
+                ByteBufCodecs.<RegistryFriendlyByteBuf, IRecipeIngredient>list().apply(RecipeIngredientSerializer.STREAM_CODEC), ModRecipe::getIngredients,
+                ByteBufCodecs.<RegistryFriendlyByteBuf, IRecipeIngredient>list().apply(RecipeIngredientSerializer.STREAM_CODEC), ModRecipe::getResults,
+                ByteBufCodecs.INT, ModRecipe::getRecipeWidth,
+                ByteBufCodecs.INT, ModRecipe::getRecipeHeight,
                 factory::create
         );
     }
@@ -39,6 +39,6 @@ public class ModRecipeSerializer<T extends Recipe> implements net.minecraft.worl
     public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() { return streamCodec; }
 
     public interface RecipeFactory<T> {
-        T create(List<Ingredient> ingredients, List<RecipeResult> results, int width, int height);
+        T create(List<IRecipeIngredient> ingredients, List<IRecipeIngredient> results, int width, int height);
     }
 }

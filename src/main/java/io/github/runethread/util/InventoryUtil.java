@@ -62,48 +62,60 @@ public class InventoryUtil {
         return remaining <= 0;
     }
 
-    public static void distributeOutput(ItemStackHandler output, ItemStack result) {
-        int toInsert = result.getCount();
-        ItemStack toDistribute = result.copy();
-
-        for (int i = 0; i < output.getSlots() && toInsert > 0; i++) {
-            // Prepare stack to try to insert
-            ItemStack attempt = toDistribute.copy();
-            attempt.setCount(toInsert);
-
-            ItemStack remainder = output.insertItem(i, attempt, false);
-
-            // Update how much is left to insert
-            int inserted = attempt.getCount() - (remainder.isEmpty() ? 0 : remainder.getCount());
-            toInsert -= inserted;
-        }
-    }
-
-    public static void removeCraftingItems(int width, int height, ItemStackHandler inventory) {
+    public static void removeCraftingItems(int width, int height, ItemStackHandler inventory, int[] countMap, BlockPos pos, Level level) {
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 int idx = row * width + col;
-                ItemStack item = inventory.extractItem(idx, 1, false);
+                int toRemove = countMap[idx];
+                if (toRemove == 0) continue;
+                ItemStack item = inventory.extractItem(idx, toRemove, false);
+
                 ItemStack remainder = item.getCraftingRemainder();
-                if (!remainder.isEmpty()) {
-                    inventory.insertItem(idx, remainder, false);
-                }
+                if (!remainder.isEmpty()) addItemStackInventory(level, pos, inventory, remainder);
             }
         }
+    }
+
+    /**
+     * Adds an ItemStack to an inventory, returning any remainder that could not be added.
+     * @param inventory The inventory to add to.
+     * @param stackToAdd The ItemStack to add.
+     * @return The remainder ItemStack that could not be added.
+     *
+     * @see #addItemStackInventory(Level, BlockPos, IItemHandler, ItemStack)
+     */
+    public static ItemStack addItemStackInventory(IItemHandler inventory, ItemStack stackToAdd) {
+        ItemStack itemStack = stackToAdd.copy();
+        for (int j=0; j < inventory.getSlots(); j++)
+            itemStack = inventory.insertItem(j, itemStack, false);
+        return itemStack;
+    }
+
+    /**
+     * Adds an ItemStack to an inventory, dropping any remainder into the world at the given position.
+     * @param level The level to drop remainder in.
+     * @param pos The position to drop remainder at.
+     * @param inventory The inventory to add to.
+     * @param stackToAdd The ItemStack to add.
+     *
+     * @see #addItemStackInventory(IItemHandler, ItemStack)
+     */
+    public static void addItemStackInventory(Level level, BlockPos pos, IItemHandler inventory, ItemStack stackToAdd) {
+        ItemStack itemStack = addItemStackInventory(inventory, stackToAdd);
+        if(!itemStack.isEmpty())
+            dropStack(pos, level, itemStack);
     }
 
     public static void addItemHandlerInventory(Level level, BlockPos pos, IItemHandler inventory, IItemHandler stacksToAdd) {
         for(int i=0; i < stacksToAdd.getSlots(); i++) {
             ItemStack itemStack = stacksToAdd.extractItem(i, Integer.MAX_VALUE, false);
-            for(int j=0; j < inventory.getSlots(); j++) {
+            for (int j=0; j < inventory.getSlots(); j++)
                 itemStack = inventory.insertItem(j, itemStack, false);
-            }
+
             if(!itemStack.isEmpty())
                 dropStack(pos, level, itemStack);
         }
     }
-
-
 
     public static void addItemStackHandlerToBlock(Level level, BlockPos pos, IItemHandler stacksToAdd) {
         IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
