@@ -7,7 +7,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 @EventBusSubscriber
-public class ImmunityHandler {
+public class EffectsHandler {
     @SubscribeEvent
     public static void onLivingIncomingDamage(LivingIncomingDamageEvent event) {
         LivingEntity entity = event.getEntity();

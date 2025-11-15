@@ -52,9 +52,9 @@ public class TagRestrictedSlot extends SlotItemHandler implements  ISlotType {
     public boolean mayPlace(@NotNull ItemStack stack) {
         boolean matches;
         if(strictMode)
-            matches = stack.getTags().allMatch(filteredTags::contains);
+            matches = filteredTags.stream().allMatch(stack::is);
         else
-            matches = stack.getTags().anyMatch(filteredTags::contains);
+            matches = filteredTags.stream().anyMatch(stack::is);
 
         return matches == whitelist;
     }

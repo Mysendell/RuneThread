@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class TeleportUtil {
     public enum TeleportResult {
@@ -33,15 +34,11 @@ public class TeleportUtil {
     }
 
     private static TeleportResult teleportToNearestSafe(LivingEntity entity, ServerLevel level, BlockPos center, double maxRadius, double yRadius) {
-        int entityHeight = (int) Math.ceil(entity.getBbHeight());
         List<BlockPos> loadedChunkList = new ArrayList<>();
 
-        // For each distance outwards from the center (spiral/ring)
         for (int dist = 0; dist <= maxRadius; dist++) {
-            // For each Y offset within yRadius
             for (int dy = (int) -yRadius; dy <= yRadius; dy++) {
-                List<BlockPos> ringPositions = getPositionsAtDistance(center.getX(), center.getY() + dy, center.getZ(), dist);
-                for (BlockPos pos : ringPositions) {
+                boolean stopped = forEachPositionAtDistance(center.getX(), center.getY() + dy, center.getZ(), dist, pos -> {
                     double x = pos.getX() + 0.5;
                     double y = pos.getY();
                     double z = pos.getZ() + 0.5;
@@ -51,9 +48,11 @@ public class TeleportUtil {
                     if (entity.randomTeleport(x, y, z, true)) {
                         for (BlockPos loadedPos : loadedChunkList)
                             ChunkUtils.removeForceLoadChunk(level, loadedPos);
-                        return TeleportResult.SUCCESS;
+                        return true;
                     }
-                }
+                    return false;
+                });
+                if (stopped) return TeleportResult.SUCCESS;
             }
         }
         for (BlockPos loadedPos : loadedChunkList)
@@ -61,12 +60,9 @@ public class TeleportUtil {
         return TeleportResult.FAILED_NO_SAFE_LOCATION;
     }
 
-    // Returns all positions at exactly Manhattan distance 'dist' from (x, y, z)
-    private static List<BlockPos> getPositionsAtDistance(int x, int y, int z, int dist) {
-        List<BlockPos> positions = new ArrayList<>();
+    private static boolean forEachPositionAtDistance(int x, int y, int z, int dist, Predicate<BlockPos> handler) {
         if (dist == 0) {
-            positions.add(new BlockPos(x, y, z));
-            return positions;
+            return handler.test(new BlockPos(x, y, z));
         }
         for (int dx = -dist; dx <= dist; dx++) {
             for (int dz = -dist; dz <= dist; dz++) {
@@ -74,11 +70,13 @@ public class TeleportUtil {
                 int absdz = Math.abs(dz);
                 int dy = dist - absdx - absdz;
                 if (dy >= 0) {
-                    positions.add(new BlockPos(x + dx, y + dy, z + dz));
-                    if (dy != 0) positions.add(new BlockPos(x + dx, y - dy, z + dz));
+                    if (handler.test(new BlockPos(x + dx, y + dy, z + dz))) return true;
+                    if (dy != 0) {
+                        if (handler.test(new BlockPos(x + dx, y - dy, z + dz))) return true;
+                    }
                 }
             }
         }
-        return positions;
+        return false;
     }
 }

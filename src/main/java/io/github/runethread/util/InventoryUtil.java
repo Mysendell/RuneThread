@@ -48,12 +48,10 @@ public class InventoryUtil {
             if (remaining <= 0) break;
 
             if (outputStack.isEmpty()) {
-                // Can insert up to the max stack size
                 int max = result.getMaxStackSize();
                 int canInsert = Math.min(max, remaining);
                 remaining -= canInsert;
             } else if (ItemStack.isSameItemSameComponents(outputStack, result)) {
-                // Can fill up to max stack size
                 int space = outputStack.getMaxStackSize() - outputStack.getCount();
                 int canInsert = Math.min(space, remaining);
                 remaining -= canInsert;

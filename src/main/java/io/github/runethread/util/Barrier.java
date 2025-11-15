@@ -82,9 +82,6 @@ public class Barrier {
             // i.e. p0 was on one side, attempted is on the other
             boolean fromBelow = p0 < plane;
             boolean toAbove  = (p0 + d) > plane;
-            // startedInside tells us which side is “blocked”:
-            // if startedInside, we’re exiting (so we hit whichever plane we go past);
-            // if not startedInside, we’re entering, same logic applies.
             if (fromBelow && toAbove || (!fromBelow && !toAbove)) {
                 // keep the minimum t
                 return Math.min(t, currentBest);

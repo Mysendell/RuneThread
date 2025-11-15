@@ -5,10 +5,14 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -17,28 +21,35 @@ import java.util.List;
 public class ExplosionUtil {
     /**
      * Creates a "perfect" spherical explosion.
-     * @param level The server level
-     * @param center Center of the explosion
-     * @param radius The radius (can be a float)
-     * @param dropBlocks Whether to drop block items (true = drops, false = just deletes)
+     *
+     * @param level          The server level
+     * @param center         Center of the explosion
+     * @param radius         The radius (can be a float)
+     * @param dropBlocks     Whether to drop block items (true = drops, false = just deletes)
      * @param damageEntities Whether to apply damage to entities within the radius
-     * @param damage Amount of damage to apply to entities
+     * @param damage         Amount of damage to apply to entities
      */
-    public static void accurateExplosion(ServerLevel level, BlockPos center, double radius, boolean dropBlocks, boolean destroyBlocks,boolean damageEntities, double damage) {
-        if(destroyBlocks)
+    public static void accurateExplosion(ServerLevel level, BlockPos center, double radius, boolean dropBlocks, boolean destroyBlocks, boolean damageEntities, double damage) {
+        if (destroyBlocks)
             AreaUtil.IterateAreaSphere(level, center, radius, (args) -> {
                 BlockPos pos = (BlockPos) args[0];
                 BlockState state = level.getBlockState(pos);
-                if (!state.isAir())
-                    level.destroyBlock(pos, dropBlocks);
-                level.sendParticles(ParticleTypes.EXPLOSION, center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5, 1, 0, 0, 0, 0.1);
-                level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5, 1, 0, 0, 0, 0.1);
+                if (!state.isAir()) {
+                    if (dropBlocks) {
+                        List<ItemStack> drops = Block.getDrops(state, level, pos, level.getBlockEntity(pos));
+                        for (ItemStack stack : drops) {
+                            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+                        }
+                    }
+                    level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                }
             });
-
+        level.sendParticles(ParticleTypes.EXPLOSION, center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5, 1, 0, 0, 0, 0.1);
+        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, center.getX() + 0.5, center.getY() + 0.5, center.getZ() + 0.5, 1, 0, 0, 0, 0.1);
         if (damageEntities)
             damageEntities(level, center, radius, damage, radius * radius);
 
-        level.playSound(null ,center, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS);
+        level.playSound(null, center, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS);
 
     }
 
@@ -51,7 +62,7 @@ public class ExplosionUtil {
         DamageSource explosionSource = level.damageSources().source(DamageTypes.EXPLOSION, null);
         for (Entity entity : entities) {
             if (entity instanceof LivingEntity living) {
-                living.hurtServer(level,  explosionSource, (float) damage);
+                living.hurtServer(level, explosionSource, (float) damage);
             }
         }
     }

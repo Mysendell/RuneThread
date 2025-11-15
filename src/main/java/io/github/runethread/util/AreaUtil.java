@@ -11,20 +11,35 @@ public class AreaUtil {
         void action(Object... args);
     }
 
+    private record Bounding3D(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+        Bounding3D(BlockPos center, double radius, int levelMinY, int levelMaxY) {
+            this(center.getX() - (int) Math.round(radius),
+                    center.getX() + (int) Math.round(radius),
+                    Math.max(levelMinY, center.getY() - (int) Math.round(radius)),
+                    Math.min(levelMaxY - 1, center.getY() + (int) Math.round(radius)),
+                    center.getZ() - (int) Math.round(radius),
+                    center.getZ() + (int) Math.round(radius));
+        }
+    }
+
+    private record Bounding2D(int minX, int maxX, int minZ, int maxZ) {
+        Bounding2D(BlockPos center, double radius) {
+            this(center.getX() - (int) Math.round(radius),
+                    center.getX() + (int) Math.round(radius),
+                    center.getZ() - (int) Math.round(radius),
+                    center.getZ() + (int) Math.round(radius));
+        }
+    }
+
     public static void IterateAreaSphere(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
-        int minX = center.getX() - (int) Math.round(radius);
-        int maxX = center.getX() + (int) Math.round(radius);
-        int minY = Math.max(level.getMinY(), center.getY() - (int) Math.round(radius));
-        int maxY = Math.min(level.getMaxY() - 1, center.getY() + (int) Math.round(radius));
-        int minZ = center.getZ() - (int) Math.round(radius);
-        int maxZ = center.getZ() + (int) Math.round(radius);
+        Bounding3D bounding = new Bounding3D(center, radius, level.getMinY(), level.getMaxY());
         double radiusSq = radius * radius;
 
         List<BlockPos> loadedChunkList = new ArrayList<>();
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
+        for (int x = bounding.minX(); x <= bounding.maxX(); x++) {
+            for (int y = bounding.minY(); y <= bounding.maxY(); y++) {
+                for (int z = bounding.minZ(); z <= bounding.maxZ(); z++) {
                     double dx = x + 0.5 - center.getX();
                     double dy = y + 0.5 - center.getY();
                     double dz = z + 0.5 - center.getZ();
@@ -44,16 +59,13 @@ public class AreaUtil {
     }
 
     public static void IterateAreaCircle(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
-        int minX = center.getX() - (int) Math.ceil(radius);
-        int maxX = center.getX() + (int) Math.ceil(radius);
-        int minZ = center.getZ() - (int) Math.ceil(radius);
-        int maxZ = center.getZ() + (int) Math.ceil(radius);
+        Bounding2D bounding = new Bounding2D(center, radius);
         double radiusSq = radius * radius;
 
         List<BlockPos> loadedChunkList = new ArrayList<>();
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
+        for (int x = bounding.minX(); x <= bounding.maxX(); x++) {
+            for (int z = bounding.minZ(); z <= bounding.maxZ(); z++) {
                 double dx = x + 0.5 - center.getX();
                 double dz = z + 0.5 - center.getZ();
                 if (dx * dx + dz * dz <= radiusSq) {
@@ -71,18 +83,13 @@ public class AreaUtil {
     }
 
     public static void IterateAreaBox(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
-        int minX = center.getX() - (int) Math.round(radius);
-        int maxX = center.getX() + (int) Math.round(radius);
-        int minY = Math.max(level.getMinY(), center.getY() - (int) Math.round(radius));
-        int maxY = Math.min(level.getMaxY() - 1, center.getY() + (int) Math.round(radius));
-        int minZ = center.getZ() - (int) Math.round(radius);
-        int maxZ = center.getZ() + (int) Math.round(radius);
+        Bounding3D bounding = new Bounding3D(center, radius, level.getMinY(), level.getMaxY());
 
         List<BlockPos> loadedChunkList = new ArrayList<>();
 
-        for (int x = minX; x < maxX; x++) {
-            for (int y = minY; y < maxY; y++) {
-                for (int z = minZ; z < maxZ; z++) {
+        for (int x = bounding.minX(); x < bounding.maxX(); x++) {
+            for (int y = bounding.minY(); y < bounding.maxY(); y++) {
+                for (int z = bounding.minZ(); z < bounding.maxZ(); z++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     if (ChunkUtils.forceLoadChunk(level, pos))
                         loadedChunkList.add(pos);
