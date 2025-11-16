@@ -124,7 +124,7 @@ public class RuneThread {
 
     @SubscribeEvent
     public void EntityTick(EntityTickEvent.Post event) {
-        Entity entity = event.getEntity();
+        Entity entity = event.getEntity(); // TODO: Don't check this every tick
         Vec3 now = entity.position();
         BarrierTracker barrierTracker = entity.getData(CustomDataAttachments.BARRIER_TRACKER_STORAGE);
         Vec3 lastPos = barrierTracker.getLastBarrierCheckPos();

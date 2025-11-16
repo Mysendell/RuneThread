@@ -45,6 +45,10 @@ public class BarrierManager {
         barriers.remove(barrier);
     }
 
+    public static void removeBarriers(List<Barrier> barriers) {
+        barriers.forEach(BarrierManager::removeBarrier);
+    }
+
     public static List<Barrier> getBarrierFromBlockEntity(RunicAltarEntity entity) {
         synchronized (barriers) {
         return barriers.stream()

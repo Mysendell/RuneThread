@@ -3,11 +3,9 @@ package io.github.runethread.customblocks.altar;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
 import io.github.runethread.customblocks.structure.StructureCenterEntity;
-import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.customitems.runes.LocationRuneItem;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.datacomponents.DataComponentRegistry;
-import io.github.runethread.datacomponents.EntityData;
 import io.github.runethread.datacomponents.LocationData;
 import io.github.runethread.datacomponents.PowerData;
 import io.github.runethread.gui.menus.RusticAltarMenu;
@@ -25,7 +23,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -63,9 +60,6 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     private RitualState ritualState = RitualState.IDLE;
     private String playerName;
     private final List<Barrier> barriers;
-    private DestinationRuneData lastDest = null;
-    private DestinationRuneData lastRef = null;
-    private Double lastRange = null;
     private boolean isTesting;
 
     static {
@@ -206,8 +200,6 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     }
 
     public void onScheduledTick() {
-        if (level.players().isEmpty())
-            return;
         if (ritualState != RitualState.NEUTRAL && ritualState != RitualState.IDLE) {
             update(RitualState.IDLE);
             return;
@@ -255,38 +247,30 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         try {
             if (mainRuneStack.isEmpty())
                 throw new MissingRuneException("Ritual failed: Main rune is missing!");
+            if (destinationRuneStack.isEmpty())
+                throw new MissingRuneException("Ritual failed: Destination rune is missing!");
 
             MainRuneItem mainRuneItem = (MainRuneItem) mainRuneStack.getItem();
             double range;
 
-            DestinationRuneData destination;
-
-            DestinationRuneData reference = null;
+            ILocation reference = null;
             if (!referenceRuneStack.isEmpty())
-                reference = getDestinationRuneDataFromItem(referenceRuneStack);
+                reference = getLocationFromItem(referenceRuneStack);
+            else if (mainRuneItem.requiresReference())
+                throw new MissingRuneException("Ritual failed: Reference rune is missing!");
 
-            if (mainRuneItem.equals(CustomItems.PORTAL_RUNE.get()) && additionalData.containsKey("Reverse Rune")) {
-                if (lastDest == null || lastRef == null)
-                    throw new GenericRuneException("Ritual failed: No previous teleport to reverse!");
-                destination = lastRef;
-                reference = new DestinationRuneData(lastRef.entity.getOnPos(), lastRef.entity);
-                range = lastRange;
-            } else {
-                if (destinationRuneStack.isEmpty())
-                    throw new MissingRuneException("Ritual failed: Destination rune is missing!");
-                LocationRuneItem destinationRuneItem = (LocationRuneItem) destinationRuneStack.getItem();
-                range = destinationRuneItem.getMaxRange();
-                destination = getDestinationRuneDataFromItem(destinationRuneStack);
-            }
+            LocationRuneItem destinationRuneItem = (LocationRuneItem) destinationRuneStack.getItem();
+            range = destinationRuneItem.getMaxRange();
+            ILocation destination = getLocationFromItem(destinationRuneStack);
 
             double distance = getDistance(reference, destination);
 
             double scalingCost = mainRuneItem.getScalingCost();
             int cost = mainRuneItem.getCost();
-            if(additionalData.containsKey("Scale Rune: POWER")) {
+            if (additionalData.containsKey("Scale Rune: POWER")) {
                 ItemStack scaleRuneStack = (ItemStack) additionalData.get("Scale Rune: POWER");
                 double scale = scaleRuneStack.get(DataComponentRegistry.SCALE_DATA).scale();
-                if(scale >= 1)
+                if (scale >= 1)
                     usableEnergy = scale;
                 else if (scale > 0)
                     usableEnergy *= scale;
@@ -294,7 +278,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
 
             maxScale = getScale(usableEnergy, cost, scalingCost);
             if (maxScale <= 0) throw new InsufficientEnergyException("Ritual failed: Not enough energy!");
-            if(additionalData.containsKey("Scale Rune: SCALE")) {
+            if (additionalData.containsKey("Scale Rune: SCALE")) {
                 ItemStack scaleRuneStack = (ItemStack) additionalData.get("Scale Rune: SCALE");
                 double scale = scaleRuneStack.get(DataComponentRegistry.SCALE_DATA).scale();
                 if (scale >= 1)
@@ -309,9 +293,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             if (usableEnergy < energyCost)
                 throw new InsufficientEnergyException("Ritual failed: Not enough energy!");
 
-            if(mainRuneItem.equals(CustomItems.PORTAL_RUNE.get()))
-                range *= actualScale;
-            if (distance > range)
+            if (!mainRuneItem.insideRange(actualScale, range, distance))
                 throw new GenericRuneException("Ritual failed: Target is out of range!");
 
             update(RitualState.SUCCESS);
@@ -319,20 +301,16 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             if (isTesting)
                 return energy;
 
-            additionalData.put("origin", new DestinationRuneData(worldPosition, null));
-
-            update(mainRuneItem.getRuneFunction().perform(
+            update(mainRuneItem.perform(
                     (ServerLevel) level,
                     player,
                     mainRuneStack,
                     actualScale,
                     destination,
                     reference,
+                    worldPosition,
                     additionalData
             ));
-            lastDest = destination;
-            lastRef = reference;
-            lastRange = range;
 
             if (Math.random() < mainRuneItem.getBreakChance())
                 mainRuneStack.shrink(1);
@@ -363,76 +341,32 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         }
     }
 
-    private double getDistance(DestinationRuneData reference, DestinationRuneData destination) {
+    private double getDistance(ILocation reference, ILocation destination) {
         if (destination == null)
             throw new MissingRuneException("Ritual failed: Destination rune is not set!");
 
-        DestinationRuneData rangeReference = reference;
+        ILocation rangeReference = reference;
         if (reference == null)
-            rangeReference = new DestinationRuneData(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), null);
+            rangeReference = new LocationData(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
+        BlockPos destPos = destination.getLocation(level);
+        BlockPos rangePos = rangeReference.getLocation(level);
         return Math.sqrt(
-                Math.pow(rangeReference.locationX() - destination.locationX(), 2) +
-                        Math.pow(rangeReference.locationY() - destination.locationY(), 2) +
-                        Math.pow(rangeReference.locationZ() - destination.locationZ(), 2)
+                Math.pow(rangePos.getX() - destPos.getX(), 2) +
+                        Math.pow(rangePos.getY() - destPos.getY(), 2) +
+                        Math.pow(rangePos.getZ() - destPos.getZ(), 2)
         );
     }
 
-    private @Nullable DestinationRuneData getDestinationRuneDataFromItem(ItemStack destinationRuneStack) {
-        int locationX;
-        int locationY;
-        int locationZ;
-        LivingEntity entity = null;
+    private @Nullable ILocation getLocationFromItem(@NotNull ItemStack destinationRuneStack) {
 
-        LocationData locationData = destinationRuneStack.get(DataComponentRegistry.LOCATION_DATA.get());
-        EntityData entityData = destinationRuneStack.get(DataComponentRegistry.ENTITY_DATA.get());
+        ILocation locationData = destinationRuneStack.get(DataComponentRegistry.LOCATION_DATA.get());
+        if (locationData == null)
+            locationData = destinationRuneStack.get(DataComponentRegistry.ENTITY_DATA.get());
 
-        if (locationData != null) {
-            locationX = locationData.posX();
-            locationY = locationData.posY();
-            locationZ = locationData.posZ();
-        } else if (entityData != null) {
-            entity = (LivingEntity) level.getEntity(entityData.UUID());
-            if (entity == null) {
-                ChatUtils.sendErrorMessagePlayer(playerName, "Ritual failed: Target entity not found!", level);
-                updateRitual(RitualState.FAIL);
-                return null;
-            }
-            locationX = entity.blockPosition().getX();
-            locationY = entity.blockPosition().getY();
-            locationZ = entity.blockPosition().getZ();
-        } else
-            return null;
-
-        return new DestinationRuneData(locationX, locationY, locationZ, entity);
+        return locationData;
     }
 
-    private @Nullable DestinationRuneData getDestinationRuneDataFromEntity(LivingEntity entity) {
-        int locationX;
-        int locationY;
-        int locationZ;
-        if (entity != null) {
-            locationX = entity.blockPosition().getX();
-            locationY = entity.blockPosition().getY();
-            locationZ = entity.blockPosition().getZ();
-        } else {
-            ChatUtils.sendErrorMessagePlayer(playerName, "Ritual failed: Target entity not found!", level);
-            updateRitual(RitualState.FAIL);
-            return null;
-        }
-
-        return new DestinationRuneData(locationX, locationY, locationZ, entity);
-    }
-
-    public record DestinationRuneData(int locationX, int locationY, int locationZ, LivingEntity entity) {
-        public BlockPos getBlockPos() {
-            return new BlockPos(locationX, locationY, locationZ);
-        }
-        public DestinationRuneData(BlockPos pos, LivingEntity entity) {
-            this(pos.getX(), pos.getY(), pos.getZ(), entity);
-        }
-    }
-
-    private static int addEnergy(ItemStackHandler power) {
+    private static int addEnergy(@NotNull ItemStackHandler power) {
         int energy = 0;
         for (int i = 0; i < power.getSlots(); i++) {
             ItemStack powerStack = power.getStackInSlot(i);
@@ -441,7 +375,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         return energy;
     }
 
-    private static int addEnergy(ItemStack powerStack) {
+    private static int addEnergy(@NotNull ItemStack powerStack) {
         if (powerStack.isEmpty()) return 0;
         int energyPer = powerStack.getOrDefault(DataComponentRegistry.POWER_DATA.get(), new PowerData(1)).getRealPower();
         int amount = powerStack.getCount();
@@ -454,9 +388,9 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     }
 
     public void startRitual(String playerName) {
-        if (ritualState == RitualState.NEUTRAL) {
+        if (ritualState != RitualState.IDLE)
             return;
-        }
+
         this.playerName = playerName;
         updateRitual(RitualState.NEUTRAL);
     }
@@ -465,12 +399,6 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         this.playerName = playerName;
         isTesting = true;
         updateRitual(RitualState.IDLE);
-    }
-
-    public void removeBarriers() {
-        for (Barrier barrier : barriers) {
-            BarrierManager.removeBarrier(barrier);
-        }
     }
 
     public void serverTick() {
@@ -491,7 +419,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         level.setBlock(worldPosition, state.setValue(RunicAltar.STRUCTURED, value), 2);
     }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, RunicAltarEntity entity) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, @NotNull RunicAltarEntity entity) {
         entity.serverTick();
     }
 
@@ -519,7 +447,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
 
     public void onRemove() {
         dropItems();
-        removeBarriers();
+        BarrierManager.removeBarriers(barriers);
         updateStructureState(false);
     }
 

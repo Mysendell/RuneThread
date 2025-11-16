@@ -5,7 +5,6 @@ import io.github.runethread.datacomponents.EntityData;
 import io.github.runethread.datacomponents.LocationData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -18,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -35,8 +33,7 @@ public class LocationRuneItem extends Item {
         if (context.getPlayer().isCrouching())
             return InteractionResult.PASS;
 
-        BlockPosSpreader blockPosSpreader = spreadBlockPos(context.getClickedPos());
-        LocationData locationData = new LocationData(blockPosSpreader.posX(), blockPosSpreader.posY(), blockPosSpreader.posZ());
+        LocationData locationData = new LocationData(context.getClickedPos().getX(), context.getClickedPos().getY(), context.getClickedPos().getZ());
 
         return addTargetData(stack, context.getPlayer(), context.getHand(), DataComponentRegistry.LOCATION_DATA.get(), locationData);
     }
@@ -59,17 +56,6 @@ public class LocationRuneItem extends Item {
         EntityData entityData = new EntityData(id, name);
 
         return addTargetData(player.getItemInHand(hand), player, hand, DataComponentRegistry.ENTITY_DATA.get(), entityData);
-    }
-
-    private static @NotNull BlockPosSpreader spreadBlockPos(BlockPos blockPos) {
-        int posX = blockPos.getX();
-        int posY = blockPos.getY();
-        int posZ = blockPos.getZ();
-        BlockPosSpreader blockPosSpreader = new BlockPosSpreader(posX, posY, posZ);
-        return blockPosSpreader;
-    }
-
-    private record BlockPosSpreader(int posX, int posY, int posZ) {
     }
 
     private static <T extends Record> InteractionResult addTargetData(ItemStack stack, Player player, InteractionHand hand, DataComponentType<T> dataType, T data) {

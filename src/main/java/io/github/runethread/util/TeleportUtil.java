@@ -1,6 +1,6 @@
 package io.github.runethread.util;
 
-import io.github.runethread.customblocks.altar.RunicAltarEntity;
+import io.github.runethread.datacomponents.EntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,16 +18,16 @@ public class TeleportUtil {
         FAILED_NO_ENTITY
     }
 
-    public static TeleportResult teleportManager(RunicAltarEntity.DestinationRuneData destination, RunicAltarEntity.DestinationRuneData reference, ServerLevel level, double maxRadius, double yRadius, ServerPlayer player) {
+    public static TeleportResult teleportManager(ILocation destination, ILocation reference, ServerLevel level, double maxRadius, double yRadius, ServerPlayer player) {
         LivingEntity toTeleport;
         if (reference == null)
             toTeleport = player;
-        else if(reference.entity() == null)
-            return TeleportResult.FAILED_NO_ENTITY;
+        else if (reference instanceof EntityData referenceEntityData && referenceEntityData.entity(level) instanceof LivingEntity entity)
+            toTeleport = entity;
         else
-            toTeleport = reference.entity();
+            return TeleportResult.FAILED_NO_ENTITY;
 
-        return teleportToNearestSafe(toTeleport, level, destination.getBlockPos(), maxRadius, yRadius);
+        return teleportToNearestSafe(toTeleport, level, destination.getLocation(level), maxRadius, yRadius);
     }
     public static TeleportResult teleportManager(BlockPos destination, @NotNull LivingEntity reference, ServerLevel level, double maxRadius, double yRadius) {
         return teleportToNearestSafe(reference, level, destination, maxRadius, yRadius);
