@@ -9,10 +9,8 @@ public class TempleAltarScreen extends AbstractScreen<TempleAltarMenu> {
     public TempleAltarScreen(TempleAltarMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         GUI_TEXTURE = menu.getBackgroundTexture();
-        offsetX = 16;
-        offsetY = 2;
-        imageWidth = 224;
-        imageHeight = 209;
+        imageWidth = 209;
+        imageHeight = 224;
         inventoryLabelY = 114;
     }
 }

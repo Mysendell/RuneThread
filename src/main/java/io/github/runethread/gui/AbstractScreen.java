@@ -23,12 +23,6 @@ public class AbstractScreen<T extends AbstractContainerMenu> extends AbstractCon
     /** The height of the texture file. Default is 256.
      */
     protected static int textureHeight;
-    /** The width of the GUI image inside the texture. Default is 176.
-     */
-    protected static int imageWidth;
-    /** The height of the GUI image inside the texture. Default is 166.
-     */
-    protected static int imageHeight;
     /** The x offset of the GUI image inside the texture. Default is 0.
      */
     protected static int offsetX;
@@ -51,7 +45,6 @@ public class AbstractScreen<T extends AbstractContainerMenu> extends AbstractCon
         textureWidth = 256;
         textureHeight = 256;
     }
-
 
     /**
      * Renders the background of the GUI, including the texture.

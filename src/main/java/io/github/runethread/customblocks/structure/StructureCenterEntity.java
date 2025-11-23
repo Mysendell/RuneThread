@@ -32,24 +32,11 @@ public abstract class StructureCenterEntity extends BlockEntity {
 
     protected abstract void updateSelfState(boolean value);
 
+    protected abstract void updateOtherStates(boolean value);
+
     protected void updateStructureState(boolean value){
-        try {
-            updateSelfState(value);
-        }
-        catch (Exception e) {
-            System.err.println("Error updating self state: " + e.getMessage());
-        }
-        try{
-            for (BlockPos pos : structureBlocks) {
-                BlockState state = level.getBlockState(pos);
-                if (state.getBlock() instanceof IStructurePart part)
-                    part.setStructureCenter(this);
-                level.setBlock(pos, state.setValue(IStructurePart.STRUCTURED, value), 2);
-            }
-        }
-        catch (Exception e) {
-            System.err.println("Error updating structure state: " + e.getMessage());
-        }
+        updateSelfState(value);
+        updateOtherStates(value);
     }
 
     @Override
@@ -85,5 +72,9 @@ public abstract class StructureCenterEntity extends BlockEntity {
 
     public void setStructured(boolean structured) {
         isStructured = structured;
+    }
+
+    public boolean getRemove(){
+        return remove;
     }
 }

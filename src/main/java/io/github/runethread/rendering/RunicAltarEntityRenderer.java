@@ -1,6 +1,8 @@
-package io.github.runethread.customblocks.altar;
+package io.github.runethread.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.runethread.customblocks.altar.RunicAltar;
+import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.CustomItems;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.datacomponents.IndicatorData;

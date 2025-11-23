@@ -20,8 +20,8 @@ public class StructurePartBlock extends BaseEntityBlock implements IStructurePar
 
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
-        if(structureCenter != null)
-            structureCenter.createStructure();
+        if(getStructureCenter() != null)
+            getStructureCenter().createStructure();
         else if (neighborBlock instanceof IStructurePart structurePart){
             StructureCenterEntity center = structurePart.getStructureCenter();
             if (center != null)
@@ -52,6 +52,8 @@ public class StructurePartBlock extends BaseEntityBlock implements IStructurePar
     }
 
     public StructureCenterEntity getStructureCenter() {
+        if(structureCenter != null && structureCenter.getRemove())
+            structureCenter = null;
         return structureCenter;
     }
     public void setStructureCenter(StructureCenterEntity structureCenter) {

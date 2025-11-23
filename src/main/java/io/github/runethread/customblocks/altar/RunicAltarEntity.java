@@ -2,6 +2,7 @@ package io.github.runethread.customblocks.altar;
 
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
+import io.github.runethread.customblocks.structure.IStructurePart;
 import io.github.runethread.customblocks.structure.StructureCenterEntity;
 import io.github.runethread.customitems.runes.LocationRuneItem;
 import io.github.runethread.customitems.runes.MainRuneItem;
@@ -412,11 +413,29 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     }
 
     protected void updateSelfState(boolean value) {
-        if (isStructured != value)
-            dropItems();
-        isStructured = value;
-        BlockState state = level.getBlockState(worldPosition);
-        level.setBlock(worldPosition, state.setValue(RunicAltar.STRUCTURED, value), 2);
+        try {
+            if (isStructured != value)
+                dropItems();
+            isStructured = value;
+            BlockState state = level.getBlockState(worldPosition);
+            level.setBlock(worldPosition, state.setValue(RunicAltar.STRUCTURED, value), 2);
+        }catch (Exception e) {
+            System.err.println("Error updating self state: " + e.getMessage());
+        }
+    }
+
+    protected void updateOtherStates(boolean value) {
+        try{
+            for (BlockPos pos : structureBlocks) {
+                BlockState state = level.getBlockState(pos);
+                if (state.getBlock() instanceof IStructurePart part)
+                    part.setStructureCenter(this);
+                level.setBlock(pos, state.setValue(IStructurePart.STRUCTURED, value), 2);
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Error updating structure state: " + e.getMessage());
+        }
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, @NotNull RunicAltarEntity entity) {
@@ -448,7 +467,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     public void onRemove() {
         dropItems();
         BarrierManager.removeBarriers(barriers);
-        updateStructureState(false);
+        updateOtherStates(false);
     }
 
     public void dropItems() {

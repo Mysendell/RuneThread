@@ -1,8 +1,10 @@
-package io.github.runethread.util;
+package io.github.runethread.rendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import io.github.runethread.util.Barrier;
+import io.github.runethread.util.BarrierManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;

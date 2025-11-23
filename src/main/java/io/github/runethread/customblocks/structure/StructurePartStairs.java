@@ -42,6 +42,8 @@ public class StructurePartStairs extends StairBlock implements IStructurePart {
     }
 
     public StructureCenterEntity getStructureCenter() {
+        if(structureCenter != null && structureCenter.getRemove())
+            structureCenter = null;
         return structureCenter;
     }
     public void setStructureCenter(StructureCenterEntity structureCenter) {
