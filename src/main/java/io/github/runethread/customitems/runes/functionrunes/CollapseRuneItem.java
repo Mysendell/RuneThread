@@ -18,8 +18,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-
 public class CollapseRuneItem extends MainRuneItem {
     public CollapseRuneItem(Properties properties, int cost, int scale, double scalingCost, double breakChance) {
         super(properties, cost, scale, scalingCost, breakChance);
@@ -55,7 +53,7 @@ public class CollapseRuneItem extends MainRuneItem {
     }
 
     @Override
-    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, Map<String, Object> additionalData) {
+    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         ListTag listTag = new ListTag();
         ItemStack finalStack = mainStack.copy();
         finalStack.setCount(1);

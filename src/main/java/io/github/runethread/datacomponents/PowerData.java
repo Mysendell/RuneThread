@@ -11,8 +11,8 @@ public record PowerData(int power) {
     public void addToTooltip(Item.TooltipContext ctx, Consumer<Component> tooltipAdder, TooltipFlag flag) {
         tooltipAdder.accept(Component.literal("Power: " + getRealPower()).withStyle(ChatFormatting.BLUE));
     }
-    public int getRealPower() {
-        return new int[]{10, 50, 100, 200, 500, Integer.MAX_VALUE}[power - 1];
+    public double getRealPower() {
+        return new double[]{10, 50, 100, 200, 500, Integer.MAX_VALUE, Double.MAX_VALUE}[power - 1];
     }
 
 }

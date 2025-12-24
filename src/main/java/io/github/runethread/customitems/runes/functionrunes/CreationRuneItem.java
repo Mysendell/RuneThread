@@ -6,13 +6,12 @@ import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.util.ChatUtils;
 import io.github.runethread.util.ILocation;
 import io.github.runethread.util.InventoryUtil;
+import io.github.runethread.util.ModifierMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
 
 public class CreationRuneItem extends MainRuneItem{
     public CreationRuneItem(Properties properties, int cost, double scale, double scalingCost, double breakChance) {
@@ -20,7 +19,7 @@ public class CreationRuneItem extends MainRuneItem{
     }
 
     @Override
-    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, Map<String, Object> additionalData) {
+    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         // TODO make cost same amount as max power rune
         if (!additionalData.containsKey("Collapse Rune")) {
             ChatUtils.sendErrorMessagePlayer(player.getName().getString(), "Creation rune requires a Collapse Rune to be used!", level);

@@ -165,5 +165,8 @@ public class CustomItems {
         powerRuneStack = new ItemStack(POWER_RUNE.get());
         powerRuneStack.set(DataComponentRegistry.POWER_DATA, new PowerData(6));
         output.accept(powerRuneStack);
+        powerRuneStack = new ItemStack(POWER_RUNE.get());
+        powerRuneStack.set(DataComponentRegistry.POWER_DATA, new PowerData(7));
+        output.accept(powerRuneStack);
     }
 }

@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 
 // TODO ADD DIMENSIONS
+// TODO check UUID persistence across chunk unloads and loads
 public record EntityData(int UUID, String name) implements ILocation {
 
     @Override

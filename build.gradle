@@ -52,9 +52,19 @@ runs {
         modSource project.sourceSets.main
     }
 
+    client2 {
+        runType 'client'
+        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        arguments '--username=Froggy'
+    }
+
     client {
         // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        devLogin {
+            enabled true
+        }
     }
 
     server {

@@ -35,9 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RunicAltarEntity extends StructureCenterEntity implements MenuProvider {
     public enum RitualState implements StringRepresentable {
@@ -214,14 +212,14 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     }
 
     private void performRustic() {
-        Map<String, Object> additionalData = new HashMap<>();
+        ModifierMap additionalData = new ModifierMap();
 
         perform(0, additionalData);
         updateRitual(ritualState);
     }
 
     private void performTemple() {
-        Map<String, Object> additionalData = new HashMap<>();
+        ModifierMap additionalData = new ModifierMap();
 
         for (int i = 0; i < targetRune.getSlots(); i++) {
             ItemStack targetRuneStack = targetRune.getStackInSlot(i);
@@ -233,7 +231,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         updateRitual(ritualState);
     }
 
-    private double perform(double energy, Map<String, Object> additionalData) {
+    private double perform(double energy, ModifierMap additionalData) {
         ItemStack mainRuneStack = mainRune.getStackInSlot(0);
         ItemStack destinationRuneStack = destinationRune.getStackInSlot(0);
         ItemStack referenceRuneStack = destinationRune.getStackInSlot(1);
@@ -367,8 +365,8 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         return locationData;
     }
 
-    private static int addEnergy(@NotNull ItemStackHandler power) {
-        int energy = 0;
+    private static double addEnergy(@NotNull ItemStackHandler power) {
+        double energy = 0;
         for (int i = 0; i < power.getSlots(); i++) {
             ItemStack powerStack = power.getStackInSlot(i);
             energy += addEnergy(powerStack);
@@ -376,9 +374,9 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         return energy;
     }
 
-    private static int addEnergy(@NotNull ItemStack powerStack) {
+    private static double addEnergy(@NotNull ItemStack powerStack) {
         if (powerStack.isEmpty()) return 0;
-        int energyPer = powerStack.getOrDefault(DataComponentRegistry.POWER_DATA.get(), new PowerData(1)).getRealPower();
+        double energyPer = powerStack.getOrDefault(DataComponentRegistry.POWER_DATA.get(), new PowerData(1)).getRealPower();
         int amount = powerStack.getCount();
         powerStack.shrink(amount);
         return amount * energyPer;
