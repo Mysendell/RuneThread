@@ -1,6 +1,5 @@
 package io.github.runethread.util;
 
-import io.github.runethread.customblocks.structure.StructureCenterEntity;
 import io.github.runethread.customblocks.structure.StructurePartBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -12,22 +11,21 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Objects;
 
 public class StructureUtil {
     public record StructurePart(BlockPos corner1, BlockPos corner2, DeferredBlock<? extends Block> block) {
     }
 
-    public static Set<BlockPos> ValidateAndAddStructure(StructurePart[] structure, BlockPos origin, Level level, int structureSize, StructureCenterEntity entity) {
-        Set<BlockPos> structureBlocks = new HashSet<>(structureSize);
+    public static Structure ValidateAndAddStructure(StructurePart[] structure, BlockPos origin, Level level, int structureSize) {
+        Structure structureBlocks = new Structure(structureSize);
         for (StructurePart part : structure) {
-            ValidateAndAddArea(part.corner1, part.corner2, origin, level, (DeferredBlock<StructurePartBlock>) part.block, structureBlocks, entity);
+            ValidateAndAddArea(part.corner1, part.corner2, origin, level, (DeferredBlock<StructurePartBlock>) part.block, structureBlocks);
         }
         return structureBlocks;
     }
 
-    public static Set<BlockPos> ValidateAndAddArea(BlockPos corner1, BlockPos corner2, BlockPos origin, Level level, DeferredBlock<StructurePartBlock> block, Set<BlockPos> structureBlocks, StructureCenterEntity entity) {
+    public static void ValidateAndAddArea(BlockPos corner1, BlockPos corner2, BlockPos origin, Level level, DeferredBlock<StructurePartBlock> block, Structure structureBlocks) {
         int minX = Math.min(corner1.getX(), corner2.getX());
         int maxX = Math.max(corner1.getX(), corner2.getX());
         int minY = Math.min(corner1.getY(), corner2.getY());
@@ -39,15 +37,11 @@ public class StructureUtil {
             for (int y = minY; y <= maxY; y++)
                 for (int z = minZ; z <= maxZ; z++) {
                     BlockPos checkPos = origin.offset(x, y, z);
-                    if (level.getBlockState(checkPos).is(block)) {
-                        /*if (level.getBlockState(checkPos).getBlock() instanceof IStructurePart structurePart)
-                            structurePart.setStructureCenter(entity);*/
+                    if (level.getBlockState(checkPos).is(block))
                         structureBlocks.add(checkPos);
-                    }
+                    else
+                        structureBlocks.setValid(false);
                 }
-
-
-        return structureBlocks;
     }
 
     public static CompoundTag serializeBlock(BlockPos pos, BlockPos center, Level level) {
@@ -59,7 +53,7 @@ public class StructureUtil {
         BlockState blockState = level.getBlockState(pos);
         tag.put("blockState", NbtUtils.writeBlockState(blockState));
         if(level.getBlockEntity(pos) != null)
-            tag.put("blockEntity", level.getBlockEntity(pos).saveWithFullMetadata(level.registryAccess()));
+            tag.put("blockEntity", Objects.requireNonNull(level.getBlockEntity(pos)).saveWithFullMetadata(level.registryAccess()));
         return tag;
     }
 
@@ -71,7 +65,7 @@ public class StructureUtil {
         BlockState blockState = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), tag.getCompound("blockState"));
         level.setBlock(pos, blockState, 3);
         if(tag.contains("blockEntity") && level.getBlockEntity(pos) != null)
-            level.getBlockEntity(pos).loadCustomOnly(tag.getCompound("blockEntity"), level.registryAccess());
+            Objects.requireNonNull(level.getBlockEntity(pos)).loadCustomOnly(tag.getCompound("blockEntity"), level.registryAccess());
     }
 
     public static void placeStructureViaTag(ListTag listTag, BlockPos center, Level level) {

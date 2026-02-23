@@ -3,11 +3,11 @@ package io.github.runethread.util;
 import io.github.runethread.datacomponents.EntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -15,26 +15,29 @@ public class TeleportUtil {
     public enum TeleportResult {
         SUCCESS,
         FAILED_NO_SAFE_LOCATION,
-        FAILED_NO_ENTITY
+        FAILED_NO_ENTITY,
+        FAILED_NO_LEVEL
     }
 
-    public static TeleportResult teleportManager(ILocation destination, ILocation reference, ServerLevel level, double maxRadius, double yRadius, ServerPlayer player) {
+    public static TeleportResult teleportManager(ILocation destination, ILocation reference, ServerLevel level, double maxRadius, double yRadius) {
         LivingEntity toTeleport;
-        if (reference == null)
-            toTeleport = player;
-        else if (reference instanceof EntityData referenceEntityData && referenceEntityData.entity(level) instanceof LivingEntity entity)
+        if (reference instanceof EntityData referenceEntityData && referenceEntityData.entity(level) instanceof LivingEntity entity)
             toTeleport = entity;
         else
             return TeleportResult.FAILED_NO_ENTITY;
 
-        return teleportToNearestSafe(toTeleport, level, destination.getLocation(level), maxRadius, yRadius);
+        return teleportToNearestSafe(toTeleport, level, destination, maxRadius, yRadius);
     }
-    public static TeleportResult teleportManager(BlockPos destination, @NotNull LivingEntity reference, ServerLevel level, double maxRadius, double yRadius) {
-        return teleportToNearestSafe(reference, level, destination, maxRadius, yRadius);
+    public static void teleportManager(ILocation destination, @NotNull LivingEntity reference, ServerLevel level, double maxRadius, double yRadius) {
+        teleportToNearestSafe(reference, level, destination, maxRadius, yRadius);
     }
 
-    private static TeleportResult teleportToNearestSafe(LivingEntity entity, ServerLevel level, BlockPos center, double maxRadius, double yRadius) {
+    private static TeleportResult teleportToNearestSafe(LivingEntity entity, ServerLevel level, ILocation destination, double maxRadius, double yRadius){
         List<BlockPos> loadedChunkList = new ArrayList<>();
+        BlockPos center = destination.getLocation(level);
+        ServerLevel destinationLevel = level.getServer().getLevel(destination.getDimension(level));
+        if(destinationLevel == null)
+            return  TeleportResult.FAILED_NO_LEVEL;
 
         for (int dist = 0; dist <= maxRadius; dist++) {
             for (int dy = (int) -yRadius; dy <= yRadius; dy++) {
@@ -45,9 +48,10 @@ public class TeleportUtil {
                     BlockPos blockPos = new BlockPos((int) x, (int) y, (int) z);
                     if (ChunkUtils.forceLoadChunk(level, pos))
                         loadedChunkList.add(blockPos);
+                    entity.teleportTo(destinationLevel, x, y, z, new HashSet<>(), 0, 0, true);
                     if (entity.randomTeleport(x, y, z, true)) {
                         for (BlockPos loadedPos : loadedChunkList)
-                            ChunkUtils.removeForceLoadChunk(level, loadedPos);
+                            ChunkUtils.removeForceLoadChunk(destinationLevel, loadedPos);
                         return true;
                     }
                     return false;

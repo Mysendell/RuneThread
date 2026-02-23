@@ -10,6 +10,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
@@ -22,7 +23,8 @@ public class DataComponentRegistry {
             instance.group(
                     Codec.INT.fieldOf("posX").forGetter(LocationData::posX),
                     Codec.INT.fieldOf("posY").forGetter(LocationData::posY),
-                    Codec.INT.fieldOf("posZ").forGetter(LocationData::posZ)
+                    Codec.INT.fieldOf("posZ").forGetter(LocationData::posZ),
+                    ResourceLocation.CODEC.fieldOf("location").forGetter(LocationData::dimensionLocation)
             ).apply(instance, LocationData::new)
     );
     public static final Supplier<DataComponentType<LocationData>> LOCATION_DATA =
@@ -33,8 +35,9 @@ public class DataComponentRegistry {
 
     public static final Codec<EntityData> ENTITY_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.INT.fieldOf("UUID").forGetter(EntityData::UUID),
-                    Codec.STRING.fieldOf("name").forGetter(EntityData::name)
+                    Codec.STRING.fieldOf("uuid").forGetter(EntityData::uuidString),
+                    Codec.STRING.fieldOf("name").forGetter(EntityData::name),
+                    ResourceLocation.CODEC.fieldOf("location").forGetter(EntityData::dimensionLocation)
             ).apply(instance, EntityData::new)
     );
     public static final Supplier<DataComponentType<EntityData>> ENTITY_DATA =

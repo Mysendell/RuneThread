@@ -2,18 +2,18 @@ package io.github.runethread.customblocks.altar;
 
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
-import io.github.runethread.customblocks.structure.IStructurePart;
 import io.github.runethread.customblocks.structure.StructureCenterEntity;
 import io.github.runethread.customitems.runes.LocationRuneItem;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.datacomponents.DataComponentRegistry;
-import io.github.runethread.datacomponents.LocationData;
 import io.github.runethread.datacomponents.PowerData;
+import io.github.runethread.datacomponents.ScaleData;
 import io.github.runethread.gui.menus.RusticAltarMenu;
 import io.github.runethread.gui.menus.TempleAltarMenu;
 import io.github.runethread.util.*;
 import io.github.runethread.util.exceptions.GenericRuneException;
 import io.github.runethread.util.exceptions.InsufficientEnergyException;
+import io.github.runethread.util.exceptions.MissingLevelException;
 import io.github.runethread.util.exceptions.MissingRuneException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -46,7 +46,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         FAIL;
 
         @Override
-        public String getSerializedName() {
+        public @NotNull String getSerializedName() {
             return name().toLowerCase();
         }
     }
@@ -203,6 +203,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             update(RitualState.IDLE);
             return;
         }
+        assert level != null;
         BlockState state = level.getBlockState(worldPosition);
         if (!state.getValue(RunicAltar.STRUCTURED))
             performRustic();
@@ -241,6 +242,9 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         double actualScale = 0;
         double energyCost = 0;
         double usableEnergy = energy;
+
+        ServerLevel level = (ServerLevel) this.level;
+        assert level != null;
         ServerPlayer player = level.getServer().getPlayerList().getPlayerByName(playerName);
 
         try {
@@ -268,7 +272,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             int cost = mainRuneItem.getCost();
             if (additionalData.containsKey("Scale Rune: POWER")) {
                 ItemStack scaleRuneStack = (ItemStack) additionalData.get("Scale Rune: POWER");
-                double scale = scaleRuneStack.get(DataComponentRegistry.SCALE_DATA).scale();
+                double scale = scaleRuneStack.getOrDefault(DataComponentRegistry.SCALE_DATA, new ScaleData(0, ScaleData.Mode.SCALE)).scale();
                 if (scale >= 1)
                     usableEnergy = scale;
                 else if (scale > 0)
@@ -279,7 +283,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             if (maxScale <= 0) throw new InsufficientEnergyException("Ritual failed: Not enough energy!");
             if (additionalData.containsKey("Scale Rune: SCALE")) {
                 ItemStack scaleRuneStack = (ItemStack) additionalData.get("Scale Rune: SCALE");
-                double scale = scaleRuneStack.get(DataComponentRegistry.SCALE_DATA).scale();
+                double scale = scaleRuneStack.getOrDefault(DataComponentRegistry.SCALE_DATA, new ScaleData(0, ScaleData.Mode.SCALE)).scale();
                 if (scale >= 1)
                     actualScale = Math.min(maxScale, scale);
                 else if (scale > 0)
@@ -301,7 +305,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
                 return energy;
 
             update(mainRuneItem.perform(
-                    (ServerLevel) level,
+                    level,
                     player,
                     mainRuneStack,
                     actualScale,
@@ -320,11 +324,12 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
                 energy -= energyCost;
 
             return energy;
-        } catch (GenericRuneException e) {
+        } catch (GenericRuneException | MissingLevelException e) {
             ChatUtils.sendErrorMessagePlayer(playerName, e.getMessage(), level);
             update(RitualState.FAIL);
             return energy;
-        } finally {
+        }
+        finally {
             if (isTesting) {
                 if (ritualState == RitualState.FAIL)
                     ChatUtils.sendInfoMessagePlayer(playerName, "Ritual invalid!", level);
@@ -344,16 +349,22 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         if (destination == null)
             throw new MissingRuneException("Ritual failed: Destination rune is not set!");
 
-        ILocation rangeReference = reference;
-        if (reference == null)
-            rangeReference = new LocationData(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
-        BlockPos destPos = destination.getLocation(level);
-        BlockPos rangePos = rangeReference.getLocation(level);
-        return Math.sqrt(
-                Math.pow(rangePos.getX() - destPos.getX(), 2) +
-                        Math.pow(rangePos.getY() - destPos.getY(), 2) +
-                        Math.pow(rangePos.getZ() - destPos.getZ(), 2)
-        );
+        try {
+            BlockPos destPos = destination.getLocation((ServerLevel) level);
+            BlockPos rangePos;
+            if (reference != null)
+                rangePos = reference.getLocation((ServerLevel) level);
+            else
+                rangePos = worldPosition;
+
+            return Math.sqrt(
+                    Math.pow(rangePos.getX() - destPos.getX(), 2) +
+                            Math.pow(rangePos.getY() - destPos.getY(), 2) +
+                            Math.pow(rangePos.getZ() - destPos.getZ(), 2)
+            );
+        } catch (Exception e) {
+            throw new GenericRuneException("Ritual failed: Could not find reference!");
+        }
     }
 
     private @Nullable ILocation getLocationFromItem(@NotNull ItemStack destinationRuneStack) {
@@ -415,24 +426,11 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             if (isStructured != value)
                 dropItems();
             isStructured = value;
+            assert level != null;
             BlockState state = level.getBlockState(worldPosition);
             level.setBlock(worldPosition, state.setValue(RunicAltar.STRUCTURED, value), 2);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Error updating self state: " + e.getMessage());
-        }
-    }
-
-    protected void updateOtherStates(boolean value) {
-        try{
-            for (BlockPos pos : structureBlocks) {
-                BlockState state = level.getBlockState(pos);
-                if (state.getBlock() instanceof IStructurePart part)
-                    part.setStructureCenter(this);
-                level.setBlock(pos, state.setValue(IStructurePart.STRUCTURED, value), 2);
-            }
-        }
-        catch (Exception e) {
-            System.err.println("Error updating structure state: " + e.getMessage());
         }
     }
 
@@ -446,6 +444,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     }
 
     private void updateRitual(RitualState ritualState) {
+        assert level != null;
         level.scheduleTick(worldPosition, getBlockState().getBlock(), 20);
         update(ritualState);
     }

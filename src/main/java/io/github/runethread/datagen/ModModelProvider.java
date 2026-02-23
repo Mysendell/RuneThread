@@ -26,6 +26,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.registries.DeferredItem;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +43,7 @@ public class ModModelProvider extends ModelProvider {
     }
 
     @Override
-    protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+    protected void registerModels(@NotNull BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         /* ITEMS */
         itemModels.generateFlatItem(HAMPTER_ITEM.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(DOUGH_ITEM.get(), ModelTemplates.FLAT_ITEM);
@@ -52,6 +53,8 @@ public class ModModelProvider extends ModelProvider {
         for(DeferredItem<Item> item : simpleItems) {
             itemModels.generateFlatItem(item.get(), ModelTemplates.FLAT_ITEM);
         }
+
+        itemModels.generateFlatItem(DATA_STICK.get(), ModelTemplates.FLAT_HANDHELD_ROD_ITEM);
 
         Optional<ItemModel.Unbaked> fallbackModelCollapse = Optional.of(ItemModelUtils.plainModel(itemModels.createFlatItemModel(COLLAPSE_RUNE.get(), ModelTemplates.FLAT_ITEM)));
 
@@ -175,14 +178,14 @@ public class ModModelProvider extends ModelProvider {
     }
 
     @Override
-    protected Stream<? extends Holder<Block>> getKnownBlocks() {
+    protected @NotNull Stream<? extends Holder<Block>> getKnownBlocks() {
         return CustomBlocks.BLOCKS.getEntries().stream()
                 .filter(x -> x.get() instanceof Block)
                 .map(x -> Holder.direct(x.get()));
     }
 
     @Override
-    protected Stream<? extends Holder<Item>> getKnownItems() {
+    protected @NotNull Stream<? extends Holder<Item>> getKnownItems() {
         return ITEMS.getEntries().stream().filter(x -> {
             x.get();
             return true;

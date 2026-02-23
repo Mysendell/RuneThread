@@ -3,6 +3,7 @@ package io.github.runethread.customitems.runes.functionrunes;
 import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.datacomponents.DataComponentRegistry;
+import io.github.runethread.datacomponents.LocationData;
 import io.github.runethread.datacomponents.StructureData;
 import io.github.runethread.util.*;
 import net.minecraft.core.BlockPos;
@@ -16,7 +17,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public class CollapseRuneItem extends MainRuneItem {
     public CollapseRuneItem(Properties properties, int cost, int scale, double scalingCost, double breakChance) {
@@ -28,17 +32,20 @@ public class CollapseRuneItem extends MainRuneItem {
     // TODO Add direction arrow support (center not being actual center)
 
     @Override
-    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+    public @NotNull InteractionResult onItemUseFirst(@NotNull ItemStack stack, UseOnContext context) {
         Level level = context.getLevel();
         if (level.isClientSide())
             return InteractionResult.PASS;
         Player player = context.getPlayer();
+        if(player == null)
+            return InteractionResult.FAIL;
+
         if (!player.isCrouching())
             return InteractionResult.PASS;
         BlockPos center = context.getClickedPos();
         ListTag listTag;
         try {
-            listTag = stack.get(DataComponentRegistry.STRUCTURE_DATA.get()).structure();
+            listTag = Objects.requireNonNull(stack.get(DataComponentRegistry.STRUCTURE_DATA.get())).structure();
         }
         catch (NullPointerException e) {
             return InteractionResult.PASS;
@@ -48,7 +55,7 @@ public class CollapseRuneItem extends MainRuneItem {
         StructureUtil.placeStructureViaTag(listTag, center, level);
         stack.shrink(1);
         player.setItemInHand(context.getHand(), stack);
-        TeleportUtil.teleportManager(center, player, (ServerLevel) level, radius, radius);
+        TeleportUtil.teleportManager(new LocationData(center, level.dimension()), player, (ServerLevel) level, radius, radius);
         return InteractionResult.SUCCESS;
     }
 

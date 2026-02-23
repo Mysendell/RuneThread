@@ -17,8 +17,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class LocationRuneItem extends Item {
     private final int maxRange;
@@ -29,39 +32,41 @@ public class LocationRuneItem extends Item {
         this.maxRange = maxRange;
     }
 
-    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-        if (context.getPlayer().isCrouching())
+    @Override
+    public @NotNull InteractionResult onItemUseFirst(@NotNull ItemStack stack, UseOnContext context) {
+        if (context.getLevel().isClientSide || Objects.requireNonNull(context.getPlayer()).isCrouching())
             return InteractionResult.PASS;
 
-        LocationData locationData = new LocationData(context.getClickedPos().getX(), context.getClickedPos().getY(), context.getClickedPos().getZ());
+        LocationData locationData = new LocationData(context.getClickedPos(), context.getLevel().dimension());
 
         return addTargetData(stack, context.getPlayer(), context.getHand(), DataComponentRegistry.LOCATION_DATA.get(), locationData);
     }
 
-    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
-        int id = interactionTarget.getId();
+    @Override
+    public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack stack, @NotNull Player player, @NotNull LivingEntity interactionTarget, @NotNull InteractionHand usedHand) {
+        if(player instanceof LocalPlayer)
+            return InteractionResult.PASS;
+
+        UUID id = interactionTarget.getUUID();
         String name = interactionTarget.getName().getString();
-        EntityData entityData = new EntityData(id, name);
+        EntityData entityData = new EntityData(id, name, interactionTarget.level().dimension());
 
         return addTargetData(stack, player, usedHand, DataComponentRegistry.ENTITY_DATA.get(), entityData);
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        if(!player.isCrouching())
+    public @NotNull InteractionResult use(@NotNull Level level, Player player, @NotNull InteractionHand hand) {
+        if(!player.isCrouching() || level.isClientSide)
             return InteractionResult.PASS;
 
-        int id = player.getId();
+        UUID id = player.getUUID();
         String name = player.getName().getString();
-        EntityData entityData = new EntityData(id, name);
+        EntityData entityData = new EntityData(id, name, player.level().dimension());
 
         return addTargetData(player.getItemInHand(hand), player, hand, DataComponentRegistry.ENTITY_DATA.get(), entityData);
     }
 
     private static <T extends Record> InteractionResult addTargetData(ItemStack stack, Player player, InteractionHand hand, DataComponentType<T> dataType, T data) {
-        if(player instanceof LocalPlayer)
-            return InteractionResult.PASS;
-
         stack = stack.copy();
         ItemStack newItemStack = new ItemStack(stack.getItem());
         newItemStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
@@ -78,7 +83,7 @@ public class LocationRuneItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, Item.@NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
         Component modName = Component.translatable("itemGroup.runethread.runethread_tab").withStyle(ChatFormatting.BLUE);
         LocationData locationData = stack.get(DataComponentRegistry.LOCATION_DATA.get());
         if (locationData != null) {

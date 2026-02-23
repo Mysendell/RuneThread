@@ -1,5 +1,6 @@
 package io.github.runethread.customblocks.structure;
 
+import io.github.runethread.util.Structure;
 import io.github.runethread.util.StructureUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -8,10 +9,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Set;
-
 public abstract class StructureCenterEntity extends BlockEntity {
-    protected Set<BlockPos> structureBlocks = null;
+    protected Structure structureBlocks = null;
     protected boolean isStructured = false;
     protected static StructureUtil.StructurePart[] structure;
     protected static int structureSize;
@@ -21,18 +20,32 @@ public abstract class StructureCenterEntity extends BlockEntity {
     }
 
     public void createStructure(){
+        assert level != null;
         if(!level.isClientSide)
             updateStructureState(isValidStructure());
     }
 
     public boolean isValidStructure() {
-        structureBlocks = StructureUtil.ValidateAndAddStructure(structure, worldPosition, level, structureSize, this);
-        return structureBlocks.size() == structureSize;
+        structureBlocks = StructureUtil.ValidateAndAddStructure(structure, worldPosition, level, structureSize);
+        return structureBlocks.isValid();
     }
 
     protected abstract void updateSelfState(boolean value);
 
-    protected abstract void updateOtherStates(boolean value);
+    protected void updateOtherStates(boolean value) {
+        try{
+            for (BlockPos pos : structureBlocks) {
+                assert level != null;
+                BlockState state = level.getBlockState(pos);
+                if (state.getBlock() instanceof IStructurePart part)
+                    part.setStructureCenter(this);
+                level.setBlock(pos, state.setValue(IStructurePart.STRUCTURED, value), 2);
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Error updating structure state: " + e.getMessage());
+        }
+    }
 
     protected void updateStructureState(boolean value){
         updateSelfState(value);
@@ -58,11 +71,11 @@ public abstract class StructureCenterEntity extends BlockEntity {
 
     }
 
-    public Set<BlockPos> getStructureBlocks() {
+    public Structure getStructureBlocks() {
         return structureBlocks;
     }
 
-    public void setStructureBlocks(Set<BlockPos> structureBlocks) {
+    public void setStructureBlocks(Structure structureBlocks) {
         this.structureBlocks = structureBlocks;
     }
 

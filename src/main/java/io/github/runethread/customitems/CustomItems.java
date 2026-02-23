@@ -39,6 +39,10 @@ public class CustomItems {
                     )
             );
 
+    public static final DeferredItem<Item> DATA_STICK = ITEMS.registerItem("data_stick",
+            (properties) -> new DataStick(properties.stacksTo(1)));
+
+
     public static final DeferredItem<Item> POWER_GEM = ITEMS.registerSimpleItem("power_gem",
             new Item.Properties().stacksTo(64).fireResistant());
     public static final DeferredItem<Item> RITUAL_INDICATOR = ITEMS.registerSimpleItem("ritual_indicator",

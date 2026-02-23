@@ -8,6 +8,9 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Supplier;
+
+import static io.github.runethread.recipes.CustomRecipes.RECIPE_BOOK_CATEGORIES;
 
 /**
  * A shaped crafting recipe. The arrangement of ingredients matters.
@@ -19,6 +22,10 @@ public class RecipeShaped extends ModRecipe {
     public RecipeShaped(List<IRecipeIngredient> ingredients, List<IRecipeIngredient> result, int recipeWidth, int recipeHeight) {
         super(ingredients, result, recipeWidth, recipeHeight);
     }
+
+    public static final Supplier<RecipeBookCategory> RUNETHREAD_SHAPED = RECIPE_BOOK_CATEGORIES.register(
+            "runethread_shaped", RecipeBookCategory::new
+    );
 
     /**
      * Checks if the given crafting input matches this recipe. Checks all possible offsets in the input.
@@ -63,8 +70,13 @@ public class RecipeShaped extends ModRecipe {
     }
 
     @Override
-    public @NotNull CraftingBookCategory category() {
+    public CraftingBookCategory category() {
         return null; // TODO implement categories
+    }
+
+    @Override
+    public @NotNull RecipeBookCategory recipeBookCategory() {
+        return RUNETHREAD_SHAPED.get();
     }
 
     @Override

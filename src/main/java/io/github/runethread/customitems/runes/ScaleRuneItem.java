@@ -24,7 +24,7 @@ public class ScaleRuneItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public @NotNull InteractionResult use(@NotNull Level level, Player player, @NotNull InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (player.isCrouching()) {
             ScaleData scaleData = itemStack.getOrDefault(DataComponentRegistry.SCALE_DATA.get(), new ScaleData(0, ScaleData.Mode.POWER));
@@ -38,14 +38,14 @@ public class ScaleRuneItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, Item.@NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
         ScaleData scaleData = stack.get(DataComponentRegistry.SCALE_DATA.get());
         if(scaleData == null)
             return;
         Component modName = Component.translatable("itemGroup.runethread.runethread_tab").withStyle(ChatFormatting.BLUE);
         scaleData.addToTooltip(context, tooltipComponents::add, tooltipFlag);
         tooltipComponents.add(modName);
-    } // TODO TOOLTIP NOT WORKING PROPERLY, MOD ID DOESN'T SHOW
+    }
 
     @Override
     public @NotNull Component getName(ItemStack stack) {
