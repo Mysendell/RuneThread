@@ -2,6 +2,8 @@ package io.github.runethread.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,7 +22,7 @@ import java.util.List;
 
 public class ExplosionUtil {
     /**
-     * Creates a "perfect" spherical explosion.
+     * Creates an explosion.
      *
      * @param level          The server level
      * @param center         Center of the explosion
@@ -29,12 +31,13 @@ public class ExplosionUtil {
      * @param damageEntities Whether to apply damage to entities within the radius
      * @param damage         Amount of damage to apply to entities
      */
-    public static void accurateExplosion(ServerLevel level, BlockPos center, double radius, boolean dropBlocks, boolean destroyBlocks, boolean damageEntities, double damage) {
-        if (destroyBlocks)
-            AreaUtil.IterateAreaSphere(level, center, radius, (args) -> {
+    public static void accurateExplosion(ServerLevel level, BlockPos center, double radius, boolean dropBlocks, List<ResourceLocation> filter, boolean reverse, ModifierRune shape, boolean damageEntities, double damage) {
+        if (!(filter.isEmpty() && reverse))
+            AreaUtil.iterateAreaShape(shape, level, center, radius, (args) -> {
                 BlockPos pos = (BlockPos) args[0];
                 BlockState state = level.getBlockState(pos);
-                if (!state.isAir()) {
+                ResourceLocation blockKey = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+                if (!state.isAir() && filter.contains(blockKey) == reverse) {
                     if (dropBlocks) {
                         List<ItemStack> drops = Block.getDrops(state, level, pos, level.getBlockEntity(pos));
                         for (ItemStack stack : drops) {

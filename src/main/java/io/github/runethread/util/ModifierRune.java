@@ -1,6 +1,6 @@
 package io.github.runethread.util;
 
-public enum Modifiers {
+public enum ModifierRune {
     LIVING_RUNE("Living Rune"),
     UP_RUNE("Up Rune"),
     DOWN_RUNE("Down Rune"),
@@ -9,11 +9,12 @@ public enum Modifiers {
     NULL_RUNE("Null Rune"),
     REVERSE_RUNE("Reverse Rune"),
     SCALE_RUNE("Scale Rune"),
+    SPHERE_RUNE("Sphere Rune"),
     CIRCLE_RUNE("Circle Rune"),
     SQUARE_RUNE("Square Rune");
 
     private final String name;
-    Modifiers(String name) {
+    ModifierRune(String name) {
         this.name = name;
     }
 

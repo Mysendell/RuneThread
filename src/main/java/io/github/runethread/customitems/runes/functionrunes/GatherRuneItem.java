@@ -27,7 +27,7 @@ public class GatherRuneItem extends MainRuneItem{
     @Override
     public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         double radius = finalScale * ((MainRuneItem) mainStack.getItem()).getScale();
-        AreaUtil.IteratePerimeterCircle(level, destination.getLocation(level), radius, (args) -> {
+        AreaUtil.iteratePerimeterCircle(level, destination.getLocation(level), radius, (args) -> {
             ParticleOptions particleOptions = new DustParticleOptions(6, 2.0f);
             BlockPos pos = (BlockPos) args[0];
             level.sendParticles(particleOptions,

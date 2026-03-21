@@ -1,6 +1,6 @@
 package io.github.runethread.datacomponents;
 
-import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 
-public record StructureData(ListTag structure) {
+public record StructureData(ResourceLocation structureName) {
 }

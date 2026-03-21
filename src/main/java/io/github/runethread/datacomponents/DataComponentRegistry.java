@@ -1,15 +1,10 @@
 package io.github.runethread.datacomponents;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.runethread.RuneThread;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -77,23 +72,12 @@ public class DataComponentRegistry {
                     ))
             );
 
-    public static final Codec<ListTag> LIST_TAG_CODEC = Codec.PASSTHROUGH.comapFlatMap(
-            dynamic -> {
-                Tag tag = dynamic.convert(NbtOps.INSTANCE).getValue();
-                if (tag instanceof ListTag listTag) {
-                    return DataResult.success(listTag);
-                }
-                return DataResult.error(() -> "Not a ListTag");
-            },
-            listTag -> new Dynamic<>(NbtOps.INSTANCE, listTag)
-    );
-
-    public static final Supplier<DataComponentType<StructureData>> STRUCTURE_DATA =
+    public static final Supplier<DataComponentType<StructureData>> STRUCTURE_NAME =
             DATA_COMPONENTS.registerComponentType(
                     "structure_data",
                     builder -> builder.persistent(RecordCodecBuilder.create(instance ->
                             instance.group(
-                                    LIST_TAG_CODEC.fieldOf("structure_blocks").forGetter(StructureData::structure)
+                                    ResourceLocation.CODEC.fieldOf("structureName").forGetter(StructureData::structureName)
                             ).apply(instance, StructureData::new)
                     ))
             );

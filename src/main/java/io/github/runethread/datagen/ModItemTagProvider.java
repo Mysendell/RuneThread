@@ -7,6 +7,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +24,7 @@ public class ModItemTagProvider extends ItemTagsProvider {
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider provider) {
+    protected void addTags(HolderLookup.@NotNull Provider provider) {
         tag(RuneTags.Items.LOCATON_RUNE_TAG)
                 .add(ALPHA_RUNE.get())
                 .add(BETA_RUNE.get())
@@ -44,7 +45,6 @@ public class ModItemTagProvider extends ItemTagsProvider {
         tag(RuneTags.Items.MODIFIER_RUNE_TAG)
                 .add(UP_RUNE.get())
                 .add(DOWN_RUNE.get())
-                .add(LEFT_RUNE.get())
                 .add(RIGHT_RUNE.get())
                 .add(LEFT_RUNE.get())
                 .add(LIVING_RUNE.get())
@@ -70,7 +70,6 @@ public class ModItemTagProvider extends ItemTagsProvider {
                 .add(DOWN_RUNE.get())
                 .add(LEFT_RUNE.get())
                 .add(RIGHT_RUNE.get())
-                .add(LEFT_RUNE.get())
                 .add(LIVING_RUNE.get())
                 .add(DESTRUCTION_RUNE.get())
                 .add(PORTAL_RUNE.get())

@@ -24,7 +24,7 @@ public class FireRuneItem extends MainRuneItem{
         double radius = finalScale * ((MainRuneItem) mainStack.getItem()).getScale();
         BlockPos center = destination.getLocation(level);
         center = center.offset(0, 1, 0);
-        AreaUtil.IterateAreaSphere(level, center, radius, (args) -> {
+        AreaUtil.iterateAreaSphere(level, center, radius, (args) -> {
             BlockPos pos = (BlockPos) args[0];
             if (BaseFireBlock.canBePlacedAt(level, pos, Direction.DOWN)) {
                 BlockState blockstate = BaseFireBlock.getState(level, pos);

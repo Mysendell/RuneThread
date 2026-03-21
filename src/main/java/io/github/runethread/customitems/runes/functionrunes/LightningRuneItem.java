@@ -25,7 +25,7 @@ public class LightningRuneItem extends MainRuneItem{
         radiusScale = strengthScale = finalScale;
         MainRuneItem item = (MainRuneItem) mainStack.getItem();
         if (additionalData.containsKey("Scale Rune: MODIFIER")) {
-            ItemStack scaleRune = (ItemStack) additionalData.get("Scale Rune: MODIFIER");
+            ItemStack scaleRune = additionalData.get("Scale Rune: MODIFIER");
             double scale = scaleRune.get(DataComponentRegistry.SCALE_DATA).scale();
             if (scale < 0)
                 scale = 1 / scale;
@@ -39,7 +39,7 @@ public class LightningRuneItem extends MainRuneItem{
         strength = strength == 0.0 ? 4.0 : strength;
         int finalStrength = (int) Math.pow(2, strength - 1);
         float damage = (float) (strengthScale / (item.getScale() * 2.0 * finalStrength));
-        AreaUtil.IterateAreaCircle(level, destination.getLocation(level), radius, (args) -> {
+        AreaUtil.iterateAreaSphere(level, destination.getLocation(level), radius, (args) -> {
             BlockPos pos = (BlockPos) args[0];
             for (int i = 0; i < finalStrength; i++)
                 EntityType.LIGHTNING_BOLT.spawn(level, pos, EntitySpawnReason.TRIGGERED).setDamage(damage);

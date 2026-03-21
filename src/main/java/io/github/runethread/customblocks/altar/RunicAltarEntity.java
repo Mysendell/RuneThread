@@ -61,6 +61,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     private final List<Barrier> barriers;
     private boolean isTesting;
 
+    // TODO Maybe change this to use built-in structures
     static {
         structure = new StructureUtil.StructurePart[]{
                 new StructureUtil.StructurePart(
@@ -271,7 +272,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             double scalingCost = mainRuneItem.getScalingCost();
             int cost = mainRuneItem.getCost();
             if (additionalData.containsKey("Scale Rune: POWER")) {
-                ItemStack scaleRuneStack = (ItemStack) additionalData.get("Scale Rune: POWER");
+                ItemStack scaleRuneStack = additionalData.get("Scale Rune: POWER");
                 double scale = scaleRuneStack.getOrDefault(DataComponentRegistry.SCALE_DATA, new ScaleData(0, ScaleData.Mode.SCALE)).scale();
                 if (scale >= 1)
                     usableEnergy = scale;
@@ -282,7 +283,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             maxScale = getScale(usableEnergy, cost, scalingCost);
             if (maxScale <= 0) throw new InsufficientEnergyException("Ritual failed: Not enough energy!");
             if (additionalData.containsKey("Scale Rune: SCALE")) {
-                ItemStack scaleRuneStack = (ItemStack) additionalData.get("Scale Rune: SCALE");
+                ItemStack scaleRuneStack = additionalData.get("Scale Rune: SCALE");
                 double scale = scaleRuneStack.getOrDefault(DataComponentRegistry.SCALE_DATA, new ScaleData(0, ScaleData.Mode.SCALE)).scale();
                 if (scale >= 1)
                     actualScale = Math.min(maxScale, scale);
@@ -413,10 +414,6 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
 
     public void serverTick() {
         for (Barrier barrier : barriers) {
-            if (barrier.getTicks() <= 0) {
-                BarrierManager.removeBarrier(barrier);
-                continue;
-            }
             barrier.countdown();
         }
     }
@@ -457,7 +454,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             BlockState newState = oldState.setValue(RunicAltar.RITUAL_STATE, ritualState);
             level.setBlock(worldPosition, newState, 3);
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
 

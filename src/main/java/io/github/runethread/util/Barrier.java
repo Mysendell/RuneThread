@@ -3,6 +3,7 @@ package io.github.runethread.util;
 import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class Barrier {
     private final BlockPos centerPos;
@@ -20,14 +21,14 @@ public class Barrier {
         this.ticks = ticks;
     }
 
-    public boolean isInside(BlockPos pos) {
+    public boolean isInside(@NotNull BlockPos pos) {
         return Math.abs(pos.getX() - centerPos.getX()) <= radius &&
                 Math.abs(pos.getY() - centerPos.getY()) <= radius &&
                 Math.abs(pos.getZ() - centerPos.getZ()) <= radius;
     }
     public boolean isCrossed(Vec3 prev, Vec3 current) {
-        boolean wasInside = !BarrierManager.isInsideAnyBarrier(BlockPos.containing(prev)).isEmpty();
-        boolean isNowInside = !BarrierManager.isInsideAnyBarrier(BlockPos.containing(current)).isEmpty();
+        boolean wasInside = isInside(BlockPos.containing(prev));
+        boolean isNowInside = isInside(BlockPos.containing(current));
         return wasInside != isNowInside;
     }
     public Vec3 clampToCubeBarrier(Vec3 prev, Vec3 attempted) {
@@ -99,10 +100,12 @@ public class Barrier {
     public RunicAltarEntity getAltarEntity() {
         return altarEntity;
     }
-    public int getTicks() {
-        return ticks;
-    }
+
     public void countdown() {
+        if (ticks <= 0) {
+            BarrierManager.removeBarrier(this);
+            return;
+        }
         ticks--;
     }
 }

@@ -124,48 +124,48 @@ public class RuneThread {
 
     @SubscribeEvent
     public void EntityTick(EntityTickEvent.Post event) {
-        Entity entity = event.getEntity(); // TODO: Don't check this every tick
+        Entity entity = event.getEntity();
         Vec3 now = entity.position();
         BarrierTracker barrierTracker = entity.getData(CustomDataAttachments.BARRIER_TRACKER_STORAGE);
         Vec3 lastPos = barrierTracker.getLastBarrierCheckPos();
-        Barrier crossedBarrier = BarrierManager.isCrossingAnyBarrier(now, lastPos);
-        if (crossedBarrier != null && lastPos != Vec3.ZERO) {
-            Vec3 clampedVec = crossedBarrier.clampToCubeBarrier(lastPos, now);
-            Vec3 deltaMob = entity.getDeltaMovement();
-            Vec3 deltaProjectile;
+        if (lastPos != Vec3.ZERO) {
+            Barrier crossedBarrier = BarrierManager.isCrossingAnyBarrier(now, lastPos);
+            if (crossedBarrier != null) {
+                Vec3 clampedVec = crossedBarrier.clampToCubeBarrier(lastPos, now);
+                Vec3 deltaMob = entity.getDeltaMovement();
+                Vec3 deltaProjectile;
 
-            if (clampedVec == null) {
-                clampedVec = lastPos;
-                deltaMob = new Vec3(deltaMob.x, -deltaMob.y, deltaMob.z);
-                deltaProjectile = deltaMob.scale(scale);
-            } else {
-                deltaProjectile = new Vec3(0, -0.3, 0);
-                entity.setPos(clampedVec);
-            }
-
-            if (entity instanceof Projectile) {
-                entity.setPos(clampedVec);
-                switch (entity) {
-                    case AbstractArrow arrow -> {
-                        arrow.setCritArrow(false);
-                        arrow.setDeltaMovement(deltaProjectile);
-                        arrow.setNoPhysics(false);
-                    }
-                    case FishingHook hook -> {
-                    }
-                    case ThrownEnderpearl enderPearl -> {
-                        Entity owner = enderPearl.getOwner();
-                        if (owner != null)
-                            owner.teleportTo(clampedVec.x, clampedVec.y, clampedVec.z);
-                        enderPearl.discard();
-                    }
-                    default -> {
-                        entity.setDeltaMovement(deltaProjectile);
-                    }
+                if (clampedVec == null) {
+                    clampedVec = lastPos;
+                    deltaMob = new Vec3(deltaMob.x, -deltaMob.y, deltaMob.z);
+                    deltaProjectile = deltaMob.scale(scale);
+                } else {
+                    deltaProjectile = new Vec3(0, -0.3, 0);
+                    entity.setPos(clampedVec);
                 }
-            } else
-                entity.setDeltaMovement(deltaMob);
 
+                if (entity instanceof Projectile) {
+                    entity.setPos(clampedVec);
+                    switch (entity) {
+                        case AbstractArrow arrow -> {
+                            arrow.setCritArrow(false);
+                            arrow.setDeltaMovement(deltaProjectile);
+                            arrow.setNoPhysics(false);
+                        }
+                        case FishingHook hook -> {
+                        }
+                        case ThrownEnderpearl enderPearl -> {
+                            Entity owner = enderPearl.getOwner();
+                            if (owner != null)
+                                owner.teleportTo(clampedVec.x, clampedVec.y, clampedVec.z);
+                            enderPearl.discard();
+                        }
+                        default -> entity.setDeltaMovement(deltaProjectile);
+                    }
+                } else
+                    entity.setDeltaMovement(deltaMob);
+
+            }
         } else {
             barrierTracker.setLastBarrierCheckPos(now);
             entity.setData(CustomDataAttachments.BARRIER_TRACKER_STORAGE, barrierTracker);
@@ -180,8 +180,9 @@ public class RuneThread {
                 BarrierRenderManager.renderBarriers(event.getPoseStack(), event.getCamera());
             }
         }
+
         @SubscribeEvent
-        public static void scrollWheelScroll(InputEvent.MouseScrollingEvent event){
+        public static void scrollWheelScroll(InputEvent.MouseScrollingEvent event) {
             Player player = Minecraft.getInstance().player;
             event.setCanceled(incrementScale(event.getScrollDeltaY(), player));
         }

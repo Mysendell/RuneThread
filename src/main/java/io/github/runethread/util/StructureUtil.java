@@ -1,17 +1,18 @@
 package io.github.runethread.util;
 
 import io.github.runethread.customblocks.structure.StructurePartBlock;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.neoforged.neoforge.registries.DeferredBlock;
-
-import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
 
 public class StructureUtil {
     public record StructurePart(BlockPos corner1, BlockPos corner2, DeferredBlock<? extends Block> block) {
@@ -44,34 +45,43 @@ public class StructureUtil {
                 }
     }
 
-    public static CompoundTag serializeBlock(BlockPos pos, BlockPos center, Level level) {
-        CompoundTag tag = new CompoundTag();
-        BlockPos newPos = pos.offset(center.multiply(-1));
-        tag.putInt("x", newPos.getX());
-        tag.putInt("y", newPos.getY());
-        tag.putInt("z", newPos.getZ());
-        BlockState blockState = level.getBlockState(pos);
-        tag.put("blockState", NbtUtils.writeBlockState(blockState));
-        if(level.getBlockEntity(pos) != null)
-            tag.put("blockEntity", Objects.requireNonNull(level.getBlockEntity(pos)).saveWithFullMetadata(level.registryAccess()));
-        return tag;
-    }
+    public static boolean saveStructure(BlockPos center, Vec3i size, boolean ignoreEntities, boolean writeToDisk, ServerLevel level, ResourceLocation structureName, String author) {
+        StructureTemplateManager structuretemplatemanager = level.getStructureManager();
+        StructureTemplate structuretemplate;
 
-    public static void placeBlockViaTag(CompoundTag tag, BlockPos center, Level level) {
-        int x = tag.getInt("x");
-        int y = tag.getInt("y");
-        int z = tag.getInt("z");
-        BlockPos pos = new BlockPos(x, y, z).offset(center);
-        BlockState blockState = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), tag.getCompound("blockState"));
-        level.setBlock(pos, blockState, 3);
-        if(tag.contains("blockEntity") && level.getBlockEntity(pos) != null)
-            Objects.requireNonNull(level.getBlockEntity(pos)).loadCustomOnly(tag.getCompound("blockEntity"), level.registryAccess());
-    }
-
-    public static void placeStructureViaTag(ListTag listTag, BlockPos center, Level level) {
-        for (int i = 0; i < listTag.size(); i++) {
-            CompoundTag tag = listTag.getCompound(i);
-            placeBlockViaTag(tag, center, level);
+        try {
+            structuretemplate = structuretemplatemanager.getOrCreate(structureName);
+        } catch (ResourceLocationException e) {
+            e.printStackTrace();
+            return false;
         }
+
+        structuretemplate.fillFromWorld(level, center, size, !ignoreEntities, Blocks.STRUCTURE_VOID);
+        structuretemplate.setAuthor(author);
+
+        if (writeToDisk) {
+            try {
+                return structuretemplatemanager.save(structureName);
+            } catch (ResourceLocationException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    public static StructureTemplate loadStructure(@NotNull ResourceLocation structureName, ServerLevel level){
+        return level.getStructureManager().get(structureName).orElse(null);
+    }
+
+    public static boolean placeStructure(StructureTemplate structureTemplate, ServerLevel level){
+//        StructurePlaceSettings structureplacesettings = new StructurePlaceSettings()
+//                .setMirror(mirror)
+//                .setRotation(rotation)
+//                .setIgnoreEntities(ignoreEntities);
+//        BlockPos blockpos = getBlockPos().offset(structurePos);
+//        structureTemplate.placeInWorld(level, blockpos, blockpos, structureplacesettings, RandomSource.create(Util.getMillis()), 2);
+        return true;
     }
 }

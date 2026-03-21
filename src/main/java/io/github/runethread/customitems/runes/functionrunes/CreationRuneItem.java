@@ -25,8 +25,8 @@ public class CreationRuneItem extends MainRuneItem{
             ChatUtils.sendErrorMessagePlayer(player.getName().getString(), "Creation rune requires a Collapse Rune to be used!", level);
             return RunicAltarEntity.RitualState.ALMOST;
         }
-        ItemStack collapseStack = (ItemStack) additionalData.get("Collapse Rune");
-        if (!collapseStack.has(DataComponentRegistry.STRUCTURE_DATA)) { // TODO change to item data Don't duplicate structures
+        ItemStack collapseStack = additionalData.get("Collapse Rune");
+        if (!collapseStack.has(DataComponentRegistry.STRUCTURE_NAME)) { // TODO change to item data Don't duplicate structures
             ChatUtils.sendErrorMessagePlayer(player.getName().getString(), "Creation rune requires a Collapse Rune with a valid structure data!", level);
             return RunicAltarEntity.RitualState.ALMOST;
         }

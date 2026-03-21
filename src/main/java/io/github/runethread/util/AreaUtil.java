@@ -65,14 +65,26 @@ public class AreaUtil {
         action.action(pos4);
     }
 
-
     private static void eightPointSymmetry(BlockPos center, int x, int z, int y, AreaInterface action, ServerLevel level, List<BlockPos> loadedChunkList) {
         int symY = (2 * center.getY()) - y;
         fourPointSymmetry(center, x, z, y, action, level, loadedChunkList);
         fourPointSymmetry(center, x, z, symY, action, level, loadedChunkList);
     }
 
-    public static void IterateAreaSphere(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
+    public static void iterateAreaShape(ModifierRune shape, ServerLevel level, BlockPos center, double radius, AreaInterface action) {
+        switch (shape) {
+            case SQUARE_RUNE:
+                iterateAreaBox(level, center, radius, action);
+                break;
+            case CIRCLE_RUNE:
+                iterateAreaCircle(level, center, radius, action);
+                break;
+            default:
+                iterateAreaSphere(level, center, radius, action);
+        }
+    }
+
+    public static void iterateAreaSphere(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
         Bounding3D bounding = new Bounding3D(center, radius, level.getMinY(), level.getMaxY());
         double radiusSq = radius * radius;
 
@@ -96,7 +108,7 @@ public class AreaUtil {
         }
     }
 
-    public static void IteratePerimeterCircle(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
+    public static void iteratePerimeterCircle(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
         Bounding2D bounding = new Bounding2D(center, radius);
         double radiusSq = radius * radius;
         double innerRadiusSq = (radius - 1) * (radius - 1);
@@ -120,7 +132,7 @@ public class AreaUtil {
         }
     }
 
-    public static void IterateAreaCircle(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
+    public static void iterateAreaCircle(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
         Bounding2D bounding = new Bounding2D(center, radius);
         double radiusSq = radius * radius;
 
@@ -140,7 +152,7 @@ public class AreaUtil {
         }
     }
 
-    public static void IterateAreaBox(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
+    public static void iterateAreaBox(ServerLevel level, BlockPos center, double radius, AreaInterface action) {
         Bounding3D bounding = new Bounding3D(center, radius, level.getMinY(), level.getMaxY());
 
         List<BlockPos> loadedChunkList = new ArrayList<>();

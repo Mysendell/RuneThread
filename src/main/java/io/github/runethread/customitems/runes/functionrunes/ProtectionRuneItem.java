@@ -16,6 +16,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+// TODO Make renderer adapt to the entities ability to pass the barrier
+
 public class ProtectionRuneItem extends MainRuneItem{
     public ProtectionRuneItem(Properties properties, int cost, double scale, double scalingCost, double breakChance) {
         super(properties, cost, scale, scalingCost, breakChance);
