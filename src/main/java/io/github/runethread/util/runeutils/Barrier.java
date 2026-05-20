@@ -1,4 +1,4 @@
-package io.github.runethread.util;
+package io.github.runethread.util.runeutils;
 
 import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import net.minecraft.core.BlockPos;

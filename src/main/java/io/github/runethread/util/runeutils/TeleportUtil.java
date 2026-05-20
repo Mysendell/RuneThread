@@ -1,6 +1,8 @@
-package io.github.runethread.util;
+package io.github.runethread.util.runeutils;
 
 import io.github.runethread.datacomponents.EntityData;
+import io.github.runethread.util.ChunkUtils;
+import io.github.runethread.util.ILocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;

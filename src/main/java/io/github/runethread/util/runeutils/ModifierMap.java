@@ -1,4 +1,4 @@
-package io.github.runethread.util;
+package io.github.runethread.util.runeutils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.HashMap;
 import java.util.List;
 
-import static io.github.runethread.util.ModifierRune.*;
+import static io.github.runethread.util.runeutils.ModifierRune.*;
 
 public class ModifierMap extends HashMap<String, ItemStack> {
     public ItemStack getModifierRune(ModifierRune modifierName) {

@@ -4,11 +4,12 @@ import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.altar.RunicAltar;
 import io.github.runethread.customblocks.craftingtable.animator.Animator;
 import io.github.runethread.customblocks.craftingtable.arcanetable.ArcaneTableBlock;
-import io.github.runethread.customblocks.structure.StructurePartBlock;
-import io.github.runethread.customblocks.structure.StructurePartStairs;
+import io.github.runethread.customblocks.etcher.RuneEtcher;
+import io.github.runethread.customblocks.structure.CollapseStructureBlock;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -37,16 +38,25 @@ public class CustomBlocks {
             properties -> new Block(properties.mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1f, 6.0f)
                     .sound(SoundType.STONE)));
 
+    public static final DeferredBlock<Block> COLLAPSE_STRUCTURE = register("collapse_structure",
+            properties -> new CollapseStructureBlock(properties.mapColor(MapColor.COLOR_LIGHT_GRAY)));
+
     public static final DeferredBlock<Block> RUNIC_ALTAR_BLOCK = register("runic_altar",
             properties -> new RunicAltar(properties
                     .mapColor(MapColor.COLOR_LIGHT_GRAY).strength(1f, 6.0f).sound(SoundType.STONE)
                     .noOcclusion()));
+    public static final DeferredBlock<Block> RUNE_ETCHER = register("rune_etcher",
+            properties -> new RuneEtcher(properties
+                    .mapColor(MapColor.COLOR_LIGHT_GRAY)
+                    .strength(1f, 6.0f)
+                    .sound(SoundType.TUFF_BRICKS)));
 
-    public static final DeferredBlock<StructurePartBlock> MARBLE_BRICK_BLOCK = register("marble_bricks",
-            properties -> new StructurePartBlock(properties
+
+    public static final DeferredBlock<Block> MARBLE_BRICK_BLOCK = register("marble_bricks",
+            properties -> new Block(properties
                     .mapColor(MapColor.COLOR_GRAY)));
 
-    public static final DeferredBlock<StructurePartStairs> MARBLE_BRICK_STAIR_BLOCK = register("marble_brick_stairs", properties -> new StructurePartStairs(
+    public static final DeferredBlock<StairBlock> MARBLE_BRICK_STAIR_BLOCK = register("marble_brick_stairs", properties -> new StairBlock(
                     MARBLE_BRICK_BLOCK.get().defaultBlockState(),
                     properties.mapColor(MapColor.COLOR_GRAY).sound(SoundType.STONE)));
 
@@ -64,5 +74,6 @@ public class CustomBlocks {
         output.accept(RUNIC_ALTAR_BLOCK);
         output.accept(MARBLE_BRICK_BLOCK.get());
         output.accept(MARBLE_BRICK_STAIR_BLOCK);
+        output.accept(RUNE_ETCHER);
     }
 }

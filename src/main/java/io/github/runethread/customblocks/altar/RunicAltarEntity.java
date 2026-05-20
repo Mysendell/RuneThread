@@ -1,7 +1,6 @@
 package io.github.runethread.customblocks.altar;
 
 import io.github.runethread.customblocks.CustomBlockEntities;
-import io.github.runethread.customblocks.CustomBlocks;
 import io.github.runethread.customblocks.structure.StructureCenterEntity;
 import io.github.runethread.customitems.runes.LocationRuneItem;
 import io.github.runethread.customitems.runes.MainRuneItem;
@@ -10,11 +9,16 @@ import io.github.runethread.datacomponents.PowerData;
 import io.github.runethread.datacomponents.ScaleData;
 import io.github.runethread.gui.menus.RusticAltarMenu;
 import io.github.runethread.gui.menus.TempleAltarMenu;
-import io.github.runethread.util.*;
+import io.github.runethread.util.ChatUtils;
+import io.github.runethread.util.ILocation;
+import io.github.runethread.util.InventoryUtil;
 import io.github.runethread.util.exceptions.GenericRuneException;
 import io.github.runethread.util.exceptions.InsufficientEnergyException;
 import io.github.runethread.util.exceptions.MissingLevelException;
 import io.github.runethread.util.exceptions.MissingRuneException;
+import io.github.runethread.util.runeutils.Barrier;
+import io.github.runethread.util.runeutils.BarrierManager;
+import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -61,125 +65,8 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     private final List<Barrier> barriers;
     private boolean isTesting;
 
-    // TODO Maybe change this to use built-in structures
-    static {
-        structure = new StructureUtil.StructurePart[]{
-                new StructureUtil.StructurePart(
-                        new BlockPos(-2, -3, -2), new BlockPos(2, -3, 2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-1, -2, -1), new BlockPos(1, -2, 1),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(0, -1, 0), new BlockPos(0, -1, 0),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-
-                new StructureUtil.StructurePart(
-                        new BlockPos(3, -3, 3), new BlockPos(2, -3, 2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-3, -3, -3), new BlockPos(-2, -3, -2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(3, -3, -3), new BlockPos(2, -3, -2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-3, -3, 3), new BlockPos(-2, -3, 2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-
-                new StructureUtil.StructurePart(
-                        new BlockPos(2, -2, 2), new BlockPos(2, 0, 2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-2, -2, -2), new BlockPos(-2, 0, -2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-2, -2, 2), new BlockPos(-2, 0, 2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(2, -2, -2), new BlockPos(2, 0, -2),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-
-                new StructureUtil.StructurePart(
-                        new BlockPos(3, -2, 3), new BlockPos(3, 1, 3),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(3, -2, -3), new BlockPos(3, 1, -3),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-3, -2, -3), new BlockPos(-3, 1, -3),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-3, -2, 3), new BlockPos(-3, 1, 3),
-                        CustomBlocks.MARBLE_BRICK_BLOCK
-                ),
-
-                new StructureUtil.StructurePart(
-                        new BlockPos(3, -3, 1), new BlockPos(3, -3, -1),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-3, -3, 1), new BlockPos(-3, -3, -1),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(1, -3, 3), new BlockPos(-1, -3, 3),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(1, -3, -3), new BlockPos(-1, -3, -3),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-
-                new StructureUtil.StructurePart(
-                        new BlockPos(2, -2, 1), new BlockPos(2, -2, -1),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-2, -2, 1), new BlockPos(-2, -2, -1),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(1, -2, 2), new BlockPos(-1, -2, 2),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(1, -2, -2), new BlockPos(-1, -2, -2),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-
-                new StructureUtil.StructurePart(
-                        new BlockPos(1, -1, 1), new BlockPos(1, -1, -1),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(-1, -1, 1), new BlockPos(-1, -1, -1),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(0, -1, 1), new BlockPos(0, -1, 1),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-                new StructureUtil.StructurePart(
-                        new BlockPos(0, -1, -1), new BlockPos(0, -1, -1),
-                        CustomBlocks.MARBLE_BRICK_STAIR_BLOCK
-                ),
-        };
-        structureSize = 107;
+    static{
+        structureName = "temple";
     }
 
     public RunicAltarEntity(BlockPos pos, BlockState blockState) {
@@ -461,7 +348,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
     public void onRemove() {
         dropItems();
         BarrierManager.removeBarriers(barriers);
-        updateOtherStates(false);
+        isValidStructure();
     }
 
     public void dropItems() {

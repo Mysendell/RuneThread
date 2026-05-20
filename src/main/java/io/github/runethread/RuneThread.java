@@ -3,6 +3,7 @@ package io.github.runethread;
 import com.mojang.logging.LogUtils;
 import io.github.runethread.attachments.BarrierTracker;
 import io.github.runethread.attachments.CustomDataAttachments;
+import io.github.runethread.config.RuneConfig;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.CustomBlocks;
 import io.github.runethread.customblocks.altar.RunicAltarEntity;
@@ -17,16 +18,13 @@ import io.github.runethread.datagen.properties.CollapseRune;
 import io.github.runethread.datagen.properties.PowerRune;
 import io.github.runethread.datagen.properties.RitualIndicator;
 import io.github.runethread.gui.CustomMenus;
-import io.github.runethread.gui.screens.AnimatorScreen;
-import io.github.runethread.gui.screens.ArcaneScreen;
-import io.github.runethread.gui.screens.RusticAltarScreen;
-import io.github.runethread.gui.screens.TempleAltarScreen;
+import io.github.runethread.gui.screens.*;
 import io.github.runethread.recipes.CustomRecipes;
 import io.github.runethread.rendering.BarrierRenderManager;
 import io.github.runethread.rendering.RunicAltarEntityRenderer;
-import io.github.runethread.util.Barrier;
-import io.github.runethread.util.BarrierManager;
-import io.github.runethread.util.RuneConfig;
+import io.github.runethread.util.runeutils.Barrier;
+import io.github.runethread.util.runeutils.BarrierManager;
+import io.github.runethread.util.structure.StructureLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -50,6 +48,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -99,6 +98,7 @@ public class RuneThread {
         CustomEffects.EFFECTS.register(modEventBus);
         CustomDataAttachments.ATTACHMENT_TYPES.register(modEventBus);
         NeoForge.EVENT_BUS.register(this);
+        //modEventBus.addListener(this::onAddReloadListeners); // TODO CHECK THIS
     }
 
     @SubscribeEvent
@@ -172,6 +172,12 @@ public class RuneThread {
         }
     }
 
+    @SubscribeEvent
+    public void onAddReloadListeners(AddServerReloadListenersEvent event) {
+        event.addListener(ResourceLocation.fromNamespaceAndPath("runethread", "structurelistener"), new StructureLoader());
+    }
+
+
     @EventBusSubscriber(value = Dist.CLIENT)
     public static class ClientEvents {
         @SubscribeEvent
@@ -213,6 +219,7 @@ public class RuneThread {
             event.register(CustomMenus.ANIMATOR_MENU.get(), AnimatorScreen::new);
             event.register(CustomMenus.RUSTIC_ALTAR_MENU.get(), RusticAltarScreen::new);
             event.register(CustomMenus.TEMPLE_ALTAR_MENU.get(), TempleAltarScreen::new);
+            event.register(CustomMenus.RUNE_ETCHER_MENU.get(), RuneEtcherScreen::new);
         }
 
         @SubscribeEvent

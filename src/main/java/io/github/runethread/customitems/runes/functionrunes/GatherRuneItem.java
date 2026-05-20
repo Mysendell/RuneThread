@@ -5,7 +5,7 @@ import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.util.AreaUtil;
 import io.github.runethread.util.ILocation;
 import io.github.runethread.util.InventoryUtil;
-import io.github.runethread.util.ModifierMap;
+import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -27,9 +27,8 @@ public class GatherRuneItem extends MainRuneItem{
     @Override
     public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         double radius = finalScale * ((MainRuneItem) mainStack.getItem()).getScale();
-        AreaUtil.iteratePerimeterCircle(level, destination.getLocation(level), radius, (args) -> {
+        AreaUtil.iteratePerimeterCircle(level, destination.getLocation(level), radius, (pos) -> {
             ParticleOptions particleOptions = new DustParticleOptions(6, 2.0f);
-            BlockPos pos = (BlockPos) args[0];
             level.sendParticles(particleOptions,
                     pos.getX() + 0.5,
                     pos.getY() + 0.1,

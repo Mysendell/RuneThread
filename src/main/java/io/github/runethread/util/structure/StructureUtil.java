@@ -1,48 +1,56 @@
-package io.github.runethread.util;
+package io.github.runethread.util.structure;
 
-import io.github.runethread.customblocks.structure.StructurePartBlock;
+import io.github.runethread.customblocks.structure.StructureCenterBlock;
+import io.github.runethread.customblocks.structure.StructureCenterEntity;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.github.runethread.RuneThread.MODID;
 
 public class StructureUtil {
-    public record StructurePart(BlockPos corner1, BlockPos corner2, DeferredBlock<? extends Block> block) {
+    private static Map<ResourceLocation, Structure> StructureMap = new HashMap<>();
+    public static void addModdedStructure(ResourceLocation resourceLocation, Structure structure) {
+        StructureMap.put(resourceLocation, structure);
+    }
+    public static Structure getModdedStructure(String structureName) throws ResourceLocationException {
+        Structure structure = StructureMap.get(ResourceLocation.fromNamespaceAndPath(MODID, structureName));
+        if (structure == null)
+            throw new ResourceLocationException("Unknown structure: " + structureName);
+        return structure;
     }
 
-    public static Structure ValidateAndAddStructure(StructurePart[] structure, BlockPos origin, Level level, int structureSize) {
-        Structure structureBlocks = new Structure(structureSize);
-        for (StructurePart part : structure) {
-            ValidateAndAddArea(part.corner1, part.corner2, origin, level, (DeferredBlock<StructurePartBlock>) part.block, structureBlocks);
+    public static boolean ValidateStructure(String structureName, StructureCenterEntity center, ServerLevel level) throws ResourceLocationException {
+        BlockPos origin = center.getBlockPos();
+        Structure structure = getModdedStructure(structureName);
+
+        for(Structure.StructurePart structurePart : structure){
+            BlockPos pos = structurePart.pos().offset(origin);
+            BlockState state = level.getBlockState(pos);
+            ResourceKey<Block> key = BuiltInRegistries.BLOCK.getResourceKey(state.getBlock()).orElseThrow();
+
+            if(structurePart.id().contains(level.registryAccess().holderOrThrow(key))) {
+                if(state.hasProperty(StructureCenterBlock.STRUCTURED)){
+                    level.setBlock(pos, state.setValue(StructureCenterBlock.STRUCTURED, true), 2);
+                    }
+            }
+            else{
+                return false;
+            }
         }
-        return structureBlocks;
-    }
-
-    public static void ValidateAndAddArea(BlockPos corner1, BlockPos corner2, BlockPos origin, Level level, DeferredBlock<StructurePartBlock> block, Structure structureBlocks) {
-        int minX = Math.min(corner1.getX(), corner2.getX());
-        int maxX = Math.max(corner1.getX(), corner2.getX());
-        int minY = Math.min(corner1.getY(), corner2.getY());
-        int maxY = Math.max(corner1.getY(), corner2.getY());
-        int minZ = Math.min(corner1.getZ(), corner2.getZ());
-        int maxZ = Math.max(corner1.getZ(), corner2.getZ());
-
-        for (int x = minX; x <= maxX; x++)
-            for (int y = minY; y <= maxY; y++)
-                for (int z = minZ; z <= maxZ; z++) {
-                    BlockPos checkPos = origin.offset(x, y, z);
-                    if (level.getBlockState(checkPos).is(block))
-                        structureBlocks.add(checkPos);
-                    else
-                        structureBlocks.setValid(false);
-                }
+        return true;
     }
 
     public static boolean saveStructure(BlockPos center, Vec3i size, boolean ignoreEntities, boolean writeToDisk, ServerLevel level, ResourceLocation structureName, String author) {
@@ -69,10 +77,6 @@ public class StructureUtil {
         } else {
             return true;
         }
-    }
-
-    public static StructureTemplate loadStructure(@NotNull ResourceLocation structureName, ServerLevel level){
-        return level.getStructureManager().get(structureName).orElse(null);
     }
 
     public static boolean placeStructure(StructureTemplate structureTemplate, ServerLevel level){

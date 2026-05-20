@@ -23,6 +23,8 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(CustomBlocks.RUNIC_ALTAR_BLOCK.get());
         dropSelf(CustomBlocks.MARBLE_BRICK_BLOCK.get());
         dropSelf(CustomBlocks.MARBLE_BRICK_STAIR_BLOCK.get());
+        dropSelf(CustomBlocks.RUNE_ETCHER.get());
+        add(CustomBlocks.COLLAPSE_STRUCTURE.get(), noDrop());
     }
     @Override
     protected Iterable<Block> getKnownBlocks() {

@@ -17,7 +17,6 @@ public class AnimatorScreen extends AbstractScreen<AnimatorMenu> {
 
     public AnimatorScreen(AnimatorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        GUI_TEXTURE = menu.getBackgroundTexture();
     }
 
     @Override

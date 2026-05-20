@@ -1,4 +1,4 @@
-package io.github.runethread.util;
+package io.github.runethread.util.runeutils;
 
 public enum ModifierRune {
     LIVING_RUNE("Living Rune"),

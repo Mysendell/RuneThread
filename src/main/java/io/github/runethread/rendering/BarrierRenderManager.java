@@ -3,8 +3,8 @@ package io.github.runethread.rendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import io.github.runethread.util.Barrier;
-import io.github.runethread.util.BarrierManager;
+import io.github.runethread.util.runeutils.Barrier;
+import io.github.runethread.util.runeutils.BarrierManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -22,7 +22,6 @@ public class BarrierRenderManager {
         Minecraft mc = Minecraft.getInstance();
         LevelRenderer levelRenderer = mc.levelRenderer;
 
-        // Example: Render all active barriers
         List<Barrier> barriers = BarrierManager.getActiveBarriers();
         synchronized (barriers) {
             for (Barrier barrier : BarrierManager.getActiveBarriers()) {
@@ -92,7 +91,6 @@ public class BarrierRenderManager {
                                  double minX, double minY, double minZ,
                                  double maxX, double maxY, double maxZ,
                                  float r, float g, float b, float a) {
-        // Normals for each face
         float[][] normals = {
                 { 0,  1,  0}, // up
                 { 0, -1,  0}, // down
@@ -123,7 +121,6 @@ public class BarrierRenderManager {
         addQuad(builder, matrix, maxX, maxY, minZ, maxX, maxY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, r, g, b, a, new float[]{-normals[5][0], -normals[5][1], -normals[5][2]}, 0.0f, 0.0f);
     }
 
-    // Add a quad (4 vertices)
     private static void addQuad(VertexConsumer builder, Matrix4f matrix,
                                 double x1, double y1, double z1,
                                 double x2, double y2, double z2,

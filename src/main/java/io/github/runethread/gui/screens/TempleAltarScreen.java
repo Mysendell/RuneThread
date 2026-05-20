@@ -8,7 +8,6 @@ import net.minecraft.world.entity.player.Inventory;
 public class TempleAltarScreen extends AbstractScreen<TempleAltarMenu> {
     public TempleAltarScreen(TempleAltarMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        GUI_TEXTURE = menu.getBackgroundTexture();
         imageWidth = 209;
         imageHeight = 224;
         inventoryLabelY = 114;

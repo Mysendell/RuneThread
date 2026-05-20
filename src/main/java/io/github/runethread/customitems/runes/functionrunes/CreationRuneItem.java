@@ -6,7 +6,7 @@ import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.util.ChatUtils;
 import io.github.runethread.util.ILocation;
 import io.github.runethread.util.InventoryUtil;
-import io.github.runethread.util.ModifierMap;
+import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

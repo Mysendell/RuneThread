@@ -3,7 +3,7 @@ package io.github.runethread.customitems.runes.functionrunes;
 import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.util.ILocation;
-import io.github.runethread.util.ModifierMap;
+import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

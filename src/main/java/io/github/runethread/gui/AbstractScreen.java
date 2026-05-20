@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -15,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * Provides basic defaults for rendering the GUI background.
  * @param <T> the type of the related menu
  */
-public class AbstractScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
+public class AbstractScreen<T extends AbstractMenu<?>> extends AbstractContainerScreen<T> {
     protected static ResourceLocation GUI_TEXTURE;
     /** The width of the texture file. Default is 256.
      */
@@ -38,6 +37,7 @@ public class AbstractScreen<T extends AbstractContainerMenu> extends AbstractCon
      */
     public AbstractScreen(T menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
+        GUI_TEXTURE = menu.getBackgroundTexture();
         imageWidth = 176;
         imageHeight = 166;
         offsetX = 0;

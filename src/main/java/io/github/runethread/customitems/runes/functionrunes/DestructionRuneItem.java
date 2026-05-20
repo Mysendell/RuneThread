@@ -2,10 +2,10 @@ package io.github.runethread.customitems.runes.functionrunes;
 
 import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.runes.MainRuneItem;
-import io.github.runethread.util.ExplosionUtil;
 import io.github.runethread.util.ILocation;
-import io.github.runethread.util.ModifierMap;
-import io.github.runethread.util.ModifierRune;
+import io.github.runethread.util.runeutils.ExplosionUtil;
+import io.github.runethread.util.runeutils.ModifierMap;
+import io.github.runethread.util.runeutils.ModifierRune;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static io.github.runethread.util.ModifierRune.*;
+import static io.github.runethread.util.runeutils.ModifierRune.*;
 
 public class DestructionRuneItem extends MainRuneItem{
     public DestructionRuneItem(Properties properties, int cost, double scale, double scalingCost, double breakChance) {

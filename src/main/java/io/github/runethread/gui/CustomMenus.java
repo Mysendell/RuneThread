@@ -1,10 +1,7 @@
 package io.github.runethread.gui;
 
 import io.github.runethread.RuneThread;
-import io.github.runethread.gui.menus.AnimatorMenu;
-import io.github.runethread.gui.menus.ArcaneMenu;
-import io.github.runethread.gui.menus.RusticAltarMenu;
-import io.github.runethread.gui.menus.TempleAltarMenu;
+import io.github.runethread.gui.menus.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -33,4 +30,7 @@ public class CustomMenus {
 
     public static final DeferredHolder<MenuType<?>, MenuType<TempleAltarMenu>> TEMPLE_ALTAR_MENU =
             registerMenuType("temple_altar_menu", TempleAltarMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<RuneEtcherMenu>> RUNE_ETCHER_MENU =
+            registerMenuType("rune_etcher_menu", RuneEtcherMenu::new);
 }

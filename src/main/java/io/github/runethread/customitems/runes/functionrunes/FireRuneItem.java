@@ -4,7 +4,7 @@ import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.util.AreaUtil;
 import io.github.runethread.util.ILocation;
-import io.github.runethread.util.ModifierMap;
+import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -24,8 +24,7 @@ public class FireRuneItem extends MainRuneItem{
         double radius = finalScale * ((MainRuneItem) mainStack.getItem()).getScale();
         BlockPos center = destination.getLocation(level);
         center = center.offset(0, 1, 0);
-        AreaUtil.iterateAreaSphere(level, center, radius, (args) -> {
-            BlockPos pos = (BlockPos) args[0];
+        AreaUtil.iterateAreaSphere(level, center, radius, (pos) -> {
             if (BaseFireBlock.canBePlacedAt(level, pos, Direction.DOWN)) {
                 BlockState blockstate = BaseFireBlock.getState(level, pos);
                 level.setBlockAndUpdate(pos, blockstate);

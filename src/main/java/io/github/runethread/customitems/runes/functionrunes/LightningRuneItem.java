@@ -5,7 +5,7 @@ import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.util.AreaUtil;
 import io.github.runethread.util.ILocation;
-import io.github.runethread.util.ModifierMap;
+import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,8 +39,7 @@ public class LightningRuneItem extends MainRuneItem{
         strength = strength == 0.0 ? 4.0 : strength;
         int finalStrength = (int) Math.pow(2, strength - 1);
         float damage = (float) (strengthScale / (item.getScale() * 2.0 * finalStrength));
-        AreaUtil.iterateAreaSphere(level, destination.getLocation(level), radius, (args) -> {
-            BlockPos pos = (BlockPos) args[0];
+        AreaUtil.iterateAreaSphere(level, destination.getLocation(level), radius, (pos) -> {
             for (int i = 0; i < finalStrength; i++)
                 EntityType.LIGHTNING_BOLT.spawn(level, pos, EntitySpawnReason.TRIGGERED).setDamage(damage);
         });

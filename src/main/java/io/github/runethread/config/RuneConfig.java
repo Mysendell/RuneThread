@@ -1,4 +1,4 @@
-package io.github.runethread.util;
+package io.github.runethread.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 

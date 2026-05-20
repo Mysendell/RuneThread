@@ -20,7 +20,10 @@
   "block.runethread.tsavorite_ore": "Tsavorite Ore",
   "block.runethread.marble_bricks": "Marble Bricks",
   "block.runethread.marble_brick_stairs": "Marble Brick Stairs",
+  "block.runethread.rune_etcher": "Rune Etcher",
 
-  "effect.runethread.immunity": "Immunity"
+  "effect.runethread.immunity": "Immunity",
+  "container.rune_etcher": "Rune Etcher",
+  "container.runic_altar": "Runic Altar"
 
 }

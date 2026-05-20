@@ -1,0 +1,60 @@
+{
+  "mapping": {
+    "B": "runethread:marble",
+    "S": "runethread:marble_brick_stairs",
+    "0": "runethread:runic_altar"
+  },
+  "rotation": 0,
+  "center": [
+    3,
+    3,
+    3
+  ],
+  "structure": [
+    [
+      "B     B",
+      "       ",
+      "       ",
+      "       ",
+      "       ",
+      "       ",
+      "B     B"
+    ],
+    [
+      "B     B",
+      " B   B ",
+      "       ",
+      "   0   ",
+      "       ",
+      " B   B ",
+      "B     B"
+    ],
+    [
+      "B     B",
+      " B   B ",
+      "  SSS  ",
+      "  SBS  ",
+      "  SSS  ",
+      " B   B ",
+      "B     B"
+    ],
+    [
+      "B     B",
+      " BSSSB ",
+      " SBBBS ",
+      " SBBBS ",
+      " SBBBS ",
+      " BSSSB ",
+      "B     B"
+    ],
+    [
+      "BBSSSBB",
+      "BBBBBBB",
+      "SBBBBBS",
+      "SBBBBBS",
+      "SBBBBBS",
+      "BBBBBBB",
+      "BBSSSBB"
+    ]
+  ]
+}

@@ -1,5 +1,6 @@
-package io.github.runethread.util;
+package io.github.runethread.util.runeutils;
 
+import io.github.runethread.util.AreaUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -33,8 +34,7 @@ public class ExplosionUtil {
      */
     public static void accurateExplosion(ServerLevel level, BlockPos center, double radius, boolean dropBlocks, List<ResourceLocation> filter, boolean reverse, ModifierRune shape, boolean damageEntities, double damage) {
         if (!(filter.isEmpty() && reverse))
-            AreaUtil.iterateAreaShape(shape, level, center, radius, (args) -> {
-                BlockPos pos = (BlockPos) args[0];
+            AreaUtil.iterateAreaShape(shape, level, center, radius, (pos) -> {
                 BlockState state = level.getBlockState(pos);
                 ResourceLocation blockKey = BuiltInRegistries.BLOCK.getKey(state.getBlock());
                 if (!state.isAir() && filter.contains(blockKey) == reverse) {

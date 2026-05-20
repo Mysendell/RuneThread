@@ -153,7 +153,6 @@ public class ModModelProvider extends ModelProvider {
                                 PropertyDispatch.property(BlockStateProperties.HORIZONTAL_FACING)
                                         .generate(facing -> {
                                             int y = switch (facing) {
-                                                case NORTH -> 0;
                                                 case EAST -> 90;
                                                 case SOUTH -> 180;
                                                 case WEST -> 270;
@@ -175,6 +174,24 @@ public class ModModelProvider extends ModelProvider {
                                         })
                         )
         );
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.multiVariant(CustomBlocks.RUNE_ETCHER.get())
+                        .with(
+                                PropertyDispatch.property(BlockStateProperties.HORIZONTAL_FACING)
+                                        .generate(facing -> {
+                                            int y = switch (facing) {
+                                                case EAST -> 90;
+                                                case SOUTH -> 180;
+                                                case WEST -> 270;
+                                                default -> 0;
+                                            };
+                                            return Variant.variant()
+                                                    .with(VariantProperties.MODEL, ResourceLocation.fromNamespaceAndPath("runethread", "block/rune_etcher"))
+                                                    .with(VariantProperties.Y_ROT, VariantProperties.Rotation.values()[y / 90]);
+                                        })
+                        )
+        );
+        blockModels.createNonTemplateModelBlock(CustomBlocks.COLLAPSE_STRUCTURE.get());
     }
 
     @Override

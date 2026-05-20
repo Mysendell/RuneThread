@@ -1,5 +1,6 @@
 package io.github.runethread.util;
 
+import io.github.runethread.util.runeutils.ModifierRune;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 public class AreaUtil {
     public interface AreaInterface {
-        void action(Object... args);
+        void action(BlockPos pos);
     }
 
     private record Bounding3D(int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {

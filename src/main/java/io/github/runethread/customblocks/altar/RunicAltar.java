@@ -2,7 +2,7 @@ package io.github.runethread.customblocks.altar;
 
 import com.mojang.serialization.MapCodec;
 import io.github.runethread.customblocks.CustomBlockEntities;
-import io.github.runethread.customblocks.structure.StructurePartBlock;
+import io.github.runethread.customblocks.structure.StructureCenterBlock;
 import io.github.runethread.customitems.CustomItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -14,7 +14,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -28,7 +27,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class RunicAltar extends StructurePartBlock {
+public class RunicAltar extends StructureCenterBlock {
     private static final MapCodec<RunicAltar> CODEC = simpleCodec(RunicAltar::new);
 
     public static final EnumProperty<RunicAltarEntity.RitualState> RITUAL_STATE = EnumProperty.create("ritual_state", RunicAltarEntity.RitualState.class);
@@ -48,12 +47,6 @@ public class RunicAltar extends StructurePartBlock {
         builder.add(RITUAL_STATE);
     }
 
-    @Nullable
-    @Override
-    public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(STRUCTURED, true);
-    }
-
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         RunicAltarEntity entity = new RunicAltarEntity(pos, state);
@@ -65,7 +58,7 @@ public class RunicAltar extends StructurePartBlock {
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.getBlockEntity(pos) instanceof RunicAltarEntity runicAltarEntity) {
             if (!level.isClientSide) {
-                (player).openMenu(new SimpleMenuProvider(runicAltarEntity, Component.literal("Runic Altar")), pos);
+                (player).openMenu(new SimpleMenuProvider(runicAltarEntity, Component.translatable("container.runic_altar")), pos);
                 return InteractionResult.SUCCESS;
             }
         }

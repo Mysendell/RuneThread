@@ -8,6 +8,5 @@ import net.minecraft.world.entity.player.Inventory;
 public class ArcaneScreen extends AbstractScreen<ArcaneMenu> {
     public ArcaneScreen(ArcaneMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        GUI_TEXTURE = menu.getBackgroundTexture();
     }
 }
