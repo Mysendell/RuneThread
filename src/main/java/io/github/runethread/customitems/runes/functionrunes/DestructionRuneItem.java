@@ -25,14 +25,13 @@ public class DestructionRuneItem extends MainRuneItem{
 
     @Override
     public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
-        MainRuneItem item = (MainRuneItem) mainStack.getItem();
         boolean damageEntities = additionalData.hasModifier(LIVING_RUNE);
         boolean dropBlocks = additionalData.hasModifier(NULL_RUNE);
         List<ResourceLocation> filter = additionalData.getAllIdentifiersOfType(BlockItem.class);
         boolean reversedFilter = additionalData.hasModifier(REVERSE_RUNE);
         ModifierRune shape = additionalData.getShape();
-        ExplosionUtil.accurateExplosion(level, destination.getLocation(level), finalScale * item.getScale(),
-                dropBlocks, filter, reversedFilter, shape, damageEntities, item.getScale() * finalScale * 1.5f);
+        ExplosionUtil.accurateExplosion(level, destination.getLocation(level), finalScale * getScale(),
+                dropBlocks, filter, reversedFilter, shape, damageEntities, getScale() * finalScale * 1.5f);
         return RunicAltarEntity.RitualState.SUCCESS;
     }
 }

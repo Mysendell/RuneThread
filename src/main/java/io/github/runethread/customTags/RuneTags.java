@@ -13,6 +13,6 @@ public class RuneTags {
         public static final TagKey<Item> POWER_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "power_tag"));
         public static final TagKey<Item> MODIFIER_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "modifier_rune_tag"));
         public static final TagKey<Item> NATURE_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "nature_rune_tag"));
-        public static final TagKey<Item> FUNCTION_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "function_rune_tag"));
+        public static final TagKey<Item> FUNCTION_RUNE_TAG = TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, "function_rune_tag")); // TODO Maybe remove one of these
     }
 }

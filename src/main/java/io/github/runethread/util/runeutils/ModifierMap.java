@@ -7,10 +7,18 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static io.github.runethread.util.runeutils.ModifierRune.*;
 
-public class ModifierMap extends HashMap<String, ItemStack> {
+public class ModifierMap extends HashMap<ResourceLocation, ItemStack> {
+    public ModifierMap(Map<ResourceLocation, ItemStack> map) {
+        super(map);
+    }
+    public ModifierMap() {
+        super();
+    }
+
     public ItemStack getModifierRune(ModifierRune modifierName) {
         return this.get(modifierName.toString());
     }
@@ -23,7 +31,7 @@ public class ModifierMap extends HashMap<String, ItemStack> {
     }
 
     public boolean hasModifier(ModifierRune modifierName) {
-        return this.containsKey(modifierName.toString());
+        return this.containsKey(modifierName.getName());
     }
 
     public <T extends Item> List<T> getAllOfType(Class<T> clazz) {

@@ -17,15 +17,15 @@ public class ArcaneMenu extends AbstractMenu<ArcaneTableEntity> {
 
     public ArcaneMenu(int id, Inventory playerInv, FriendlyByteBuf buf) {
         this(id, playerInv, playerInv.player.level().getBlockEntity(buf.readBlockPos()));
-        TE_INVENTORY_SLOT_COUNT = 10;
+        TE_INVENTORY_SLOT_COUNT = 9;
     }
 
     public ArcaneMenu(int id, Inventory playerInv, BlockEntity blockEntity) {
         super(id, playerInv, blockEntity, ARCANE_MENU.get());
         this.inventory = ((ArcaneTableEntity) blockEntity).getInput();
 
-        addPlayerInventory(playerInv, 8, 84, 18, 18);
         addPlayerHotbar(playerInv, 8, 142, 18);
+        addPlayerInventory(playerInv, 8, 84, 18, 18);
         addArcaneTableSlots();
     }
 

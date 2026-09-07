@@ -4,7 +4,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 
 import java.util.Objects;
 
@@ -25,20 +24,20 @@ public class ChatUtils {
         }
     }
 
-    public static void clearChat(Level level) {
+    public static void clearChat(ServerLevel level) {
         Objects.requireNonNull(level.getServer()).getPlayerList().broadcastSystemMessage(Component.empty(), false);
     }
 
-    public static void sendErrorMessageAll(String message, Level level) {
+    public static void sendErrorMessageAll(String message, ServerLevel level) {
         sendMessageAll(Component.literal(message).withStyle(ChatFormatting.RED, ChatFormatting.BOLD), level);
     }
-    public static void sendInfoMessageAll(String message, Level level) {
+    public static void sendInfoMessageAll(String message, ServerLevel level) {
         sendMessageAll(Component.literal(message).withStyle(ChatFormatting.BLUE), level);
     }
-    public static void sendSuccessMessageAll(String message, Level level) {
+    public static void sendSuccessMessageAll(String message, ServerLevel level) {
         sendMessageAll(Component.literal(message).withStyle(ChatFormatting.GREEN), level);
     }
-    public static void sendMessageAll(Component messageComponent, Level level) {
+    public static void sendMessageAll(Component messageComponent, ServerLevel level) {
         Objects.requireNonNull(level.getServer()).getPlayerList().broadcastSystemMessage(messageComponent, false);
     }
 }

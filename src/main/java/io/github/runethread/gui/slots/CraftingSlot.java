@@ -3,7 +3,6 @@ package io.github.runethread.gui.slots;
 import io.github.runethread.customblocks.craftingtable.ICraftingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -45,12 +44,12 @@ public class CraftingSlot extends SlotItemHandler {
     public CraftingSlot(IItemHandler itemHandler, int slot, int x, int y, ICraftingEntity blockEntity) {
         super(itemHandler, slot, x, y);
         this.blockEntity = blockEntity;
-        this.slotType = new BlockEntitySlot(itemHandler, slot, x, y, (BlockEntity) blockEntity);
+        this.slotType = null;
     }
 
     @Override
     public boolean mayPlace(@NotNull ItemStack stack) {
-        return super.mayPlace(stack) && slotType.mayPlace(stack);
+        return super.mayPlace(stack) && (slotType == null || slotType.mayPlace(stack));
     }
 
     /**
@@ -72,9 +71,9 @@ public class CraftingSlot extends SlotItemHandler {
      */
     @Override
     public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
-        super.onTake(player, stack);
         if (!blockEntity.getLevel().isClientSide()) {
             blockEntity.scheduleCraftingUpdate();
         }
+        super.onTake(player, stack);
     }
 }

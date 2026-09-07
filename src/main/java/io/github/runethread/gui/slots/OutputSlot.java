@@ -1,17 +1,22 @@
 package io.github.runethread.gui.slots;
 
 import io.github.runethread.customblocks.craftingtable.ICraftingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 
 /**
- * A CraftingSlot that only allows item extraction, not placement.
+ * A CraftingSlot that optionally allows placement.
  * @see ISlotType
  * @see CraftingSlot
  */
 public class OutputSlot extends CraftingSlot {
+
+    private final Level level;
+    private final boolean mayPlace;
 
     /**
      * Creates a new OutputSlot.
@@ -21,8 +26,10 @@ public class OutputSlot extends CraftingSlot {
      * @param y the y position of the slot on the GUI
      * @param blockEntity the crafting entity this slot belongs to
      */
-    public OutputSlot(IItemHandler itemHandler, int slotIndex, int x, int y, ICraftingEntity blockEntity) {
+    public OutputSlot(IItemHandler itemHandler, Level level, int slotIndex, int x, int y, ICraftingEntity blockEntity, boolean mayPlace) {
         super(itemHandler, slotIndex, x, y, blockEntity);
+        this.level = level;
+        this.mayPlace = mayPlace;
     }
 
 
@@ -34,6 +41,12 @@ public class OutputSlot extends CraftingSlot {
      */
     @Override
     public boolean mayPlace(@NotNull ItemStack stack) {
-        return false;
+        return mayPlace;
+    }
+
+    @Override
+    public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
+        blockEntity.doCraft(level, stack, player);
+        super.onTake(player, stack);
     }
 }

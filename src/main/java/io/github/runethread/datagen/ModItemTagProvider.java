@@ -37,7 +37,12 @@ public class ModItemTagProvider extends ItemTagsProvider {
                 .add(TRANSMUTATION_RUNE.get())
                 .add(COLLAPSE_RUNE.get())
                 .add(PROTECTION_RUNE.get())
-                .add(PORTAL_RUNE.get());
+                .add(PORTAL_RUNE.get())
+                .add(COMPOSITE_RUNE.get())
+
+                .add(LIGHTNING_RUNE.get())
+                .add(FIRE_RUNE.get())
+                .add(DESTRUCTION_RUNE.get());
 
         tag(RuneTags.Items.POWER_TAG)
                 .add(POWER_RUNE.get());

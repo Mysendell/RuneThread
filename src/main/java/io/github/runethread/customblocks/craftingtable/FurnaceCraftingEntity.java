@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -72,8 +74,9 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
         if (burnTime >= (recipeBurnTime + furnaceSpeed)) {
             if(!outputRecipe())
                 return;
+            scheduleCraftingUpdate();
             burnTime = 0;
-        } else {
+        } else if(recipe != null){
             if (fuelBurnTime == 0 && !updateFuel())
                 return;
             burnTime++;
@@ -139,6 +142,7 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
         }
     }
 
+    @Override
     public void scheduleCraftingUpdate() {
         this.setChanged();
         Optional<RecipeHolder<CraftingRecipe>> recipeOpt = canCraft(level);
@@ -155,10 +159,12 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
         }
     }
 
+    @Override
     public ItemStackHandler getInput() {
         return input;
     }
 
+    @Override
     public ItemStackHandler getOutput() {
         return output;
     }
@@ -178,5 +184,7 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
     public int getFuelBurnTime() {
         return fuelBurnTime;
     }
+
+    public void doCraft(Level level, @NotNull ItemStack stack, Player player){}
 }
 

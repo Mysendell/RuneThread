@@ -2,6 +2,7 @@ package io.github.runethread.customitems.runes;
 
 import io.github.runethread.customitems.runes.functionrunes.RuneFunction;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class MainRuneItem extends Item implements RuneFunction {
     private final int cost;
@@ -21,23 +22,43 @@ public abstract class MainRuneItem extends Item implements RuneFunction {
         return distance <= range;
     }
 
-    public int getCost() {
+    protected int getCost() {
         return cost;
     }
 
-    public double getScale() {
+    protected double getScale() {
         return scale;
     }
 
-    public double getScalingCost() {
+    protected double getScalingCost() {
         return scalingCost;
     }
 
-    public double getBreakChance() {
+    protected double getBreakChance() {
         return breakChance;
     }
 
-    public boolean requiresReference() {
+    protected boolean requiresReference() {
+        return false;
+    }
+
+    public int getCost(ItemStack mainRune) {
+        return cost;
+    }
+
+    public double getScale(ItemStack mainRune) {
+        return scale;
+    }
+
+    public double getScalingCost(ItemStack mainRune) {
+        return scalingCost;
+    }
+
+    public double getBreakChance(ItemStack mainRune) {
+        return breakChance;
+    }
+
+    public boolean requiresReference(ItemStack mainRune) {
         return false;
     }
 }

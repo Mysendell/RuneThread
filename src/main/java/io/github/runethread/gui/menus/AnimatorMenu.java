@@ -38,8 +38,8 @@ public class AnimatorMenu extends AbstractMenu<AnimatorCraftingEntity> {
 
         TE_INVENTORY_SLOT_COUNT = 4;
 
-        addPlayerInventory(playerInv, 8, 84, 18, 18);
         addPlayerHotbar(playerInv, 8, 142, 18);
+        addPlayerInventory(playerInv, 8, 84, 18, 18);
         addAnimatorTableSlots();
 
         this.addDataSlot(new DataSlot() {
@@ -78,7 +78,7 @@ public class AnimatorMenu extends AbstractMenu<AnimatorCraftingEntity> {
     }
 
     private void addAnimatorTableSlots() {
-        this.addSlot(new OutputSlot(output, 0, 98, 39, blockEntity));
+        this.addSlot(new OutputSlot(output, level, 0, 98, 39, blockEntity, false));
         this.addSlot(new CraftingSlot(input, 0, 17, 21, blockEntity));
         this.addSlot(new SlotItemHandler(fuel, 0, 17, 57));
         this.addSlot(new CraftingSlot(lifeEnergy, 0, 44, 21, blockEntity));

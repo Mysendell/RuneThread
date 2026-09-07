@@ -1,6 +1,6 @@
 {
   "mapping": {
-    "B": "runethread:marble",
+    "B": "runethread:marble_bricks",
     "S": "runethread:marble_brick_stairs",
     "0": "runethread:runic_altar"
   },

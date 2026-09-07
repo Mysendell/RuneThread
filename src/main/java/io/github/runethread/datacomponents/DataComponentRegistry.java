@@ -3,9 +3,11 @@ package io.github.runethread.datacomponents;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.runethread.RuneThread;
+import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
@@ -79,6 +81,16 @@ public class DataComponentRegistry {
                             instance.group(
                                     ResourceLocation.CODEC.fieldOf("structureName").forGetter(StructureData::structureName)
                             ).apply(instance, StructureData::new)
+                    ))
+            );
+    public static final Supplier<DataComponentType<CompositeRuneData>> COMPOSITE_RUNE =
+            DATA_COMPONENTS.registerComponentType(
+                    "composite_rune",
+                    builder -> builder.persistent(RecordCodecBuilder.create(instance ->
+                            instance.group(
+                                    ResourceLocation.CODEC.fieldOf("mainRune").forGetter(CompositeRuneData::mainRuneString),
+                                    Codec.unboundedMap(ResourceLocation.CODEC, ItemStack.CODEC).xmap(ModifierMap::new, mod -> mod).fieldOf("modifiers").forGetter(CompositeRuneData::modifiers)
+                                    ).apply(instance, CompositeRuneData::new)
                     ))
             );
 }

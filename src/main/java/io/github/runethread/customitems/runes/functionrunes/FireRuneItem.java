@@ -21,10 +21,10 @@ public class FireRuneItem extends MainRuneItem{
 
     @Override
     public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
-        double radius = finalScale * ((MainRuneItem) mainStack.getItem()).getScale();
+        double radius = finalScale * getScale();
         BlockPos center = destination.getLocation(level);
         center = center.offset(0, 1, 0);
-        AreaUtil.iterateAreaSphere(level, center, radius, (pos) -> {
+        AreaUtil.iterateAreaSphere(level, center, radius, (pos) -> { //TODO implement rest of modifiers
             if (BaseFireBlock.canBePlacedAt(level, pos, Direction.DOWN)) {
                 BlockState blockstate = BaseFireBlock.getState(level, pos);
                 level.setBlockAndUpdate(pos, blockstate);

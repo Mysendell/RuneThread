@@ -2,6 +2,7 @@ package io.github.runethread.customitems;
 
 import io.github.runethread.RuneThread;
 import io.github.runethread.customentities.customEntities;
+import io.github.runethread.customitems.runes.CompositeRuneItem;
 import io.github.runethread.customitems.runes.LocationRuneItem;
 import io.github.runethread.customitems.runes.PowerRuneItem;
 import io.github.runethread.customitems.runes.ScaleRuneItem;
@@ -112,13 +113,16 @@ public class CustomItems {
     public static final DeferredItem<Item> PROTECTION_RUNE = ITEMS.registerItem("protection_rune",
             (properties) -> new ProtectionRuneItem(properties.stacksTo(16).fireResistant(), 10, 10, 1.5f, 0.3));
 
+    public static final DeferredItem<Item> COMPOSITE_RUNE = ITEMS.registerItem("composite_rune",
+            (properties) -> new CompositeRuneItem(properties.stacksTo(16).fireResistant(), 1, 1, 1, 0));
+
     public static final DeferredItem<Item>[] simpleItems = new DeferredItem[]{
             UP_RUNE, DOWN_RUNE, LEFT_RUNE, RIGHT_RUNE, LIVING_RUNE,
             ALPHA_RUNE, BETA_RUNE, LAMBDA_RUNE, TAU_RUNE,
             CIRCLE_RUNE, SQUARE_RUNE, NULL_RUNE, REVERSE_RUNE,
             CREATION_RUNE, FIRE_RUNE, GATHER_RUNE,
             LIGHTNING_RUNE, TRANSMUTATION_RUNE, DESTRUCTION_RUNE,
-            PORTAL_RUNE, PROTECTION_RUNE, SCALE_RUNE, POWER_GEM
+            PORTAL_RUNE, PROTECTION_RUNE, SCALE_RUNE, POWER_GEM, COMPOSITE_RUNE
     };
 
     public static void CreativeTabItems(CreativeModeTab.Output output) {
@@ -150,6 +154,7 @@ public class CustomItems {
         output.accept(NULL_RUNE.get());
         output.accept(SCALE_RUNE);
         output.accept(REVERSE_RUNE.get());
+        output.accept(COMPOSITE_RUNE.get());
 
         ItemStack powerRuneStack = new ItemStack(POWER_RUNE.get());
         powerRuneStack.set(DataComponentRegistry.POWER_DATA, new PowerData(1));

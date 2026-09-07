@@ -66,6 +66,10 @@ public class CustomBlocks {
         return block;
     }
 
+    public static final DeferredBlock<Block>[] simpleBlocks = new DeferredBlock[]{
+            RUNE_ETCHER
+    };
+
     public static void CreativeTabBlocks(CreativeModeTab.Output output) {
         output.accept(ARCANE_TABLE_BLOCK);
         output.accept(ANIMATOR_BLOCK);

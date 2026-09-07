@@ -47,7 +47,7 @@ public class CraftingOutputSlot extends CraftingSlot {
      */
     @Override
     public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
-        blockEntity.doCraft(level);
+        blockEntity.doCraft(level, stack, player);
         super.onTake(player, stack);
     }
 

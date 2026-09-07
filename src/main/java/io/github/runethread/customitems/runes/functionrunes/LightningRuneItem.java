@@ -23,7 +23,6 @@ public class LightningRuneItem extends MainRuneItem{
     public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         double radiusScale, strengthScale;
         radiusScale = strengthScale = finalScale;
-        MainRuneItem item = (MainRuneItem) mainStack.getItem();
         if (additionalData.containsKey("Scale Rune: MODIFIER")) {
             ItemStack scaleRune = additionalData.get("Scale Rune: MODIFIER");
             double scale = scaleRune.get(DataComponentRegistry.SCALE_DATA).scale();
@@ -34,11 +33,11 @@ public class LightningRuneItem extends MainRuneItem{
             strengthScale *= 1 / scale;
         }
 
-        int radius = (int) Math.round(radiusScale / item.getScale());
-        double strength = strengthScale % item.getScale();
+        int radius = (int) Math.round(radiusScale / getScale());
+        double strength = strengthScale % getScale();
         strength = strength == 0.0 ? 4.0 : strength;
         int finalStrength = (int) Math.pow(2, strength - 1);
-        float damage = (float) (strengthScale / (item.getScale() * 2.0 * finalStrength));
+        float damage = (float) (strengthScale / (getScale() * 2.0 * finalStrength));
         AreaUtil.iterateAreaSphere(level, destination.getLocation(level), radius, (pos) -> {
             for (int i = 0; i < finalStrength; i++)
                 EntityType.LIGHTNING_BOLT.spawn(level, pos, EntitySpawnReason.TRIGGERED).setDamage(damage);

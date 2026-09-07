@@ -7,6 +7,8 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import static io.github.runethread.RuneThread.MODID;
+import static io.github.runethread.customblocks.CustomBlocks.simpleBlocks;
 import static io.github.runethread.customitems.CustomItems.simpleItems;
 
 public class ModLangProvider implements DataProvider {
@@ -30,19 +33,10 @@ public class ModLangProvider implements DataProvider {
         Path path = output.getOutputFolder().resolve("assets/runethread/lang/en_us.json");
         JsonObject json = new JsonObject();
         for(DeferredItem<Item> item : simpleItems) {
-            String name = item.getRegisteredName();
-            name = name.replace(MODID+":", "");
-            String key = "item.runethread." + name;
-            StringBuilder translation = new StringBuilder();
-
-            String[] nameParts = name.split("_");
-            for(String part : nameParts) {
-                char firstChar = part.charAt(0);
-                translation.append(part.replaceFirst(Character.toString(firstChar), Character.toString(Character.toUpperCase(firstChar))));
-                translation.append(" ");
-            }
-
-            json.addProperty(key, translation.toString().trim());
+            createKey(json, item.getRegisteredName());
+        }
+        for(DeferredBlock<Block> block : simpleBlocks) {
+            createKey(json, block.getRegisteredName());
         }
         Path expectionsPath = output.getOutputFolder().resolve("../../main/resources/temp/lang/en_us.json");
         if(Files.notExists(expectionsPath))
@@ -63,6 +57,22 @@ public class ModLangProvider implements DataProvider {
             throw new RuntimeException("Expected a JSON object in " + expectionsPath);
         }
         return DataProvider.saveStable(cache, json, path);
+    }
+
+    private void createKey(JsonObject json, String registeredName) {
+        String name = registeredName;
+        name = name.replace(MODID+":", "");
+        String key = "item.runethread." + name;
+        StringBuilder translation = new StringBuilder();
+
+        String[] nameParts = name.split("_");
+        for(String part : nameParts) {
+            char firstChar = part.charAt(0);
+            translation.append(part.replaceFirst(Character.toString(firstChar), Character.toString(Character.toUpperCase(firstChar))));
+            translation.append(" ");
+        }
+
+        json.addProperty(key, translation.toString().trim());
     }
 
     @Override

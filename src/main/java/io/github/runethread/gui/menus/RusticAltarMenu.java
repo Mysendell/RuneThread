@@ -28,8 +28,8 @@ public class RusticAltarMenu extends AbstractMenu<RunicAltarEntity> {
             destinationRune = ((RunicAltarEntity) blockEntity).getDestinationRune();
             power = ((RunicAltarEntity) blockEntity).getPower();
 
-            addPlayerInventory(playerInv, 8, 84, 18, 18);
             addPlayerHotbar(playerInv, 8, 142, 18);
+            addPlayerInventory(playerInv, 8, 84, 18, 18);
             addRunicAltarSlots();
 
             TE_INVENTORY_SLOT_COUNT = 3;

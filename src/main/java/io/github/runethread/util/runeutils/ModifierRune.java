@@ -1,25 +1,27 @@
 package io.github.runethread.util.runeutils;
 
-public enum ModifierRune {
-    LIVING_RUNE("Living Rune"),
-    UP_RUNE("Up Rune"),
-    DOWN_RUNE("Down Rune"),
-    LEFT_RUNE("Left Rune"),
-    RIGHT_RUNE("Right Rune"),
-    NULL_RUNE("Null Rune"),
-    REVERSE_RUNE("Reverse Rune"),
-    SCALE_RUNE("Scale Rune"),
-    SPHERE_RUNE("Sphere Rune"),
-    CIRCLE_RUNE("Circle Rune"),
-    SQUARE_RUNE("Square Rune");
+import io.github.runethread.RuneThread;
+import net.minecraft.resources.ResourceLocation;
 
-    private final String name;
-    ModifierRune(String name) {
+public enum ModifierRune {
+    LIVING_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"living_rune")),
+    UP_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"up_rune")),
+    DOWN_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"down_rune")),
+    LEFT_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"left_une")),
+    RIGHT_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"right_rune")),
+    NULL_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"null_rune")),
+    REVERSE_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"reverse_rune")),
+    SCALE_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"scale_rune")),
+    SPHERE_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"sphere_rune")),
+    CIRCLE_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"circle_rune")),
+    SQUARE_RUNE(ResourceLocation.fromNamespaceAndPath(RuneThread.MODID,"square_rune"));
+
+    private final ResourceLocation name;
+    ModifierRune(ResourceLocation name) {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
+    public ResourceLocation getName() {
         return name;
     }
 }

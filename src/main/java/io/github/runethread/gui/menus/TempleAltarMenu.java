@@ -35,8 +35,8 @@ public class TempleAltarMenu extends AbstractMenu<RunicAltarEntity> {
         } else {
             throw new IllegalArgumentException("Block entity must be an instance of RunicAltarEntity");
         }
-        addPlayerInventory(playerInv, 32, 127, 18, 18);
         addPlayerHotbar(playerInv, 32, 185, 18);
+        addPlayerInventory(playerInv, 32, 127, 18, 18);
         addRunicAltarSlots();
         TE_INVENTORY_SLOT_COUNT = 23;
     }

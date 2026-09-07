@@ -21,6 +21,7 @@ import io.github.runethread.util.runeutils.BarrierManager;
 import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -40,6 +41,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.github.runethread.util.runeutils.ModifierRune.SCALE_RUNE;
 
 public class RunicAltarEntity extends StructureCenterEntity implements MenuProvider {
     public enum RitualState implements StringRepresentable {
@@ -113,7 +116,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
         for (int i = 0; i < targetRune.getSlots(); i++) {
             ItemStack targetRuneStack = targetRune.getStackInSlot(i);
             if (targetRuneStack.isEmpty()) continue;
-            additionalData.put(targetRuneStack.getItemName().getString(), targetRuneStack);
+            additionalData.put(BuiltInRegistries.ITEM.getKey(targetRuneStack.getItem()), targetRuneStack);
         }
 
         energy = perform(energy, additionalData);
@@ -147,7 +150,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
             ILocation reference = null;
             if (!referenceRuneStack.isEmpty())
                 reference = getLocationFromItem(referenceRuneStack);
-            else if (mainRuneItem.requiresReference())
+            else if (mainRuneItem.requiresReference(mainRuneStack))
                 throw new MissingRuneException("Ritual failed: Reference rune is missing!");
 
             LocationRuneItem destinationRuneItem = (LocationRuneItem) destinationRuneStack.getItem();
@@ -156,21 +159,21 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
 
             double distance = getDistance(reference, destination);
 
-            double scalingCost = mainRuneItem.getScalingCost();
-            int cost = mainRuneItem.getCost();
-            if (additionalData.containsKey("Scale Rune: POWER")) {
+            double scalingCost = mainRuneItem.getScalingCost(mainRuneStack);
+            int cost = mainRuneItem.getCost(mainRuneStack);
+            /*if (additionalData.containsKey("Scale Rune: POWER")) { //TODO reimplement this in the power section
                 ItemStack scaleRuneStack = additionalData.get("Scale Rune: POWER");
                 double scale = scaleRuneStack.getOrDefault(DataComponentRegistry.SCALE_DATA, new ScaleData(0, ScaleData.Mode.SCALE)).scale();
                 if (scale >= 1)
                     usableEnergy = scale;
                 else if (scale > 0)
                     usableEnergy *= scale;
-            }
+            }*/
 
             maxScale = getScale(usableEnergy, cost, scalingCost);
             if (maxScale <= 0) throw new InsufficientEnergyException("Ritual failed: Not enough energy!");
-            if (additionalData.containsKey("Scale Rune: SCALE")) {
-                ItemStack scaleRuneStack = additionalData.get("Scale Rune: SCALE");
+            if (additionalData.hasModifier(SCALE_RUNE)) {
+                ItemStack scaleRuneStack = additionalData.get(SCALE_RUNE.getName());
                 double scale = scaleRuneStack.getOrDefault(DataComponentRegistry.SCALE_DATA, new ScaleData(0, ScaleData.Mode.SCALE)).scale();
                 if (scale >= 1)
                     actualScale = Math.min(maxScale, scale);
@@ -203,7 +206,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
                     additionalData
             ));
 
-            if (Math.random() < mainRuneItem.getBreakChance())
+            if (Math.random() < mainRuneItem.getBreakChance(mainRuneStack))
                 mainRuneStack.shrink(1);
             destinationRuneStack.shrink(1);
             referenceRuneStack.shrink(1);
@@ -223,7 +226,7 @@ public class RunicAltarEntity extends StructureCenterEntity implements MenuProvi
                     ChatUtils.sendInfoMessagePlayer(playerName, "Ritual invalid!", level);
                 else
                     ChatUtils.sendInfoMessagePlayer(playerName, "Ritual valid!", level);
-                ChatUtils.sendErrorMessagePlayer(playerName, "!Values are rounded!", level);
+                ChatUtils.sendErrorMessagePlayer(playerName, "!Values are rounded!", level); // TODO unround 'em
                 ChatUtils.sendInfoMessagePlayer(playerName, "Scale: " + Math.round(actualScale), level);
                 ChatUtils.sendInfoMessagePlayer(playerName, "Energy stored: " + Math.round(energy), level);
                 ChatUtils.sendInfoMessagePlayer(playerName, "Energy being used: " + Math.round(usableEnergy), level);
