@@ -2,7 +2,6 @@ package io.github.runethread.customitems.runes.functionrunes;
 
 import io.github.runethread.RuneThread;
 import io.github.runethread.customblocks.CustomBlocks;
-import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.datacomponents.StructureData;
@@ -104,7 +103,7 @@ public class CollapseRuneItem extends MainRuneItem {
     }
 
     @Override
-    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
+    public RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         String playerName = player.getName().getString();
         ResourceLocation structureName = ResourceLocation.fromNamespaceAndPath(RuneThread.MODID, playerName + "#" + nameBase);
         BlockPos center = destination.getLocation(level);
@@ -113,7 +112,7 @@ public class CollapseRuneItem extends MainRuneItem {
 
         if (!StructureUtil.saveStructure(center, size, ignoreEntities, writeToDisk, level, structureName, playerName)) {
             ChatUtils.sendErrorMessagePlayer(playerName, "ERROR CREATING STRUCTURE! Report this as a bug", level);
-            return RunicAltarEntity.RitualState.ALMOST;
+            return RitualState.ALMOST;
         }
 
         ItemStack finalStack = mainStack.copy();
@@ -123,6 +122,6 @@ public class CollapseRuneItem extends MainRuneItem {
         finalStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         InventoryUtil.dropStack(origin, level, finalStack);
 
-        return RunicAltarEntity.RitualState.SUCCESS;
+        return RitualState.SUCCESS;
     }
 }

@@ -1,6 +1,5 @@
 package io.github.runethread.customitems.runes.functionrunes;
 
-import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.util.ILocation;
 import io.github.runethread.util.runeutils.ModifierMap;
@@ -16,8 +15,8 @@ public class TransmutationRuneItem extends MainRuneItem{
     }
 
     @Override
-    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
+    public RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         // TODO function to be determined
-        return RunicAltarEntity.RitualState.SUCCESS;
+        return RitualState.SUCCESS;
     }
 }

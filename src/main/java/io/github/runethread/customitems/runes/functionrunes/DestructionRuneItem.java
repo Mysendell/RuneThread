@@ -1,6 +1,5 @@
 package io.github.runethread.customitems.runes.functionrunes;
 
-import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.util.ILocation;
 import io.github.runethread.util.runeutils.ExplosionUtil;
@@ -24,7 +23,7 @@ public class DestructionRuneItem extends MainRuneItem{
     }
 
     @Override
-    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
+    public RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         boolean damageEntities = additionalData.hasModifier(LIVING_RUNE);
         boolean dropBlocks = additionalData.hasModifier(NULL_RUNE);
         List<ResourceLocation> filter = additionalData.getAllIdentifiersOfType(BlockItem.class);
@@ -32,6 +31,6 @@ public class DestructionRuneItem extends MainRuneItem{
         ModifierRune shape = additionalData.getShape();
         ExplosionUtil.accurateExplosion(level, destination.getLocation(level), finalScale * getScale(),
                 dropBlocks, filter, reversedFilter, shape, damageEntities, getScale() * finalScale * 1.5f);
-        return RunicAltarEntity.RitualState.SUCCESS;
+        return RitualState.SUCCESS;
     }
 }

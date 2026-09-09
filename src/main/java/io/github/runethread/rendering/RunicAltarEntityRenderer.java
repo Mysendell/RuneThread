@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.runethread.customblocks.altar.RunicAltar;
 import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.CustomItems;
+import io.github.runethread.customitems.runes.functionrunes.RitualState;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.datacomponents.IndicatorData;
 import net.minecraft.client.Minecraft;
@@ -29,7 +30,7 @@ public class RunicAltarEntityRenderer implements BlockEntityRenderer<RunicAltarE
     public void render(RunicAltarEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         assert blockEntity.getLevel() != null;
         BlockState blockState = blockEntity.getLevel().getBlockState(blockEntity.getBlockPos());
-        RunicAltarEntity.RitualState ritualState = null;
+        RitualState ritualState = null;
         try {
             ritualState = blockState.getValue(RunicAltar.RITUAL_STATE);
         } catch (Exception e) {
@@ -37,7 +38,7 @@ public class RunicAltarEntityRenderer implements BlockEntityRenderer<RunicAltarE
             return;
         }
 
-        if(ritualState != RunicAltarEntity.RitualState.IDLE) {
+        if(ritualState != RitualState.IDLE) {
             Item item = CustomItems.RITUAL_INDICATOR.get();
             ItemStack stack = new ItemStack(item);
             IndicatorData indicatorData;

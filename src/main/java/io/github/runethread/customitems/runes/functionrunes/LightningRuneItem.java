@@ -1,6 +1,5 @@
 package io.github.runethread.customitems.runes.functionrunes;
 
-import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.util.AreaUtil;
@@ -20,7 +19,7 @@ public class LightningRuneItem extends MainRuneItem{
     }
 
     @Override
-    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
+    public RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         double radiusScale, strengthScale;
         radiusScale = strengthScale = finalScale;
         if (additionalData.containsKey("Scale Rune: MODIFIER")) {
@@ -42,6 +41,6 @@ public class LightningRuneItem extends MainRuneItem{
             for (int i = 0; i < finalStrength; i++)
                 EntityType.LIGHTNING_BOLT.spawn(level, pos, EntitySpawnReason.TRIGGERED).setDamage(damage);
         });
-        return RunicAltarEntity.RitualState.SUCCESS;
+        return RitualState.SUCCESS;
     }
 }

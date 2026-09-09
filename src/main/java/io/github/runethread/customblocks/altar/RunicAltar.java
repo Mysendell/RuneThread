@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.structure.StructureCenterBlock;
 import io.github.runethread.customitems.CustomItems;
+import io.github.runethread.customitems.runes.functionrunes.RitualState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -30,11 +31,11 @@ import org.jetbrains.annotations.Nullable;
 public class RunicAltar extends StructureCenterBlock {
     private static final MapCodec<RunicAltar> CODEC = simpleCodec(RunicAltar::new);
 
-    public static final EnumProperty<RunicAltarEntity.RitualState> RITUAL_STATE = EnumProperty.create("ritual_state", RunicAltarEntity.RitualState.class);
+    public static final EnumProperty<RitualState> RITUAL_STATE = EnumProperty.create("ritual_state", RitualState.class);
 
     public RunicAltar(Properties p_49224_) {
         super(p_49224_);
-        registerDefaultState(stateDefinition.any().setValue(RITUAL_STATE, RunicAltarEntity.RitualState.IDLE));
+        registerDefaultState(stateDefinition.any().setValue(RITUAL_STATE, RitualState.IDLE));
     }
 
     @Override

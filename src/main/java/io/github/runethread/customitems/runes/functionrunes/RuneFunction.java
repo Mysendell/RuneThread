@@ -1,6 +1,5 @@
 package io.github.runethread.customitems.runes.functionrunes;
 
-import io.github.runethread.customblocks.altar.RunicAltarEntity;
 import io.github.runethread.util.ILocation;
 import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
@@ -12,5 +11,5 @@ import javax.annotation.Nullable;
 
 @FunctionalInterface
 public interface RuneFunction {
-    RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData);
+    RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData);
 }

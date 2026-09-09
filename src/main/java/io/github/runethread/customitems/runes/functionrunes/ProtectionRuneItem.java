@@ -24,14 +24,14 @@ public class ProtectionRuneItem extends MainRuneItem{
     }
 
     @Override
-    public RunicAltarEntity.RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
+    public RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         int duration = (int) Math.round(20 * finalScale * getScale());
         if (destination instanceof EntityData entityData && entityData.entity(level) instanceof LivingEntity livingEntity) {
             livingEntity.addEffect(new MobEffectInstance(CustomEffects.IMMUNITY, duration));
         } else {
             RunicAltarEntity runicAltarEntity = (RunicAltarEntity) level.getBlockEntity(origin);
             if(runicAltarEntity == null)
-                return RunicAltarEntity.RitualState.ALMOST;
+                return RitualState.ALMOST;
 
             Barrier barrier = new Barrier(
                     destination.getLocation(level),
@@ -42,6 +42,6 @@ public class ProtectionRuneItem extends MainRuneItem{
             BarrierManager.addBarrier(barrier);
             runicAltarEntity.addBarrier(barrier);
         }
-        return RunicAltarEntity.RitualState.SUCCESS;
+        return RitualState.SUCCESS;
     }
 }
