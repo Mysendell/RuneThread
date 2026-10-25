@@ -12,8 +12,11 @@ import io.github.runethread.util.ChatUtils;
 import io.github.runethread.util.exceptions.CompositeRuneException;
 import io.github.runethread.util.runeutils.ModifierMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
@@ -31,6 +34,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 public class RuneEtcherEntity extends BlockEntity implements MenuProvider, ICraftingEntity {
@@ -78,8 +82,30 @@ public class RuneEtcherEntity extends BlockEntity implements MenuProvider, ICraf
     }
 
     @Override
-    public void scheduleCraftingUpdate() {
+    public void scheduleCraftingUpdate(@NotNull ItemStack stack, boolean taken, Inventory playerInv) {
         this.setChanged();
+        if(!taken && stack.getItem() instanceof CompositeRuneItem && stack.has(DataComponentRegistry.COMPOSITE_RUNE)) { // Just added a composite rune with data
+            unformComposite(stack, playerInv);
+        }
+    }
+
+    private void unformComposite(@NotNull ItemStack stack, Inventory playerInv) {
+        CompositeRuneData compositeRuneData = stack.get(DataComponentRegistry.COMPOSITE_RUNE);
+        ItemStack itemStack = circle.getStackInSlot(0);
+        playerInv.add(circle.extractItem(0, itemStack.getCount(), false));
+        circle.insertItem(0, compositeRuneData.mainRune().getDefaultInstance(), false);
+
+        Iterator<ItemStack> modifierItems = compositeRuneData.modifiers().values().iterator();
+        for(int i=1; i < circleSize; i++){
+            itemStack = circle.getStackInSlot(i);
+            playerInv.add(circle.extractItem(i, itemStack.getCount(), false));
+            if(modifierItems.hasNext()) {
+                circle.insertItem(i, modifierItems.next(), false);
+            }
+        }
+        stack.remove(DataComponentRegistry.COMPOSITE_RUNE);
+        stack.remove(DataComponents.ENCHANTMENT_GLINT_OVERRIDE);
+        stack.remove(DataComponents.MAX_STACK_SIZE);
     }
 
     @Override
@@ -98,7 +124,6 @@ public class RuneEtcherEntity extends BlockEntity implements MenuProvider, ICraf
     private void formComposite(ItemStack compositeRune) throws CompositeRuneException{
         ModifierMap modifiers = new ModifierMap();
         MainRuneItem runeItem = null;
-        int smallest = compositeRune.getCount();
         for(int i=0; i < circleSize; i++){
             ItemStack itemStack = circle.getStackInSlot(i);
             if(itemStack.is(RuneTags.Items.FUNCTION_RUNE_TAG)){
@@ -107,21 +132,41 @@ public class RuneEtcherEntity extends BlockEntity implements MenuProvider, ICraf
             }
             else if(!itemStack.isEmpty()){
                 modifiers.put(BuiltInRegistries.ITEM.getKey(itemStack.getItem()), itemStack);
-                smallest = Math.min(itemStack.getCount(), smallest);
             }
         }
-        if(runeItem == null || !modifiers.isEmpty()) throw new CompositeRuneException("Must have at least one function rune");
+        if(runeItem == null) {
+            if(!modifiers.isEmpty()) throw new CompositeRuneException("Must have at least one function rune");
+            return;
+        }
 
         CompositeRuneData compositeRuneData = new CompositeRuneData(runeItem, modifiers);
-        /*if(compositeRune.getCount() > 1){
-            ItemStack newCompositeRune = compositeRune.split(compositeRune.getCount() - smallest);
+        if(compositeRune.getCount() > 1){
+            ItemStack newCompositeRune = compositeRune.split(compositeRune.getCount() - 1);
             center.setStackInSlot(0, newCompositeRune);
-        }*/
+        }
         compositeRune.set(DataComponentRegistry.COMPOSITE_RUNE, compositeRuneData);
         compositeRune.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
-        /*for(int i=0; i < circleSize; i++){
-            circle.getStackInSlot(i).shrink(smallest);
-        }*/
+        compositeRune.set(DataComponents.MAX_STACK_SIZE, 1);
+
+        for(int i=0; i < circleSize; i++){
+            circle.extractItem(i, 1, false);
+        }
     }
 
+    @Override
+    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains("CenterRune", Tag.TAG_COMPOUND))
+            center.deserializeNBT(registries, tag.getCompound("CenterRune"));
+        if (tag.contains("CircleRunes", Tag.TAG_COMPOUND))
+            circle.deserializeNBT(registries, tag.getCompound("CircleRunes"));
+    }
+
+    @Override
+    public void saveAdditional(CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.put("CenterRune", center.serializeNBT(registries));
+        tag.put("CircleRunes", circle.serializeNBT(registries));
+
+    }
 }

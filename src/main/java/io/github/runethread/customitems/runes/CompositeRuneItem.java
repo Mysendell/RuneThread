@@ -17,7 +17,7 @@ public class CompositeRuneItem extends MainRuneItem{
         super(properties, cost, scale, scalingCost, breakChance);
     }
 
-    private CompositeRuneData getData(ItemStack compositeRuneItem){
+    private CompositeRuneData getData(ItemStack compositeRuneItem){ // TODO Ghost item in cursor while block gui is open
         CompositeRuneData data = compositeRuneItem.get(DataComponentRegistry.COMPOSITE_RUNE);
         if(data == null) throw new CompositeRuneException("No main rune set");
         return data;

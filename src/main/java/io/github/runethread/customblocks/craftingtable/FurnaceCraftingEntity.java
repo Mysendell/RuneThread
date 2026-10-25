@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
@@ -74,7 +75,7 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
         if (burnTime >= (recipeBurnTime + furnaceSpeed)) {
             if(!outputRecipe())
                 return;
-            scheduleCraftingUpdate();
+            updateRecipe();
             burnTime = 0;
         } else if(recipe != null){
             if (fuelBurnTime == 0 && !updateFuel())
@@ -143,8 +144,11 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
     }
 
     @Override
-    public void scheduleCraftingUpdate() {
-        this.setChanged();
+    public void scheduleCraftingUpdate(@NotNull ItemStack stack, boolean taken, Inventory playerInv) {
+        updateRecipe();
+    }
+
+    private void updateRecipe() {
         Optional<RecipeHolder<CraftingRecipe>> recipeOpt = canCraft(level);
         if (recipeOpt.isPresent()) {
             recipe = (SmeltingRecipe) recipeOpt.get().value();
@@ -157,6 +161,7 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
             burnTime = 0;
             recipe = null;
         }
+        this.setChanged();
     }
 
     @Override

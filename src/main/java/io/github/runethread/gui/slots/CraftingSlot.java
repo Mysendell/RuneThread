@@ -1,6 +1,7 @@
 package io.github.runethread.gui.slots;
 
 import io.github.runethread.customblocks.craftingtable.ICraftingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 public class CraftingSlot extends SlotItemHandler {
     ICraftingEntity blockEntity;
     ISlotType slotType;
+    Inventory playerInv;
 
     /**
      * Creates a crafting slot with a specific slot type
@@ -27,10 +29,11 @@ public class CraftingSlot extends SlotItemHandler {
      * @param slotType the slot type defining placement rules
      * @see ISlotType
      */
-    public CraftingSlot(IItemHandler itemHandler, int slotIndex, int x, int y, ICraftingEntity blockEntity, ISlotType slotType) {
+    public CraftingSlot(IItemHandler itemHandler, int slotIndex, int x, int y, ICraftingEntity blockEntity, ISlotType slotType, Inventory playerInv) {
         super(itemHandler, slotIndex, x, y);
         this.blockEntity = blockEntity;
         this.slotType = slotType;
+        this.playerInv = playerInv;
     }
 
     /**
@@ -41,10 +44,11 @@ public class CraftingSlot extends SlotItemHandler {
      * @param y Y position on the GUI
      * @param blockEntity the crafting entity this slot belongs to
      */
-    public CraftingSlot(IItemHandler itemHandler, int slot, int x, int y, ICraftingEntity blockEntity) {
+    public CraftingSlot(IItemHandler itemHandler, int slot, int x, int y, ICraftingEntity blockEntity, Inventory playerInv) {
         super(itemHandler, slot, x, y);
         this.blockEntity = blockEntity;
         this.slotType = null;
+        this.playerInv = playerInv;
     }
 
     @Override
@@ -60,7 +64,7 @@ public class CraftingSlot extends SlotItemHandler {
     public void set(@NotNull ItemStack stack) {
         super.set(stack);
         if (!blockEntity.getLevel().isClientSide()) {
-            blockEntity.scheduleCraftingUpdate();
+            blockEntity.scheduleCraftingUpdate(stack, false, playerInv);
         }
     }
 
@@ -72,7 +76,7 @@ public class CraftingSlot extends SlotItemHandler {
     @Override
     public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
         if (!blockEntity.getLevel().isClientSide()) {
-            blockEntity.scheduleCraftingUpdate();
+            blockEntity.scheduleCraftingUpdate(stack, true, playerInv);
         }
         super.onTake(player, stack);
     }

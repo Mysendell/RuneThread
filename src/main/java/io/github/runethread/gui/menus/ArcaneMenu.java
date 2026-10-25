@@ -26,18 +26,18 @@ public class ArcaneMenu extends AbstractMenu<ArcaneTableEntity> {
 
         addPlayerHotbar(playerInv, 8, 142, 18);
         addPlayerInventory(playerInv, 8, 84, 18, 18);
-        addArcaneTableSlots();
+        addArcaneTableSlots(playerInv);
     }
 
-    private void addArcaneTableSlots() {
-        this.addSlot(new CraftingOutputSlot(blockEntity.getOutput(), player, level, 0, 124, 35, blockEntity));
+    private void addArcaneTableSlots(Inventory playerInv) {
+        this.addSlot(new CraftingOutputSlot(blockEntity.getOutput(), player, level, 0, 124, 35, blockEntity, playerInv));
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 int index = row * 3 + col;
                 int x = 30 + col * 18;
                 int y = 17 + row * 18;
-                this.addSlot(new CraftingSlot(inventory, index, x, y, blockEntity));
+                this.addSlot(new CraftingSlot(inventory, index, x, y, blockEntity, playerInv));
             }
         }
     }

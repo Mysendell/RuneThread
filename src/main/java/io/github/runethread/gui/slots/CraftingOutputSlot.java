@@ -1,6 +1,7 @@
 package io.github.runethread.gui.slots;
 
 import io.github.runethread.customblocks.craftingtable.CraftingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -28,8 +29,8 @@ public class CraftingOutputSlot extends CraftingSlot {
      * @param y the y position of the slot on the GUI
      * @param blockEntity the crafting entity this slot belongs to
      */
-    public CraftingOutputSlot(IItemHandler itemHandler, Player player, Level level, int slotIndex, int x, int y, CraftingEntity blockEntity) {
-        super(itemHandler, slotIndex, x, y, blockEntity);
+    public CraftingOutputSlot(IItemHandler itemHandler, Player player, Level level, int slotIndex, int x, int y, CraftingEntity blockEntity, Inventory playerInv) {
+        super(itemHandler, slotIndex, x, y, blockEntity, playerInv);
         this.blockEntity = blockEntity;
         this.level = level;
         this.player = player;

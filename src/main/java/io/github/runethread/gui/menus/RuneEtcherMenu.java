@@ -33,10 +33,10 @@ public class RuneEtcherMenu extends AbstractMenu<RuneEtcherEntity> {
 
         addPlayerHotbar(playerInv, 32, 185, 18);
         addPlayerInventory(playerInv, 32, 127, 18, 18);
-        addEtcherSlots();
+        addEtcherSlots(playerInv);
     }
 
-    private void addEtcherSlots() {
+    private void addEtcherSlots(Inventory playerInv) {
         /*
             BIG 104 53
             104 15 Top
@@ -50,9 +50,9 @@ public class RuneEtcherMenu extends AbstractMenu<RuneEtcherEntity> {
          */
         int[][] pos = {{104, 15}, {134, 24}, {143, 53}, {133, 82}, {104, 91}, {75, 82}, {66, 53}, {75, 24}};
         for(int i = 0; i < 8; i++){
-            this.addSlot(new CraftingSlot(circle, i, pos[i][0], pos[i][1], blockEntity));
+            this.addSlot(new CraftingSlot(circle, i, pos[i][0], pos[i][1], blockEntity, playerInv));
         }
-        this.addSlot(new OutputSlot(center, level, 0, 104, 53, blockEntity, true));
+        this.addSlot(new OutputSlot(center, level, 0, 104, 53, blockEntity, true, playerInv));
     }
 
     @Override
