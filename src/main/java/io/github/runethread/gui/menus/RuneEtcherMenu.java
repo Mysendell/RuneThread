@@ -52,7 +52,7 @@ public class RuneEtcherMenu extends AbstractMenu<RuneEtcherEntity> {
         for(int i = 0; i < 8; i++){
             this.addSlot(new CraftingSlot(circle, i, pos[i][0], pos[i][1], blockEntity, playerInv));
         }
-        this.addSlot(new OutputSlot(center, level, 0, 104, 53, blockEntity, true, playerInv));
+        this.addSlot(new OutputSlot(center, 0, 104, 53, blockEntity, true, playerInv));
     }
 
     @Override

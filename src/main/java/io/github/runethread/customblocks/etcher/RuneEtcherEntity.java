@@ -4,7 +4,6 @@ import io.github.runethread.customTags.RuneTags;
 import io.github.runethread.customblocks.CustomBlockEntities;
 import io.github.runethread.customblocks.craftingtable.ICraftingEntity;
 import io.github.runethread.customitems.runes.CompositeRuneItem;
-import io.github.runethread.customitems.runes.MainRuneItem;
 import io.github.runethread.datacomponents.CompositeRuneData;
 import io.github.runethread.datacomponents.DataComponentRegistry;
 import io.github.runethread.gui.menus.RuneEtcherMenu;
@@ -30,6 +29,7 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,9 +82,9 @@ public class RuneEtcherEntity extends BlockEntity implements MenuProvider, ICraf
     }
 
     @Override
-    public void scheduleCraftingUpdate(@NotNull ItemStack stack, boolean taken, Inventory playerInv) {
+    public void scheduleCraftingUpdate(@NotNull ItemStack stack, boolean taken, Inventory playerInv, IItemHandler itemHandler) {
         this.setChanged();
-        if(!taken && stack.getItem() instanceof CompositeRuneItem && stack.has(DataComponentRegistry.COMPOSITE_RUNE)) { // Just added a composite rune with data
+        if(!taken && itemHandler == center && (center.getStackInSlot(0).getItem() instanceof CompositeRuneItem) && stack.has(DataComponentRegistry.COMPOSITE_RUNE)) { // Just added a composite rune with data
             unformComposite(stack, playerInv);
         }
     }
@@ -93,7 +93,7 @@ public class RuneEtcherEntity extends BlockEntity implements MenuProvider, ICraf
         CompositeRuneData compositeRuneData = stack.get(DataComponentRegistry.COMPOSITE_RUNE);
         ItemStack itemStack = circle.getStackInSlot(0);
         playerInv.add(circle.extractItem(0, itemStack.getCount(), false));
-        circle.insertItem(0, compositeRuneData.mainRune().getDefaultInstance(), false);
+        circle.insertItem(0, compositeRuneData.mainRune(), false);
 
         Iterator<ItemStack> modifierItems = compositeRuneData.modifiers().values().iterator();
         for(int i=1; i < circleSize; i++){
@@ -105,11 +105,11 @@ public class RuneEtcherEntity extends BlockEntity implements MenuProvider, ICraf
         }
         stack.remove(DataComponentRegistry.COMPOSITE_RUNE);
         stack.remove(DataComponents.ENCHANTMENT_GLINT_OVERRIDE);
-        stack.remove(DataComponents.MAX_STACK_SIZE);
+        stack.set(DataComponents.MAX_STACK_SIZE, stack.getItem().getDefaultMaxStackSize());
     }
 
     @Override
-    public void doCraft(Level level, @NotNull ItemStack stack, Player player) {
+    public void doCraft(@NotNull ItemStack stack, Player player) {
         if (level.isClientSide) return;
         ServerLevel serverLevel = (ServerLevel) level;
         try {
@@ -123,12 +123,12 @@ public class RuneEtcherEntity extends BlockEntity implements MenuProvider, ICraf
 
     private void formComposite(ItemStack compositeRune) throws CompositeRuneException{
         ModifierMap modifiers = new ModifierMap();
-        MainRuneItem runeItem = null;
+        ItemStack runeItem = null;
         for(int i=0; i < circleSize; i++){
             ItemStack itemStack = circle.getStackInSlot(i);
             if(itemStack.is(RuneTags.Items.FUNCTION_RUNE_TAG)){
                 if(runeItem != null) throw new CompositeRuneException("Only one function rune allowed");
-                runeItem = (MainRuneItem) itemStack.getItem();
+                runeItem = itemStack;
             }
             else if(!itemStack.isEmpty()){
                 modifiers.put(BuiltInRegistries.ITEM.getKey(itemStack.getItem()), itemStack);

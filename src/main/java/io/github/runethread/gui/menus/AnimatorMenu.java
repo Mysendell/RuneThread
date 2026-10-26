@@ -3,7 +3,6 @@ package io.github.runethread.gui.menus;
 import io.github.runethread.customblocks.craftingtable.animator.AnimatorCraftingEntity;
 import io.github.runethread.gui.AbstractMenu;
 import io.github.runethread.gui.slots.CraftingSlot;
-import io.github.runethread.gui.slots.OutputSlot;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -78,7 +77,7 @@ public class AnimatorMenu extends AbstractMenu<AnimatorCraftingEntity> {
     }
 
     private void addAnimatorTableSlots(Inventory playerInv) {
-        this.addSlot(new OutputSlot(output, level, 0, 98, 39, blockEntity, false, playerInv));
+        this.addSlot(new CraftingSlot(output, 0, 98, 39, blockEntity, false, playerInv));
         this.addSlot(new CraftingSlot(input, 0, 17, 21, blockEntity, playerInv));
         this.addSlot(new SlotItemHandler(fuel, 0, 17, 57));
         this.addSlot(new CraftingSlot(lifeEnergy, 0, 44, 21, blockEntity, playerInv));

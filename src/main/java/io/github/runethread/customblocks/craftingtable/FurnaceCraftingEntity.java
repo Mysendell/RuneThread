@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -144,7 +145,7 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
     }
 
     @Override
-    public void scheduleCraftingUpdate(@NotNull ItemStack stack, boolean taken, Inventory playerInv) {
+    public void scheduleCraftingUpdate(@NotNull ItemStack stack, boolean taken, Inventory playerInv, IItemHandler itemHandler) {
         updateRecipe();
     }
 
@@ -190,6 +191,6 @@ public abstract class FurnaceCraftingEntity extends BlockEntity implements ICraf
         return fuelBurnTime;
     }
 
-    public void doCraft(Level level, @NotNull ItemStack stack, Player player){}
+    public void doCraft(@NotNull ItemStack stack, Player player){}
 }
 

@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,7 +57,7 @@ public abstract class CraftingEntity extends BlockEntity implements ICraftingEnt
     protected abstract Optional<RecipeHolder<CraftingRecipe>> getRecipeOpt(Level level, CraftingInput input);
 
     @Override
-    public void doCraft(Level level, @NotNull ItemStack stack, Player player) {
+    public void doCraft(@NotNull ItemStack stack, Player player) {
         if (level.isClientSide) return;
         int[] countMap = recipe.getIngredientCountMap();
         removeCraftingItems(width, height, input, countMap, worldPosition, level);
@@ -64,7 +65,7 @@ public abstract class CraftingEntity extends BlockEntity implements ICraftingEnt
         tryCraft(level);
     }
 
-    public void doCraftShift(Level level, Player player) {
+    public void doCraftShift(Player player) {
         ItemStack preview = output.getStackInSlot(0);
         if (preview.isEmpty()) return;
 
@@ -89,7 +90,7 @@ public abstract class CraftingEntity extends BlockEntity implements ICraftingEnt
     }
 
     @Override
-    public void scheduleCraftingUpdate(@NotNull ItemStack stack, boolean taken, Inventory playerInv) {
+    public void scheduleCraftingUpdate(@NotNull ItemStack stack, boolean taken, Inventory playerInv, IItemHandler itemHandler) {
         tryCraft(level);
         this.setChanged();
     }

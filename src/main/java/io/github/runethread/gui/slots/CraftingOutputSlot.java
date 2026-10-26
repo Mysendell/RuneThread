@@ -4,7 +4,6 @@ import io.github.runethread.customblocks.craftingtable.CraftingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,23 +15,21 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CraftingOutputSlot extends CraftingSlot {
     private final CraftingEntity blockEntity;
-    private final Level level;
     private final Player player;
 
     /**
      * Creates a new CraftingOutputSlot.
+     *
      * @param itemHandler the item handler assigned to this slot
-     * @param player the player interacting with the GUI
-     * @param level the level the block entity is in
-     * @param slotIndex the slot index inside that item handler
-     * @param x the x position of the slot on the GUI
-     * @param y the y position of the slot on the GUI
+     * @param player      the player interacting with the GUI
+     * @param slotIndex   the slot index inside that item handler
+     * @param x           the x position of the slot on the GUI
+     * @param y           the y position of the slot on the GUI
      * @param blockEntity the crafting entity this slot belongs to
      */
-    public CraftingOutputSlot(IItemHandler itemHandler, Player player, Level level, int slotIndex, int x, int y, CraftingEntity blockEntity, Inventory playerInv) {
+    public CraftingOutputSlot(IItemHandler itemHandler, Player player, int slotIndex, int x, int y, CraftingEntity blockEntity, Inventory playerInv) {
         super(itemHandler, slotIndex, x, y, blockEntity, playerInv);
         this.blockEntity = blockEntity;
-        this.level = level;
         this.player = player;
     }
 
@@ -48,7 +45,7 @@ public class CraftingOutputSlot extends CraftingSlot {
      */
     @Override
     public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
-        blockEntity.doCraft(level, stack, player);
+        blockEntity.doCraft(stack, player);
         super.onTake(player, stack);
     }
 
@@ -59,7 +56,7 @@ public class CraftingOutputSlot extends CraftingSlot {
      */
     @Override
     public void onQuickCraft(@NotNull ItemStack stack, int amount) {
-        blockEntity.doCraftShift(level, player);
+        blockEntity.doCraftShift(player);
         super.onQuickCraft(stack, amount);
     }
 }

@@ -27,36 +27,36 @@ public class CompositeRuneItem extends MainRuneItem{
     public RitualState perform(ServerLevel level, ServerPlayer player, ItemStack mainStack, double finalScale, ILocation destination, @Nullable ILocation reference, BlockPos origin, ModifierMap additionalData) {
         CompositeRuneData data = getData(mainStack);
         additionalData.putAll(data.modifiers());
-        return data.mainRune().perform(level, player, mainStack, finalScale, destination, reference, origin, additionalData);
+        return ((MainRuneItem) data.mainRune().getItem()).perform(level, player, data.mainRune(), finalScale, destination, reference, origin, additionalData);
     }
 
     @Override
     public int getCost(ItemStack compositeRuneItem) {
         CompositeRuneData data = getData(compositeRuneItem);
-        return getCost() + data.mainRune().getCost();
+        return getCost() + ((MainRuneItem) data.mainRune().getItem()).getCost();
     }
 
     @Override
     public double getScale(ItemStack compositeRuneItem) {
         CompositeRuneData data = getData(compositeRuneItem);
-        return getScale() + data.mainRune().getScale();
+        return getScale() + ((MainRuneItem) data.mainRune().getItem()).getScale();
     }
 
     @Override
     public double getScalingCost(ItemStack compositeRuneItem) {
         CompositeRuneData data = getData(compositeRuneItem);
-        return getScalingCost() + data.mainRune().getScalingCost();
+        return getScalingCost() + ((MainRuneItem) data.mainRune().getItem()).getScalingCost();
     }
 
     @Override
     public double getBreakChance(ItemStack compositeRuneItem) {
         CompositeRuneData data = getData(compositeRuneItem);
-        return getScalingCost() + data.mainRune().getScalingCost();
+        return getScalingCost() + ((MainRuneItem) data.mainRune().getItem()).getScalingCost();
     }
 
     @Override
     public boolean requiresReference(ItemStack compositeRuneItem) {
         CompositeRuneData data = getData(compositeRuneItem);
-        return data.mainRune().requiresReference();
+        return ((MainRuneItem) data.mainRune().getItem()).requiresReference();
     }
 }

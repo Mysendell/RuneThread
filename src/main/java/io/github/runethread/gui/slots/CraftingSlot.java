@@ -37,6 +37,23 @@ public class CraftingSlot extends SlotItemHandler {
     }
 
     /**
+     * Creates a crafting slot with a specific slot type
+     * @param itemHandler the item handler assigned to this slot
+     * @param slotIndex the slot index inside that item handler
+     * @param x X position on the GUI
+     * @param y Y position on the GUI
+     * @param blockEntity the crafting entity this slot belongs to
+     * @param mayPlace If any item may be placed in this slot
+     * @see ISlotType
+     */
+    public CraftingSlot(IItemHandler itemHandler, int slotIndex, int x, int y, ICraftingEntity blockEntity, boolean mayPlace, Inventory playerInv) {
+        super(itemHandler, slotIndex, x, y);
+        this.blockEntity = blockEntity;
+        this.slotType = stack -> mayPlace;
+        this.playerInv = playerInv;
+    }
+
+    /**
      * Creates a crafting slot with no placement restrictions
      * @param itemHandler the item handler assigned to this slot
      * @param slot the slot index inside that item handler
@@ -64,7 +81,7 @@ public class CraftingSlot extends SlotItemHandler {
     public void set(@NotNull ItemStack stack) {
         super.set(stack);
         if (!blockEntity.getLevel().isClientSide()) {
-            blockEntity.scheduleCraftingUpdate(stack, false, playerInv);
+            blockEntity.scheduleCraftingUpdate(stack, false, playerInv, getItemHandler());
         }
     }
 
@@ -76,7 +93,7 @@ public class CraftingSlot extends SlotItemHandler {
     @Override
     public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
         if (!blockEntity.getLevel().isClientSide()) {
-            blockEntity.scheduleCraftingUpdate(stack, true, playerInv);
+            blockEntity.scheduleCraftingUpdate(stack, true, playerInv, getItemHandler());
         }
         super.onTake(player, stack);
     }

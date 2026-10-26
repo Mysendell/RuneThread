@@ -88,7 +88,7 @@ public class DataComponentRegistry {
                     "composite_rune",
                     builder -> builder.persistent(RecordCodecBuilder.create(instance ->
                             instance.group(
-                                    ResourceLocation.CODEC.fieldOf("mainRune").forGetter(CompositeRuneData::mainRuneString),
+                                    ItemStack.CODEC.fieldOf("mainRune").forGetter(CompositeRuneData::mainRune),
                                     Codec.unboundedMap(ResourceLocation.CODEC, ItemStack.CODEC).xmap(ModifierMap::new, mod -> mod).fieldOf("modifiers").forGetter(CompositeRuneData::modifiers)
                                     ).apply(instance, CompositeRuneData::new)
                     ))

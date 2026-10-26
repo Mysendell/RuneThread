@@ -30,7 +30,7 @@ public class ArcaneMenu extends AbstractMenu<ArcaneTableEntity> {
     }
 
     private void addArcaneTableSlots(Inventory playerInv) {
-        this.addSlot(new CraftingOutputSlot(blockEntity.getOutput(), player, level, 0, 124, 35, blockEntity, playerInv));
+        this.addSlot(new CraftingOutputSlot(blockEntity.getOutput(), player, 0, 124, 35, blockEntity, playerInv));
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
